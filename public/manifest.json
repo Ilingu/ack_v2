@@ -1,0 +1,33 @@
+{
+  "name": "AnimChecker",
+  "short_name": "ACK",
+  "description": "List of your anime",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "IconAck192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "maskable_Icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "IconAck.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

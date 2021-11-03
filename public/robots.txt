@@ -1,0 +1,11 @@
+# Groupe 1
+User-agent: Googlebot
+Disallow: /IconAck.png
+Disallow: /IconAck192.png
+Disallow: /manifest.json
+Disallow: /maskable_Icon.png
+Disallow: /api
+
+# Groupe 2
+User-agent: *
+Allow: /
