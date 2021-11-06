@@ -1,10 +1,17 @@
 import Head from "next/head";
+import React, { FC } from "react";
 
-export default function MetaTags({
+interface Props {
+  title?: string;
+  description: string;
+  image?: string;
+}
+
+const MetaTags: FC<Props> = ({
   title = "ACK:Anim-Checker",
   description = "Make your list of Anime",
   image = null,
-}) {
+}) => {
   return (
     <Head>
       <title>{title}</title>
@@ -21,4 +28,5 @@ export default function MetaTags({
       )}
     </Head>
   );
-}
+};
+export default MetaTags;
