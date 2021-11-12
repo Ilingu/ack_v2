@@ -1,12 +1,16 @@
 import { FC } from "react";
+import AuthCheck from "../components/AuthCheck";
 // UI
 import MetaTags from "../components/Metatags";
 
+/* Components */
 const Home: FC = () => {
   return (
-    <div>
-      <MetaTags description="Home Page, Your anime list" />
-    </div>
+    <AuthCheck>
+      <div>
+        <MetaTags description="Home Page, Your anime list" />
+      </div>
+    </AuthCheck>
   );
 };
 

@@ -20,7 +20,7 @@ class MyDocument extends Document {
           <meta name="author" content="Ilingu ©" />
           <meta name="robots" content="index, follow" />
         </Head>
-        <body>
+        <body className="bg-gray-800">
           <Main />
           <NextScript />
         </body>

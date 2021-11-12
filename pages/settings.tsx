@@ -1,9 +1,13 @@
 import React, { FC } from "react";
+import AuthCheck from "../components/AuthCheck";
 
-interface SettingsProps {}
-
-const Settings: FC<SettingsProps> = ({}) => {
-  return <div></div>;
+/* Components */
+const Settings: FC = () => {
+  return (
+    <AuthCheck>
+      <div></div>
+    </AuthCheck>
+  );
 };
 
 export default Settings;

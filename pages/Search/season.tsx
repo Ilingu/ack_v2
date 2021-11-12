@@ -1,9 +1,20 @@
 import React, { FC } from "react";
+import { GetStaticProps } from "next";
 
+/* Interface */
 interface SeasonAnimeProps {}
 
-// Page for the season anime
+/* ISR */
+export const getStaticProps: GetStaticProps = async () => {
+  // Page for the season anime -> fetch from API
 
+  return {
+    props: { anime: null },
+    revalidate: 10000,
+  };
+};
+
+/* Components */
 const SeasonAnime: FC<SeasonAnimeProps> = ({}) => {
   return <div></div>;
 };

@@ -1,37 +1,39 @@
 import React, { FC } from "react";
-import { GetStaticProps, GetServerSideProps } from "next";
+import { GetStaticProps, GetStaticPaths } from "next";
+// UI
+import AuthCheck from "../../components/AuthCheck";
 
 /* Interface */
 interface AnimeProps {}
 
-/* SSG */
-
+/* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   // Router
   // Get anime from firebase
-
-  return {
-    props: {
-      anime: null,
-    },
-  };
-};
-
-/* SSR */
-
-export const getServerSideProps: GetServerSideProps = async () => {
   // Get user anime progress
 
   return {
-    props: {
-      anime: null,
-    },
+    props: { anime: null },
+    revalidate: 60000,
+  };
+};
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Get all anime name from DB
+
+  return {
+    paths: null,
+    fallback: "blocking",
   };
 };
 
+/* Components */
 const WatchAnime: FC<AnimeProps> = ({}) => {
-  // Get user anime progress -> SSR then Rehydrate with Realtime
-  return <div></div>;
+  // Get user anime progress -> ISR then Rehydrate with Realtime
+  return (
+    <AuthCheck>
+      <div></div>
+    </AuthCheck>
+  );
 };
 
 export default WatchAnime;

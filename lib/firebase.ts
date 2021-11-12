@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, useDeviceLanguage } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Init
@@ -21,3 +22,6 @@ if (!getApps().length) {
 
 export const auth = getAuth();
 export const db = getFirestore();
+
+// Config
+useDeviceLanguage(auth);

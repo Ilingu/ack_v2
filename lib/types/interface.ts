@@ -1,6 +1,5 @@
-// Example
-export interface Anime {
-  episodes: number;
-  score: number;
-  // ...
+export interface UserShape {
+  displayName: string;
+  photoURL: string;
+  username: string;
 }

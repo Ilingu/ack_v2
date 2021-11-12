@@ -1,11 +1,16 @@
-import { PropsChildren } from "../lib/types/types";
+import Link from "next/link";
+// Ctx
+import { useContext } from "react";
+import { UserContext } from "../lib/context";
 
-interface Props {
-  children: PropsChildren;
-}
+const AuthCheck = ({ children }) => {
+  const { user, username } = useContext(UserContext);
 
-const AuthCheck = ({ children }: Props) => {
-  return children;
+  return user && username ? (
+    children
+  ) : (
+    <Link href="/sign-up">You must be signed in!</Link>
+  );
 };
 
 export default AuthCheck;
