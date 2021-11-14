@@ -7,8 +7,14 @@ import {
   useState,
   useCallback,
 } from "react";
+import Image from "next/image";
 // Auth
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  TwitterAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import debounce from "lodash.debounce";
@@ -20,9 +26,13 @@ import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { FaTwitter, FaSignOutAlt } from "react-icons/fa";
 import { AiFillGithub } from "react-icons/ai";
+// Types
+import { ConnMethods } from "../lib/types/types";
 
 /* Var */
-const provider = new GoogleAuthProvider();
+const GoogleProvider = new GoogleAuthProvider();
+const TwitterProvider = new TwitterAuthProvider();
+const GithubProvider = new GithubAuthProvider();
 
 /* Components */
 const SignUpPage: FC = () => {
@@ -64,11 +74,18 @@ function SignOutButton() {
 }
 
 function SignInButton() {
-  const signInWithGoogle = async () => {
+  const signIn = async (method: ConnMethods) => {
     try {
-      await signInWithPopup(auth, provider);
+      await signInWithPopup(
+        auth,
+        method === "google"
+          ? GoogleProvider
+          : method === "twitter"
+          ? TwitterProvider
+          : GithubProvider
+      );
       toast.success(
-        `Welcome ${auth.currentUser.displayName}! Sign in successfully`
+        `Welcome ${auth.currentUser.displayName}! Successfully Sign in with ${method}.`
       );
     } catch (err) {
       toast.error("Error in authentification.");
@@ -78,27 +95,36 @@ function SignInButton() {
 
   return (
     <Fragment>
-      <header className="mb-14 -mt-20">
+      <header className="mb-14 -mt-14 flex flex-col items-center">
+        <Image
+          src="/IconAck192.png"
+          alt="Icon"
+          width={48}
+          height={48}
+          className="bg-gray-700 rounded-full"
+        />
         <h1 className="text-center text-4xl font-bold mb-6">Sign In/Up</h1>
-        <hr />
+        <div className="w-full h-0.5 bg-white rounded-sm"></div>
       </header>
-      <aside className="shadow-2xl w-3/4 py-5 rounded-lg flex flex-col justify-center items-center">
+      <aside className="shadow-2xl w-3/4 h-1/3 py-2 rounded-lg flex flex-col justify-evenly items-center">
         <button
-          onClick={signInWithGoogle}
+          onClick={() => signIn("google")}
           className="py-2 px-2 bg-gray-100 rounded text-gray-900 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-6"
+          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-4"
         >
           <FcGoogle className="inline" /> Google
         </button>
         <button
+          onClick={() => signIn("twitter")}
           className="py-2 px-2 bg-gray-100 rounded text-gray-900 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-6"
+          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-4"
         >
           <FaTwitter className="inline text-blue-500" /> Twitter
         </button>
         <button
+          onClick={() => signIn("github")}
           className="py-2 px-2 bg-gray-800 rounded text-gray-50 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-800 hover:bg-gray-600 transition text-xl w-5/6 font-semibold mb-6"
+          focus:ring-gray-800 hover:bg-gray-600 transition text-xl w-5/6 font-semibold"
         >
           <AiFillGithub className="inline" /> Github
         </button>
