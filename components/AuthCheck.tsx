@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 // Ctx
@@ -10,12 +10,18 @@ import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
 const AuthCheck = ({ children }) => {
   const { user, username } = useContext(UserContext);
   const router = useRouter();
+  const ClearTimeout = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
-    setTimeout(() => {
-      router.push("/sign-up");
-    }, 15000);
-  }, []);
+    if (user && username)
+      return ClearTimeout.current.forEach((Timeout) => clearTimeout(Timeout));
+    ClearTimeout.current = [
+      ...ClearTimeout.current,
+      setTimeout(() => {
+        router.push("/sign-up");
+      }, 15000),
+    ];
+  }, [user, username]);
 
   return user && username ? (
     children
