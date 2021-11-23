@@ -4,11 +4,12 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 // Ctx
 import { UserContext } from "../lib/context";
-// Icons
+// UI
 import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
+import Loader from "./Loader";
 
 const AuthCheck = ({ children }) => {
-  const { user, username } = useContext(UserContext);
+  const { user, username, reqFinished } = useContext(UserContext);
   const router = useRouter();
   const ClearTimeout = useRef<NodeJS.Timeout[]>([]);
 
@@ -23,7 +24,17 @@ const AuthCheck = ({ children }) => {
     ];
   }, [user, username]);
 
-  return user && username ? (
+  return !reqFinished ? (
+    <div className="flex flex-col justify-center items-center h-screen text-center ">
+      <h1 className="font-bold text-xl text-gray-50 bg-gray-700 py-4 px-4 rounded-md">
+        <Loader show />
+        <span className="text-primary hover:text-yellow-300 transition">
+          Connecting
+        </span>{" "}
+        to your account
+      </h1>
+    </div>
+  ) : user && username ? (
     children
   ) : (
     <div className="flex flex-col justify-center items-center h-screen text-center">

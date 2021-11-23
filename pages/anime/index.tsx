@@ -32,6 +32,7 @@ export const getStaticProps: GetServerSideProps = async () => {
 
 /* Components */
 const SearchPage: FC<SearchPageProps> = ({ anime }) => {
+  console.log(anime);
   return <div></div>;
 };
 

@@ -8,6 +8,7 @@ import { UserShape } from "./types/interface";
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
   const [usernameState, setUsername] = useState<string>(null);
+  const [reqFinished, setFinished] = useState(false);
 
   useEffect(() => {
     let unsubscribe;
@@ -19,19 +20,22 @@ export function useUserData() {
           if (doc.exists()) {
             const { username } = doc.data() as UserShape;
             username && setUsername(username);
+            username || setUsername(null);
           } else {
             setUsername(null);
           }
+          setFinished(true);
         });
 
         setUser(user);
       } else {
         setUser(null);
+        setFinished(true);
       }
     });
 
     return unsubscribe;
   }, []);
 
-  return { user, username: usernameState };
+  return { user, username: usernameState, reqFinished };
 }

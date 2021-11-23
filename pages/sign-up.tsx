@@ -41,7 +41,7 @@ const SignUpPage: FC = () => {
   return (
     <Fragment>
       <MetaTags title="ACK:Sign up" description="Sign up Page for ACK" />
-      <div className="w-screen h-screen flex flex-col justify-center items-center">
+      <main className="w-screen h-screen flex flex-col justify-center items-center">
         <div className="bg-gray-700 text-primary h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
           {user ? (
             !username ? (
@@ -53,7 +53,7 @@ const SignUpPage: FC = () => {
             <SignInButton />
           )}
         </div>
-      </div>
+      </main>
     </Fragment>
   );
 };

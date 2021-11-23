@@ -5,7 +5,7 @@ import AuthCheck from "../components/AuthCheck";
 const Settings: FC = () => {
   return (
     <AuthCheck>
-      <div></div>
+      <main></main>
     </AuthCheck>
   );
 };

@@ -7,9 +7,9 @@ import MetaTags from "../components/Metatags";
 const Home: FC = () => {
   return (
     <AuthCheck>
-      <div>
+      <main>
         <MetaTags description="Home Page, Your anime list" />
-      </div>
+      </main>
     </AuthCheck>
   );
 };
