@@ -1,8 +1,8 @@
 import React, { FC } from "react";
 import { GetServerSideProps } from "next";
 // FB
-import { doc, getDoc } from "@firebase/firestore";
-import { db } from "../../lib/firebase";
+import { collection, getDocs } from "@firebase/firestore";
+import { db, postToJSON } from "../../lib/firebase";
 // Types
 import { AnimeShape } from "../../lib/types/interface";
 
@@ -15,24 +15,22 @@ import { AnimeShape } from "../../lib/types/interface";
 
 /* Interface */
 interface SearchPageProps {
-  anime: AnimeShape;
+  animes: AnimeShape;
 }
 
 /* SSR */
-export const getStaticProps: GetServerSideProps = async () => {
-  let anime = null;
-  const animesRef = doc(db, "animes");
-  const AnimesSnap = await getDoc(animesRef);
+export const getServerSideProps: GetServerSideProps = async () => {
+  const animesRef = collection(db, "animes");
+  const animes = (await getDocs(animesRef))?.docs?.map(postToJSON) || [];
 
-  if (AnimesSnap.exists()) anime = AnimesSnap.data();
   return {
-    props: { anime },
+    props: { animes },
   };
 };
 
 /* Components */
-const SearchPage: FC<SearchPageProps> = ({ anime }) => {
-  console.log(anime);
+const SearchPage: FC<SearchPageProps> = ({ animes }) => {
+  console.log(animes);
   return <div></div>;
 };
 

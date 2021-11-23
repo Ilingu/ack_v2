@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, useDeviceLanguage } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, DocumentSnapshot } from "firebase/firestore";
 
 // Init
 const firebaseConfig = {
@@ -23,5 +23,15 @@ if (!getApps().length) {
 export const auth = getAuth();
 export const db = getFirestore();
 
-// Config
-useDeviceLanguage(auth);
+// Utility Func
+
+/**`
+ * Converts a firestore doc to JSON
+ * @param  {DocumentSnapshot} doc
+ */
+export function postToJSON(doc: DocumentSnapshot) {
+  const data = doc.data();
+  return {
+    ...data,
+  };
+}
