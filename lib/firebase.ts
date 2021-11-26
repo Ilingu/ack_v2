@@ -35,3 +35,7 @@ export function postToJSON(doc: DocumentSnapshot) {
     ...data,
   };
 }
+
+export const removeDuplicates = (ary: any[]) => {
+  return [...Array.from(new Set(ary))];
+};

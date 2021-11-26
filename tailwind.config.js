@@ -1,10 +1,13 @@
 module.exports = {
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
-  darkMode: "media", // or 'media' or 'class'
+  darkMode: "class", // or 'media' or 'class'
   theme: {
     extend: {
       colors: {
         primary: "#fbbf24", // yellow-500
+      },
+      gridTemplateRows: {
+        12: "repeat(12, minmax(0, 1fr))",
       },
       backgroundImage: {
         // "ack-logo-sign-up": "url('/IconAck192.png')",

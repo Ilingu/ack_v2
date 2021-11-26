@@ -20,6 +20,7 @@ import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import debounce from "lodash.debounce";
 // UI
 import MetaTags from "../components/Metatags";
+import Divider from "../components/Divider";
 import { UserContext } from "../lib/context";
 import toast from "react-hot-toast";
 // Icon
@@ -104,7 +105,7 @@ function SignInButton() {
           className="bg-gray-700 rounded-full"
         />
         <h1 className="text-center text-4xl font-bold mb-6">Sign In/Up</h1>
-        <div className="w-full h-0.5 bg-white rounded-sm"></div>
+        <Divider />
       </header>
       <aside className="shadow-2xl w-3/4 h-1/3 py-2 rounded-lg flex flex-col justify-evenly items-center">
         <button

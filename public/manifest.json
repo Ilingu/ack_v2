@@ -26,6 +26,7 @@
     }
   ],
   "start_url": ".",
+  "id": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
