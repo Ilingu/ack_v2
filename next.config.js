@@ -1,6 +1,9 @@
 const withPWA = require("next-pwa");
 
 module.exports = withPWA({
+  images: {
+    domains: ["cdn.myanimelist.net"],
+  },
   pwa: {
     dest: "public",
     register: true,

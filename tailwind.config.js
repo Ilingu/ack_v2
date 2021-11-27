@@ -25,9 +25,8 @@ module.exports = {
       gridTemplateRows: {
         12: "repeat(12, minmax(0, 1fr))",
       },
-      // backgroundImage: {
-      //   // "ack-logo-sign-up": "url('/IconAck192.png')",
-      // },
+
+      // EnableVariant
       ringWidth: ["hover", "active"],
       ringColor: ["hover", "active"],
       backgroundColor: ["active"],

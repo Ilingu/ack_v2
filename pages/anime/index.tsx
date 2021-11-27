@@ -1,7 +1,9 @@
 import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 // UI
+import MetaTags from "../../components/Metatags";
 import Divider from "../../components/Divider";
 import AnimePoster from "../../components/Poster/SearchPoster";
 // FB
@@ -12,6 +14,7 @@ import {
   JikanApiToAnimeShape,
   postToJSON,
   removeDuplicates,
+  removeParamsFromPhotoUrl,
 } from "../../lib/utilityfunc";
 // Types
 import {
@@ -20,16 +23,11 @@ import {
   JikanApiResSearchAnime,
   PosterSearchData,
 } from "../../lib/types/interface";
-import MetaTags from "../../components/Metatags";
+import { SeeAnimeInfoFunc } from "../../lib/types/types";
 // Icon
 import { FaSearch, FaGlobe } from "react-icons/fa";
-
-// Form to search Anime (also the page for add an anime)
-// Btn add (pre-result)
-// Search -> query from anime props (SSR), decompose sentence into words, and search also for the all sentence
-// If no result or no user pertinent choice: API
-// If user click on API request made anime -> /Search/$anime_name?is_api=true
-// -> like that [anime].tsx will go faster in GetStaticProps
+import { template } from "../../lib/template";
+import { SearchPosterContext } from "../../lib/context";
 
 /* Interface */
 interface SearchPageProps {
@@ -42,6 +40,7 @@ interface AnimeFoundListProps {
   animeFound: PosterSearchData[];
   reqTitle: string;
   Submit: SubmitShape;
+  SeeAnimeInfo: SeeAnimeInfoFunc;
 }
 type SubmitShape = (title: string, api?: boolean) => void;
 
@@ -51,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const animes =
     (await getDocs(animesRef))?.docs
       ?.map(postToJSON)
-      .filter((dt) => !dt.AllNames) || [];
+      .filter((dt) => !dt.AllAnimeId) || [];
 
   return {
     props: {
@@ -62,10 +61,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 /* Components */
 const SearchPage: FC<SearchPageProps> = ({ animes }) => {
+  const push = useRouter().push;
+
   const [{ animesFound, reqTitle }, setResSearch] = useState<{
     animesFound: PosterSearchData[];
     reqTitle: string;
-  }>(() => ({ animesFound: null, reqTitle: null }));
+  }>(() => ({ animesFound: template, reqTitle: "Black Clover" }));
 
   const Submit = useCallback(
     async (title: string, api: boolean = false) => {
@@ -74,15 +75,17 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
       if (api) {
         const JikanDataToPosterData = (JikanObj: JikanApiResSearchAnime[]) =>
           JikanObj.map(
-            ({ type, title, image_url, score }): PosterSearchData => ({
+            ({ type, title, image_url, score, mal_id }): PosterSearchData => ({
               title,
               OverallScore: score,
-              photoPath: image_url,
+              photoPath: removeParamsFromPhotoUrl(image_url),
               type,
+              malId: mal_id,
+              api: true,
             })
           );
         const req = await fetch(
-          `https://api.jikan.moe/v3/search/anime?q=${title}&limit=64`
+          `https://api.jikan.moe/v3/search/anime?q=${title}&limit=16`
         );
         const { results: animesRes }: JikanApiResSearch = await req.json();
         const ToAnimeShape = JikanDataToPosterData(animesRes);
@@ -92,11 +95,19 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
 
       const AnimeShapeToPosterData = (JikanObj: AnimeShape[]) =>
         JikanObj.map(
-          ({ type, title, photoPath, OverallScore }): PosterSearchData => ({
+          ({
+            type,
+            title,
+            photoPath,
+            OverallScore,
+            malId,
+          }): PosterSearchData => ({
             title,
             OverallScore,
-            photoPath,
+            photoPath: removeParamsFromPhotoUrl(photoPath),
             type,
+            malId,
+            api: false,
           })
         );
       const filterIt = (searchKey: string) => {
@@ -127,6 +138,11 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
     [animes]
   );
 
+  const SeeAnimeInfo = useCallback((mal_id: number, api: boolean) => {
+    push(`/anime/${mal_id}${api ? "?from_api=true" : ""}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Fragment>
       <MetaTags
@@ -139,6 +155,7 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
           animeFound={animesFound}
           reqTitle={reqTitle}
           Submit={Submit}
+          SeeAnimeInfo={SeeAnimeInfo}
         />
       </main>
     </Fragment>
@@ -191,9 +208,14 @@ function FormInput({ Submit }: FormInputProps) {
   );
 }
 
-function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
+function AnimeFoundList({
+  animeFound,
+  reqTitle,
+  Submit,
+  SeeAnimeInfo,
+}: AnimeFoundListProps) {
   return (
-    <div className="flex flex-col justify-evenly items-center row-span-9">
+    <div className="row-span-9">
       {reqTitle && (
         <h1 className="text-2xl font-semibold text-headline">
           Résultats pour{" "}
@@ -202,14 +224,20 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
           {animeFound?.length > 0 || (
             <p
               onClick={() => Submit(reqTitle, true)}
-              className="text-lg text-center text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
+              className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
             >
               Chercher Globalement <FaGlobe className="inline text-thirdly" />
             </p>
           )}
         </h1>
       )}
-      {animeFound && <AnimePoster AnimeToTransform={animeFound} />}
+      {animeFound && (
+        <div className="grid grid-cols-7 gap-2">
+          <SearchPosterContext.Provider value={{ reqTitle, SeeAnimeInfo }}>
+            <AnimePoster AnimeToTransform={animeFound} />
+          </SearchPosterContext.Provider>
+        </div>
+      )}
     </div>
   );
 }

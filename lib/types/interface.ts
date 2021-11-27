@@ -11,6 +11,8 @@ export interface PosterSearchData {
   photoPath: string;
   OverallScore: number;
   type: AnimeType;
+  malId: number;
+  api: boolean;
 }
 /* AnimeDB */
 export interface AnimeShape {
@@ -32,6 +34,7 @@ export interface AnimeShape {
   Genre: GenreShape[];
   Theme: GenreShape[];
   nbEp: number;
+  malId: number;
 }
 export interface AnimeContentShape {
   Episodes?: EpisodesShape;

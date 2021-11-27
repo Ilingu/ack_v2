@@ -10,3 +10,4 @@ export type AnimeStatusType =
   | "completed"
   | "to_be_aired"
   | "upcoming";
+export type SeeAnimeInfoFunc = (mal_id: number, api: boolean) => void;

@@ -8,11 +8,20 @@ import { useRouter } from "next/router";
 interface AnimeInfoProps {}
 
 /* SSG */
-export const getStaticProps: GetStaticProps = async () => {
-  // Router
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { animeid } = params as { animeid: string };
+  const [animeId, fromApi] = animeid.split("?from_api=");
+
+  if (fromApi) {
+    // API Req+send to fb
+    return {
+      props: { anime: null },
+    };
+  }
+
   // Get anime from firebase OR API
   // If anime does not exist nor in db nor in API -> 404
-  // If /anime_name?is_api=true -> get anime directly on API because index.tsx already know that anime doesn't exist
+  // If /anime_id?is_api=true -> get anime directly on API because index.tsx already know that anime doesn't exist
 
   return {
     props: { anime: null },
