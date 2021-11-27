@@ -3,7 +3,7 @@ import Metatags from "../components/Metatags";
 
 export default function Custom404() {
   return (
-    <main className="flex flex-col justify-center items-center text-gray-50 h-screen">
+    <main className="flex flex-col justify-center items-center text-headline h-screen">
       <Metatags title="404 Page Not Found!" description="404 Page" />
       <h1 className="text-6xl mb-2 font-mono text-red-500 font-bold">404</h1>
       <h2 className="text-3xl mb-2 font-semibold">
@@ -18,8 +18,8 @@ export default function Custom404() {
       ></iframe>
       <Link href="/" passHref>
         <button
-          className="py-2 px-2 bg-primary mt-2 w-32 rounded-lg text-gray-900 font-bold hover:bg-yellow-500 
-        hover:text-gray-800 transition outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2"
+          className="py-2 px-2 bg-primary mt-2 w-32 rounded-lg text-gray-900 font-bold hover:bg-secondary
+        hover:text-bgMain transition outline-none focus:ring-2 focus:bg-secondary focus:ring-offset-2"
         >
           Go home
         </button>

@@ -3,14 +3,26 @@ import { GetServerSideProps } from "next";
 import debounce from "lodash.debounce";
 // UI
 import Divider from "../../components/Divider";
+import AnimePoster from "../../components/Poster/SearchPoster";
 // FB
 import { collection, getDocs } from "@firebase/firestore";
-import { db, postToJSON, removeDuplicates } from "../../lib/firebase";
+import { db } from "../../lib/firebase";
+// Utility Func
+import {
+  JikanApiToAnimeShape,
+  postToJSON,
+  removeDuplicates,
+} from "../../lib/utilityfunc";
 // Types
-import { AnimeShape } from "../../lib/types/interface";
+import {
+  AnimeShape,
+  JikanApiResSearch,
+  JikanApiResSearchAnime,
+  PosterSearchData,
+} from "../../lib/types/interface";
 import MetaTags from "../../components/Metatags";
 // Icon
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaGlobe } from "react-icons/fa";
 
 // Form to search Anime (also the page for add an anime)
 // Btn add (pre-result)
@@ -23,11 +35,23 @@ import { FaSearch } from "react-icons/fa";
 interface SearchPageProps {
   animes: AnimeShape[];
 }
+interface FormInputProps {
+  Submit: SubmitShape;
+}
+interface AnimeFoundListProps {
+  animeFound: PosterSearchData[];
+  reqTitle: string;
+  Submit: SubmitShape;
+}
+type SubmitShape = (title: string, api?: boolean) => void;
 
 /* SSR */
 export const getServerSideProps: GetServerSideProps = async () => {
   const animesRef = collection(db, "animes");
-  const animes = (await getDocs(animesRef))?.docs?.map(postToJSON) || [];
+  const animes =
+    (await getDocs(animesRef))?.docs
+      ?.map(postToJSON)
+      .filter((dt) => !dt.AllNames) || [];
 
   return {
     props: {
@@ -38,11 +62,43 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 /* Components */
 const SearchPage: FC<SearchPageProps> = ({ animes }) => {
-  const Submit = useCallback(
-    (title: string) => {
-      if (typeof title !== "string") return;
-      const keyWords = title.split(" ");
+  const [{ animesFound, reqTitle }, setResSearch] = useState<{
+    animesFound: PosterSearchData[];
+    reqTitle: string;
+  }>(() => ({ animesFound: null, reqTitle: null }));
 
+  const Submit = useCallback(
+    async (title: string, api: boolean = false) => {
+      if (typeof title !== "string" || title.length < 3) return;
+
+      if (api) {
+        const JikanDataToPosterData = (JikanObj: JikanApiResSearchAnime[]) =>
+          JikanObj.map(
+            ({ type, title, image_url, score }): PosterSearchData => ({
+              title,
+              OverallScore: score,
+              photoPath: image_url,
+              type,
+            })
+          );
+        const req = await fetch(
+          `https://api.jikan.moe/v3/search/anime?q=${title}&limit=64`
+        );
+        const { results: animesRes }: JikanApiResSearch = await req.json();
+        const ToAnimeShape = JikanDataToPosterData(animesRes);
+        setResSearch({ animesFound: ToAnimeShape, reqTitle: title });
+        return;
+      }
+
+      const AnimeShapeToPosterData = (JikanObj: AnimeShape[]) =>
+        JikanObj.map(
+          ({ type, title, photoPath, OverallScore }): PosterSearchData => ({
+            title,
+            OverallScore,
+            photoPath,
+            type,
+          })
+        );
       const filterIt = (searchKey: string) => {
         const strEquality = (base: string) =>
           base.includes(searchKey.toLowerCase());
@@ -63,17 +119,10 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
         });
       };
 
-      const resultAllAnime = removeDuplicates(filterIt(title));
-      let resultKeyWord: AnimeShape[] = []; // Result by keyWord is useless because of .includes -> To remove
-      keyWords.forEach((keyword) => {
-        resultKeyWord = [
-          ...resultKeyWord,
-          ...filterIt(keyword),
-        ] as AnimeShape[];
-      });
-      resultKeyWord = removeDuplicates(resultKeyWord);
-
-      console.log(resultAllAnime, resultKeyWord);
+      const resultAnimesFound = AnimeShapeToPosterData(
+        removeDuplicates(filterIt(title))
+      );
+      setResSearch({ animesFound: resultAnimesFound, reqTitle: title });
     },
     [animes]
   );
@@ -86,13 +135,17 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
       />
       <main className="h-screen py-2 px-2 grid grid-rows-12">
         <FormInput Submit={Submit} />
-        <Result />
+        <AnimeFoundList
+          animeFound={animesFound}
+          reqTitle={reqTitle}
+          Submit={Submit}
+        />
       </main>
     </Fragment>
   );
 };
 
-function FormInput({ Submit }) {
+function FormInput({ Submit }: FormInputProps) {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
@@ -104,36 +157,61 @@ function FormInput({ Submit }) {
   const checkWritting = useCallback(
     debounce(
       (titleArgs: string) =>
-        titleArgs.trim().length >= 2 && Submit(titleArgs.trim().toLowerCase()),
+        titleArgs.trim().length >= 3 && Submit(titleArgs.trim().toLowerCase()),
       600
     ),
     []
   );
 
   return (
-    <form
-      onSubmit={Submit}
-      className="flex flex-col justify-evenly items-center row-span-3"
-    >
-      <h1 className="tracking-wider text-5xl font-bold text-gray-50 mb-6">
+    <form className="flex flex-col justify-evenly items-center row-span-3">
+      <h1 className="tracking-wider text-5xl font-bold text-headline">
         <FaSearch className="inline" /> Find your{" "}
-        <span className="text-primary">anime</span>
+        <span className="text-primary-darker">anime</span>
       </h1>
       <input
         type="text"
         placeholder="Bungo Stray Dogs"
-        className="w-2/3 bg-gray-900 h-16 rounded-md text-center text-2xl text-gray-50 font-semibold px-2 outline-none 
-        focus:ring-2 focus:ring-offset-2 focus:ring-white transition"
+        className="w-2/3 bg-bgi-darker h-16 rounded-md text-center text-2xl text-headline font-semibold px-2 outline-none 
+        focus:ring-2 focus:ring-primary-whiter transition"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
+      <p className="text-description font-semibold tracking-wide">
+        <span className="text-base">Aucun résultats pertinent ?</span>{" "}
+        <span
+          onClick={() => Submit(title, true)}
+          className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
+        >
+          Chercher Globalement <FaGlobe className="inline text-thirdly" />
+        </span>
+      </p>
       <Divider />
     </form>
   );
 }
 
-function Result() {
-  return <div className="row-span-9"></div>;
+function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
+  return (
+    <div className="flex flex-col justify-evenly items-center row-span-9">
+      {reqTitle && (
+        <h1 className="text-2xl font-semibold text-headline">
+          Résultats pour{" "}
+          <span className="text-primary-main">&quot;{reqTitle}&quot;</span> (
+          {animeFound?.length})
+          {animeFound?.length > 0 || (
+            <p
+              onClick={() => Submit(reqTitle, true)}
+              className="text-lg text-center text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
+            >
+              Chercher Globalement <FaGlobe className="inline text-thirdly" />
+            </p>
+          )}
+        </h1>
+      )}
+      {animeFound && <AnimePoster AnimeToTransform={animeFound} />}
+    </div>
+  );
 }
 
 export default SearchPage;

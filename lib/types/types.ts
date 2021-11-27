@@ -4,7 +4,7 @@ export type PropsChildren = ReactNode | ReactNode[];
 
 export type ConnMethods = "google" | "twitter" | "github";
 
-export type AnimeType = "tv" | "ova" | "movie" | "special" | "ona" | "music";
+export type AnimeType = "TV" | "OVA" | "Movie" | "Special" | "ONA" | "Music";
 export type AnimeStatusType =
   | "airing"
   | "completed"

@@ -43,7 +43,7 @@ const SignUpPage: FC = () => {
     <Fragment>
       <MetaTags title="ACK:Sign up" description="Sign up Page for ACK" />
       <main className="w-screen h-screen flex flex-col justify-center items-center">
-        <div className="bg-gray-700 text-primary h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
+        <div className="bg-bgi-whiter text-primary-main h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
           {user ? (
             !username ? (
               <UsernameForm />
@@ -62,10 +62,12 @@ const SignUpPage: FC = () => {
 function SignOutButton() {
   return (
     <Fragment>
-      <h1 className="font-bold text-2xl tracking-wide">Already Sign-in!</h1>
+      <h1 className="font-semibold text-3xl tracking-wide text-headline">
+        Already Sign-in!
+      </h1>
       <button
         onClick={() => auth.signOut()}
-        className="mt-4 py-2 px-2 bg-red-400 text-gray-50 font-semibold text-lg rounded-md"
+        className="mt-4 py-2 px-2 bg-red-400 w-1/3 text-headline font-semibold text-lg rounded-md"
       >
         <FaSignOutAlt className="inline" />
         Sign Out
@@ -102,30 +104,30 @@ function SignInButton() {
           alt="Icon"
           width={48}
           height={48}
-          className="bg-gray-700 rounded-full"
+          className="rounded-full"
         />
         <h1 className="text-center text-4xl font-bold mb-6">Sign In/Up</h1>
         <Divider />
       </header>
-      <aside className="shadow-2xl w-3/4 h-1/3 py-2 rounded-lg flex flex-col justify-evenly items-center">
+      <aside className="shadow-2xl bg-bgi-main w-3/4 h-1/3 py-2 rounded-lg flex flex-col justify-evenly items-center">
         <button
           onClick={() => signIn("google")}
-          className="py-2 px-2 bg-gray-100 rounded text-gray-900 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-4"
+          className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
+          focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
         >
           <FcGoogle className="inline" /> Google
         </button>
         <button
           onClick={() => signIn("twitter")}
-          className="py-2 px-2 bg-gray-100 rounded text-gray-900 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-100 hover:bg-gray-300 transition text-xl w-5/6 font-semibold mb-4"
+          className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
+          focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
         >
           <FaTwitter className="inline text-blue-500" /> Twitter
         </button>
         <button
           onClick={() => signIn("github")}
-          className="py-2 px-2 bg-gray-800 rounded text-gray-50 outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-gray-800 hover:bg-gray-600 transition text-xl w-5/6 font-semibold"
+          className="py-2 px-2 bg-bgi-darker rounded text-headline outline-none focus:ring-4 
+          focus:ring-headline hover:bg-gray-600 transition text-xl w-5/6 font-semibold"
         >
           <AiFillGithub className="inline" /> Github
         </button>
@@ -209,7 +211,7 @@ function UsernameForm() {
           placeholder="username"
           value={formValue}
           onChange={onChange}
-          className="w-full py-2 pl-2 rounded-lg text-xl outline-none text-black focus:ring-4 focus:ring-offset-2 focus:ring-yellow-400 transition"
+          className="w-full py-2 pl-2 rounded-lg text-xl outline-none text-black focus:ring-4 focus:ring-offset-2 focus:ring-primary-main transition"
         />
 
         <UsernameMessage
@@ -237,9 +239,11 @@ function UsernameForm() {
           </button>
         </div>
 
-        <h3 className="font-semibold text-lg text-gray-50 mt-4">Debug State</h3>
+        <h3 className="font-semibold text-lg text-headline mt-4">
+          Debug State
+        </h3>
         <hr className="w-1/2" />
-        <div className="text-gray-50">
+        <div className="text-headline">
           Username:{" "}
           <span className="text-gray-300 font-medium">{formValue}</span>
           <br />

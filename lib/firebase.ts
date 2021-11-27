@@ -22,20 +22,3 @@ if (!getApps().length) {
 
 export const auth = getAuth();
 export const db = getFirestore();
-
-// Utility Func
-
-/**`
- * Converts a firestore doc to JSON
- * @param  {DocumentSnapshot} doc
- */
-export function postToJSON(doc: DocumentSnapshot) {
-  const data = doc.data();
-  return {
-    ...data,
-  };
-}
-
-export const removeDuplicates = (ary: any[]) => {
-  return [...Array.from(new Set(ary))];
-};

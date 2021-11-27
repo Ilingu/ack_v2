@@ -4,14 +4,30 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#fbbf24", // yellow-500
+        // Flashy Colors
+        primary: {
+          darker: "#4e44ce",
+          main: "rgb(99, 102, 241)",
+          whiter: "#7770d0",
+        },
+        secondary: "#3b82f680",
+        // Main Colors
+        headline: "#ffffff",
+        description: "#ffffff99",
+        black: "rgb(17, 24, 39)",
+        // BackGround
+        bgi: {
+          darker: "rgb(34, 34, 34)",
+          main: "rgb(44, 45, 48)",
+          whiter: "rgb(53, 54, 58)",
+        },
       },
       gridTemplateRows: {
         12: "repeat(12, minmax(0, 1fr))",
       },
-      backgroundImage: {
-        // "ack-logo-sign-up": "url('/IconAck192.png')",
-      },
+      // backgroundImage: {
+      //   // "ack-logo-sign-up": "url('/IconAck192.png')",
+      // },
       ringWidth: ["hover", "active"],
       ringColor: ["hover", "active"],
       backgroundColor: ["active"],

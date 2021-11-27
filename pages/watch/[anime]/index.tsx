@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 // UI
-import AuthCheck from "../../components/AuthCheck";
+import AuthCheck from "../../../components/AuthCheck";
 
 /* Interface */
 interface AnimeProps {}
