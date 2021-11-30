@@ -11,7 +11,6 @@ import { collection, getDocs } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // Utility Func
 import {
-  JikanApiToAnimeShape,
   postToJSON,
   removeDuplicates,
   removeParamsFromPhotoUrl,
@@ -26,7 +25,6 @@ import {
 import { SeeAnimeInfoFunc } from "../../lib/types/types";
 // Icon
 import { FaSearch, FaGlobe } from "react-icons/fa";
-import { template } from "../../lib/template";
 import { SearchPosterContext } from "../../lib/context";
 
 /* Interface */
@@ -66,7 +64,7 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
   const [{ animesFound, reqTitle }, setResSearch] = useState<{
     animesFound: PosterSearchData[];
     reqTitle: string;
-  }>(() => ({ animesFound: template, reqTitle: "Black Clover" }));
+  }>({ animesFound: [], reqTitle: "" });
 
   const Submit = useCallback(
     async (title: string, api: boolean = false) => {
@@ -81,7 +79,6 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
               photoPath: removeParamsFromPhotoUrl(image_url),
               type,
               malId: mal_id,
-              api: true,
             })
           );
         const req = await fetch(
@@ -107,7 +104,6 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
             photoPath: removeParamsFromPhotoUrl(photoPath),
             type,
             malId,
-            api: false,
           })
         );
       const filterIt = (searchKey: string) => {
@@ -138,8 +134,8 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
     [animes]
   );
 
-  const SeeAnimeInfo = useCallback((mal_id: number, api: boolean) => {
-    push(`/anime/${mal_id}${api ? "?from_api=true" : ""}`);
+  const SeeAnimeInfo = useCallback((mal_id: number) => {
+    push(`/anime/${mal_id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -181,7 +177,10 @@ function FormInput({ Submit }: FormInputProps) {
   );
 
   return (
-    <form className="flex flex-col justify-evenly items-center row-span-3">
+    <form
+      onSubmit={(e) => e.preventDefault()}
+      className="flex flex-col justify-evenly items-center row-span-3"
+    >
       <h1 className="tracking-wider text-5xl font-bold text-headline">
         <FaSearch className="inline" /> Find your{" "}
         <span className="text-primary-darker">anime</span>

@@ -34,7 +34,7 @@ function AnimeItem({ animeData }: AnimeItemProps) {
   return (
     <div
       className="cursor-pointer relative"
-      onClick={() => SeeAnimeInfo(animeData.malId, animeData.api)}
+      onClick={() => SeeAnimeInfo(animeData.malId)}
     >
       <div className="relative group">
         <Image

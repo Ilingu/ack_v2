@@ -1,5 +1,10 @@
 import { AnimeStatusType, AnimeType } from "./types";
 
+// Others
+export interface AnimeConfigPathsIdShape {
+  AllAnimeId: string[];
+}
+/* User */
 export interface UserShape {
   displayName: string;
   photoURL: string;
@@ -12,7 +17,6 @@ export interface PosterSearchData {
   OverallScore: number;
   type: AnimeType;
   malId: number;
-  api: boolean;
 }
 /* AnimeDB */
 export interface AnimeShape {
@@ -21,19 +25,20 @@ export interface AnimeShape {
   photoPath: string;
   OverallScore: number;
   ScoredBy: number;
-  content: AnimeContentShape;
+  content?: AnimeContentShape;
   Airing: boolean;
   Status: AnimeStatusType;
   ReleaseDate: string;
   AgeRating: string;
   Synopsis: string;
   trailer_url: string;
-  MoreInformation: string;
+  MalPage: string;
   type: AnimeType;
   Studios: StudiosShape[];
   Genre: GenreShape[];
   Theme: GenreShape[];
   nbEp: number;
+  duration: string;
   malId: number;
 }
 export interface AnimeContentShape {
@@ -91,10 +96,10 @@ export interface JikanApiResAnime {
   title_english: string;
   title_japanese: string;
   title_synonyms: string[];
-  type: string;
+  type: AnimeType;
   source: string;
   episodes: number;
-  status: string;
+  status: AnimeStatusType | number;
   airing: boolean;
   aired: Aired;
   duration: string;

@@ -1,51 +1,114 @@
-import React, { FC } from "react";
+import React, { FC, Fragment } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
-// Anime Info Result From Search -> OneAnim on V1
-// If anime don't existe, -> API call -> put data on "/anime" FB
+// Type
+import {
+  AnimeShape,
+  JikanApiResAnime,
+  AnimeConfigPathsIdShape,
+} from "../../lib/types/interface";
+import { JikanApiToAnimeShape, postToJSON } from "../../lib/utilityfunc";
+// FB
+import { doc, getDoc, writeBatch } from "@firebase/firestore";
+import { db } from "../../lib/firebase";
+// UI
+import MetaTags from "../../components/Metatags";
 
 /* Interface */
-interface AnimeInfoProps {}
+interface AnimeInfoProps {
+  animeData: AnimeShape;
+}
 
 /* SSG */
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const { animeid } = params as { animeid: string };
-  const [animeId, fromApi] = animeid.split("?from_api=");
+  const { animeid: animeId } = params as { animeid: string };
 
-  if (fromApi) {
-    // API Req+send to fb
+  // Check on FB
+  const animeFBRef = doc(db, "animes", animeId);
+  const animeFB = await getDoc(animeFBRef);
+  if (animeFB.exists()) {
     return {
-      props: { anime: null },
+      props: { animeData: postToJSON(animeFB) }, // Exists on FB
     };
   }
 
-  // Get anime from firebase OR API
-  // If anime does not exist nor in db nor in API -> 404
-  // If /anime_id?is_api=true -> get anime directly on API because index.tsx already know that anime doesn't exist
+  // Does not exists on FB -> API Req
+  let animeData: AnimeShape;
+  try {
+    const req = await fetch(`https://api.jikan.moe/v3/anime/${animeId}`);
+    const animeRes: JikanApiResAnime = await req.json();
+
+    if (animeRes && animeRes.status !== 404) {
+      animeData = JikanApiToAnimeShape(animeRes);
+      // Send To FB
+      const batch = writeBatch(db);
+
+      const newAnimesRef = doc(db, "animes", animeId);
+      batch.set(newAnimesRef, animeData);
+
+      const animesConfigPathsRef = doc(db, "animes", "animes-config");
+      const animesConfigPaths = (
+        await getDoc(animesConfigPathsRef)
+      ).data() as AnimeConfigPathsIdShape;
+      const newAnimeConfigPaths = {
+        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
+      };
+      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+
+      await batch.commit();
+    } else {
+      return {
+        notFound: true,
+      };
+    }
+  } catch (err) {
+    console.log(err);
+
+    return {
+      notFound: true,
+    };
+  }
 
   return {
-    props: { anime: null },
+    props: { animeData },
   };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // Get all anime name from DB
+  // Get all anime path name from DB
+  const animesPaths = (
+    await getDoc(doc(db, "animes", "animes-config"))
+  ).data() as AnimeConfigPathsIdShape;
+
+  const paths = animesPaths.AllAnimeId.map((doc) => ({
+    params: { animeid: doc },
+  }));
+
   return {
-    paths: null,
+    paths,
     fallback: true, // If anime isn't cache in DB yet
   };
 };
 
 /* Components */
-const AnimeInfo: FC<AnimeInfoProps> = ({}) => {
+const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
   const router = useRouter();
+  const { title, photoPath } = animeData;
 
-  // If the page cacheless is not yet generated, this will be displayed
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
 
-  return <div></div>;
+  return (
+    <Fragment>
+      <MetaTags
+        title={title}
+        description={`${title} anime info page`}
+        image={photoPath}
+      />
+      <div></div>
+    </Fragment>
+  );
 };
 
 export default AnimeInfo;
