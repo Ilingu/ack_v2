@@ -11,6 +11,7 @@ import { collection, getDocs } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // Utility Func
 import {
+  callApi,
   postToJSON,
   removeDuplicates,
   removeParamsFromPhotoUrl,
@@ -81,10 +82,10 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
               malId: mal_id,
             })
           );
-        const req = await fetch(
+        // Request to api
+        const { results: animesRes }: JikanApiResSearch = await callApi(
           `https://api.jikan.moe/v3/search/anime?q=${title}&limit=16`
         );
-        const { results: animesRes }: JikanApiResSearch = await req.json();
         const ToAnimeShape = JikanDataToPosterData(animesRes);
         setResSearch({ animesFound: ToAnimeShape, reqTitle: title });
         return;

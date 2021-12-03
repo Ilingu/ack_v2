@@ -8,7 +8,7 @@ module.exports = {
         primary: {
           darker: "#4e44ce",
           main: "rgb(99, 102, 241)",
-          whiter: "#7770d0",
+          whiter: "rgb(153, 155, 255)",
         },
         secondary: "#3b82f680",
         // Main Colors

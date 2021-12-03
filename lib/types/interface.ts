@@ -48,6 +48,9 @@ export interface AnimeContentShape {
 export interface EpisodesShape {}
 export interface StudiosShape {
   name: string;
+  mal_id: number;
+  type: string;
+  url: string;
 }
 export interface GenreShape {
   name: string;

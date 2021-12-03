@@ -1,10 +1,30 @@
 import { DocumentSnapshot } from "@firebase/firestore";
-import {
-  AnimeShape,
-  JikanApiResAnime,
-  JikanApiResSearchAnime,
-} from "./types/interface";
+import { AnimeShape, JikanApiResAnime } from "./types/interface";
 import { AnimeStatusType } from "./types/types";
+
+/**
+ * Is the string a valid url (https://www.example.com)
+ * @param {URL} url
+ * @returns true | false
+ */
+export function isValidUrl(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Get Data with SWR
+ * @param {URL} url
+ */
+export async function callApi(url: string) {
+  if (!isValidUrl(url)) return;
+  const req = await fetch(url);
+  return await req.json();
+}
 
 /**
  * Converts a firestore doc to JSON

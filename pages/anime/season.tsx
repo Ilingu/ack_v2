@@ -7,6 +7,7 @@ interface SeasonAnimeProps {}
 /* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   // Page for the season anime -> fetch from API
+  // With params: ?season= ?year=
 
   return {
     props: { anime: null },
