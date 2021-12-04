@@ -1,5 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { FC, Fragment, useCallback } from "react";
+import React, {
+  FC,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 // Type
@@ -8,7 +15,10 @@ import {
   JikanApiResAnime,
   AnimeConfigPathsIdShape,
   StudiosShape,
+  TagsShape,
+  AlternativeTitleShape,
 } from "../../lib/types/interface";
+import { AnimeWatchType } from "../../lib/types/enums";
 import { JikanApiToAnimeShape, postToJSON } from "../../lib/utilityfunc";
 // FB
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
@@ -21,6 +31,16 @@ import { FaCalendarAlt, FaFilm, FaInfo, FaStar, FaTv } from "react-icons/fa";
 /* Interface */
 interface AnimeInfoProps {
   animeData: AnimeShape;
+}
+interface SpecialInfoProps {
+  AgeRating: string;
+  AlternativeTitle: AlternativeTitleShape;
+  duration: string;
+}
+
+interface TagsAnimesProps {
+  Genres: TagsShape[];
+  Themes: TagsShape[];
 }
 
 /* SSG */
@@ -109,6 +129,12 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
     Airing,
     Studios,
     Synopsis,
+    Genre,
+    Theme,
+    trailer_url,
+    AgeRating,
+    AlternativeTitle,
+    duration,
   } = animeData || {};
   const ScoredByTransform = useCallback((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
@@ -187,15 +213,153 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                   />
                 </p>
               </div>
+              <TagsAnime Genres={Genre} Themes={Theme} />
+              <SpecialInfo
+                AgeRating={AgeRating}
+                AlternativeTitle={AlternativeTitle}
+                duration={duration}
+              />
+              <MyAnimes />
             </div>
           </div>
         </section>
-        <section className="bg-bgi-whiter w-5/6"></section>
+        {/* Trailer */}
+        <section className="bg-bgi-whiter w-5/6 flex flex-col items-center rounded-xl py-4">
+          <h1 className="text-4xl font-bold tracking-wider text-headline mb-8">
+            Trailer:
+          </h1>
+          <iframe
+            width="560"
+            height="315"
+            className="rounded-xl ring-primary-main ring-4"
+            src={trailer_url}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </section>
+        {/* Episodes */}
         <section className="w-5/6"></section>
+        {/* Recommendation: anime/${id}/recommendations */}
+        <section className="w-5/6 bg-bgi-whiter"></section>
       </div>
     </Fragment>
   );
 };
+
+function MyAnimes() {
+  const {
+    WATCHING,
+    WATCHED,
+    UNWATCHED,
+    STALLED,
+    WANT_TO_WATCH,
+    WONT_WATCH,
+    DROPPED,
+  } = AnimeWatchType;
+  const [SelectValue, setSelectValue] = useState(UNWATCHED);
+  const FirstEffectSkipped = useRef(false);
+
+  useEffect(() => {
+    if (!FirstEffectSkipped.current) {
+      FirstEffectSkipped.current = true;
+      return;
+    }
+    // Action Change to FB
+  }, [SelectValue]);
+
+  return (
+    <div className="flex justify-center mb-4">
+      <div className="w-2/3">
+        <p className="text-headline font-bold text-xl tracking-wide">
+          MY ANIME:
+        </p>
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex justify-center"
+        >
+          <select
+            value={SelectValue}
+            onChange={(e) => setSelectValue(e.target.value as AnimeWatchType)}
+            className="w-full bg-bgi-black text-headline text-center text-2xl outline-none focus:ring-2 focus:ring-primary-main
+             rounded-lg py-3 px-1 transition"
+          >
+            <option value={UNWATCHED}>❌ Unwatched</option>
+            <option value={WATCHING}>👀 Whatching</option>
+            <option value={WATCHED}>✅ Watched</option>
+            <option value={WANT_TO_WATCH}>⌚ Want to Watch</option>
+            <option value={STALLED}>🙃 Stalled</option>
+            <option value={DROPPED}>🚮 Dropped</option>
+            <option value={WONT_WATCH}>⛔ Won&apos;t Watch</option>
+          </select>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function SpecialInfo({
+  AgeRating,
+  AlternativeTitle,
+  duration,
+}: SpecialInfoProps) {
+  const TagsSpecialInfoData = [
+    AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
+    ...Object.keys(AlternativeTitle).map((key) => AlternativeTitle[key]),
+    `${duration.split(" ")[0]} Min/Eps`,
+  ];
+
+  const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
+    <SpecialInfoItem dataToShow={data} key={i} />
+  ));
+
+  return (
+    <div className="flex justify-center">
+      <div className="w-2/3">
+        <p className="text-headline font-bold text-lg">Special info:</p>
+        <div className="flex justify-center flex-wrap">{TagsSpecialInfo}</div>
+      </div>
+    </div>
+  );
+}
+
+function SpecialInfoItem({ dataToShow }: { dataToShow: string }) {
+  return (
+    <div className="text-headline cursor-default font-bold py-2 px-2 mr-2 bg-bgi-black rounded-lg mb-2 hover:text-primary-whiter hover:bg-bgi-darker transition">
+      {dataToShow}
+    </div>
+  );
+}
+
+function TagsAnime({ Genres, Themes }: TagsAnimesProps) {
+  const Tags = [...Genres, ...Themes].map(({ name, url }, i) => (
+    <TagsAnimeItem key={i} name={name} url={url} />
+  ));
+
+  return (
+    <div className="flex justify-center">
+      <div className="mt-4 w-2/3">
+        <p className="text-headline font-bold text-lg">Tags:</p>
+        <div className="flex justify-center flex-wrap">{Tags}</div>
+      </div>
+    </div>
+  );
+}
+
+function TagsAnimeItem({ name, url }: { name: string; url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="text-headline font-bold py-2 px-2 mr-2 bg-bgi-black rounded-lg mb-2 cursor-pointer hover:text-primary-whiter
+       hover:bg-bgi-darker transition"
+    >
+      {name}
+    </a>
+  );
+}
 
 function SynopsisComponent({ Synopsis }: { Synopsis: string }) {
   return (

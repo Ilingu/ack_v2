@@ -17,6 +17,7 @@ module.exports = {
         black: "rgb(17, 24, 39)",
         // BackGround
         bgi: {
+          black: "rgb(28, 28, 28)",
           darker: "rgb(34, 34, 34)",
           main: "rgb(44, 45, 48)",
           whiter: "rgb(53, 54, 58)",

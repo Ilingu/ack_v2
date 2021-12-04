@@ -35,8 +35,8 @@ export interface AnimeShape {
   MalPage: string;
   type: AnimeType;
   Studios: StudiosShape[];
-  Genre: GenreShape[];
-  Theme: GenreShape[];
+  Genre: TagsShape[];
+  Theme: TagsShape[];
   nbEp: number;
   duration: string;
   malId: number;
@@ -51,9 +51,6 @@ export interface StudiosShape {
   mal_id: number;
   type: string;
   url: string;
-}
-export interface GenreShape {
-  name: string;
 }
 export interface AlternativeTitleShape {
   title_english: string;
@@ -121,10 +118,10 @@ export interface JikanApiResAnime {
   producers: Producer[];
   licensors: Licensor[];
   studios: Studio[];
-  genres: Genre[];
+  genres: TagsShape[];
   explicit_genres: any[];
   demographics: Demographic[];
-  themes: Theme[];
+  themes: TagsShape[];
   opening_themes: string[];
   ending_themes: string[];
   external_links: ExternalLink[];
@@ -226,13 +223,6 @@ export interface Studio {
   url: string;
 }
 
-export interface Genre {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
 export interface Demographic {
   mal_id: number;
   type: string;
@@ -240,7 +230,7 @@ export interface Demographic {
   url: string;
 }
 
-export interface Theme {
+export interface TagsShape {
   mal_id: number;
   type: string;
   name: string;

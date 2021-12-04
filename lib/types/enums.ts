@@ -1,4 +1,10 @@
 // Example
-export enum test {
-  TEST = "test",
+export enum AnimeWatchType {
+  UNWATCHED = "unwatched",
+  WATCHED = "watched",
+  WATCHING = "watching",
+  WANT_TO_WATCH = "want_to_watch",
+  STALLED = "stalled",
+  WONT_WATCH = "wont_watch",
+  DROPPED = "dropped",
 }
