@@ -25,7 +25,8 @@ export interface AnimeShape {
   photoPath: string;
   OverallScore: number;
   ScoredBy: number;
-  content?: AnimeContentShape;
+  EpisodesData?: JikanApiResAnimeEpisodes[];
+  Recommendations: JikanApiResAnimeRecommandations[];
   Airing: boolean;
   Status: AnimeStatusType;
   ReleaseDate: string;
@@ -41,11 +42,6 @@ export interface AnimeShape {
   duration: string;
   malId: number;
 }
-export interface AnimeContentShape {
-  Episodes?: EpisodesShape;
-  Duration: number;
-}
-export interface EpisodesShape {}
 export interface StudiosShape {
   name: string;
   mal_id: number;
@@ -242,3 +238,41 @@ export interface ExternalLink {
   url: string;
 }
 //#endregion
+
+/* JikanRes on /anime/episodes */
+export interface JikanApiResEpisodes {
+  request_hash: string;
+  request_cached: boolean;
+  request_cache_expiry: number;
+  episodes_last_page: number;
+  episodes: JikanApiResAnimeEpisodes[];
+  status: number;
+}
+export interface JikanApiResAnimeEpisodes {
+  episode_id: number;
+  title: string;
+  title_japanese: string;
+  title_romanji: string;
+  aired: Date;
+  filler: boolean;
+  recap: boolean;
+  video_url: string;
+  forum_url: string;
+}
+
+/* JikanRes on /anime/recommendations */
+export interface JikanApiResRecommandations {
+  request_hash: string;
+  request_cached: boolean;
+  request_cache_expiry: number;
+  recommendations: JikanApiResAnimeRecommandations[];
+  status: number;
+}
+export interface JikanApiResAnimeRecommandations {
+  mal_id: number;
+  url: string;
+  image_url: string;
+  recommendation_url: string;
+  title: string;
+  recommendation_count: number;
+}

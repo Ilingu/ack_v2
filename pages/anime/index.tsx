@@ -86,8 +86,8 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
         const { results: animesRes }: JikanApiResSearch = await callApi(
           `https://api.jikan.moe/v3/search/anime?q=${title}&limit=16`
         );
-        const ToAnimeShape = JikanDataToPosterData(animesRes);
-        setResSearch({ animesFound: ToAnimeShape, reqTitle: title });
+        const ToPosterShape = JikanDataToPosterData(animesRes);
+        setResSearch({ animesFound: ToPosterShape, reqTitle: title });
         return;
       }
 

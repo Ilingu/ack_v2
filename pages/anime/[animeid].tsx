@@ -17,9 +17,15 @@ import {
   StudiosShape,
   TagsShape,
   AlternativeTitleShape,
+  JikanApiResRecommandations,
 } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
-import { JikanApiToAnimeShape, postToJSON } from "../../lib/utilityfunc";
+import {
+  callApi,
+  getAllTheEpisodes,
+  JikanApiToAnimeShape,
+  postToJSON,
+} from "../../lib/utilityfunc";
 // FB
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -59,11 +65,27 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Does not exists on FB -> API Req
   let animeData: AnimeShape;
   try {
-    const req = await fetch(`https://api.jikan.moe/v3/anime/${animeId}`);
-    const animeRes: JikanApiResAnime = await req.json();
+    const endpoint = `https://api.jikan.moe/v3/anime/${animeId}`;
+    // Req
+    const animeRes: JikanApiResAnime = await callApi(endpoint);
+    const animeEpsRes = await getAllTheEpisodes(animeId);
+    const animeRecommendationsRes: JikanApiResRecommandations = await callApi(
+      endpoint + "/recommendations"
+    );
+    const AllAnimeData = await Promise.all([
+      animeRes,
+      animeEpsRes,
+      animeRecommendationsRes,
+    ]);
 
-    if (animeRes && animeRes.status !== 404) {
-      animeData = JikanApiToAnimeShape(animeRes);
+    let IsGood = true;
+    AllAnimeData || (IsGood = false);
+    [AllAnimeData[0], AllAnimeData[2]].forEach((oneData) => {
+      if (!oneData || oneData.status === 404) IsGood = false;
+    });
+
+    if (IsGood) {
+      animeData = JikanApiToAnimeShape(AllAnimeData);
       // Send To FB
       const batch = writeBatch(db);
 
@@ -86,12 +108,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       };
     }
   } catch (err) {
-    console.log(err);
-
     return {
       notFound: true,
     };
   }
+
+  if (!animeData)
+    return {
+      notFound: true,
+    };
 
   return {
     props: { animeData },
@@ -306,10 +331,11 @@ function SpecialInfo({
 }: SpecialInfoProps) {
   const TagsSpecialInfoData = [
     AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
-    ...Object.keys(AlternativeTitle).map((key) => AlternativeTitle[key]),
+    ...Object.keys(AlternativeTitle)
+      .map((key) => AlternativeTitle[key].length > 0 && AlternativeTitle[key])
+      .filter((data) => data),
     `${duration.split(" ")[0]} Min/Eps`,
   ];
-
   const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
     <SpecialInfoItem dataToShow={data} key={i} />
   ));
