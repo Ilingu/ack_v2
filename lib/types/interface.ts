@@ -18,6 +18,15 @@ export interface PosterSearchData {
   type: AnimeType;
   malId: number;
 }
+/* EpisodesShapes */
+export interface EpisodesShape {
+  epsId: number;
+  title: string;
+  Filler: boolean;
+  Recap: boolean;
+  EpsURL: string;
+  ForumURL: string;
+}
 /* AnimeDB */
 export interface AnimeShape {
   title: string;

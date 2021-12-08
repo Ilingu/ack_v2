@@ -32,7 +32,17 @@ import { db } from "../../lib/firebase";
 // UI
 import MetaTags from "../../components/Metatags";
 import Loader from "../../components/Loader";
-import { FaCalendarAlt, FaFilm, FaInfo, FaStar, FaTv } from "react-icons/fa";
+import EpisodesList from "../../components/Search/EpisodesList";
+import RecommandationsList from "../../components/Search/RecommandationsList";
+import {
+  FaCalendarAlt,
+  FaClock,
+  FaFilm,
+  FaInfo,
+  FaStar,
+  FaTv,
+} from "react-icons/fa";
+import { EpisodesSearchContext } from "../../lib/context";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -42,8 +52,8 @@ interface SpecialInfoProps {
   AgeRating: string;
   AlternativeTitle: AlternativeTitleShape;
   duration: string;
+  studios: StudiosShape[];
 }
-
 interface TagsAnimesProps {
   Genres: TagsShape[];
   Themes: TagsShape[];
@@ -68,10 +78,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     const endpoint = `https://api.jikan.moe/v3/anime/${animeId}`;
     // Req
     const animeRes: JikanApiResAnime = await callApi(endpoint);
-    const animeEpsRes = await getAllTheEpisodes(animeId);
+    let animeEpsRes = await getAllTheEpisodes(animeId);
     const animeRecommendationsRes: JikanApiResRecommandations = await callApi(
       endpoint + "/recommendations"
     );
+    if (animeEpsRes.length <= 0) animeEpsRes = null;
     const AllAnimeData = await Promise.all([
       animeRes,
       animeEpsRes,
@@ -160,6 +171,8 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
     AgeRating,
     AlternativeTitle,
     duration,
+    EpisodesData,
+    Recommendations,
   } = animeData || {};
   const ScoredByTransform = useCallback((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
@@ -192,9 +205,11 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                 <div>
                   <FaTv className="inline transform -translate-y-0.5" />{" "}
                   <span className="text-primary-whiter">{type}</span>{" "}
-                  <span className="italic text-description text-xl">
-                    ({nbEp} eps)
-                  </span>
+                  {type === "TV" && (
+                    <span className="italic text-description text-xl">
+                      ({nbEp} eps)
+                    </span>
+                  )}
                 </div>
                 <div>
                   <FaStar className="inline text-yellow-500 transform -translate-y-0.5" />{" "}
@@ -211,10 +226,21 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                   </span>
                 </div>
                 <div>
-                  <FaFilm className="inline transform -translate-y-0.5" />{" "}
-                  <span className="text-primary-whiter">
-                    <StudiosComponent studio={Studios[0]} />
-                  </span>
+                  {type === "TV" ? (
+                    <Fragment>
+                      <FaFilm className="inline transform -translate-y-0.5" />{" "}
+                      <span className="text-primary-whiter">
+                        <StudiosComponent studio={Studios[0]} />
+                      </span>
+                    </Fragment>
+                  ) : (
+                    <Fragment>
+                      <FaClock className="inline transform -translate-y-0.5" />{" "}
+                      <span className="text-primary-whiter">
+                        {duration.toUpperCase()}
+                      </span>
+                    </Fragment>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-6">
@@ -242,7 +268,8 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
               <SpecialInfo
                 AgeRating={AgeRating}
                 AlternativeTitle={AlternativeTitle}
-                duration={duration}
+                duration={type === "TV" && duration}
+                studios={type === "Movie" && Studios}
               />
               <MyAnimes />
             </div>
@@ -264,8 +291,14 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
             allowFullScreen
           ></iframe>
         </section>
-        {/* Episodes */}
-        <section className="w-5/6"></section>
+        {/* Episodes -> Render Only on Change */}
+        {EpisodesData && (
+          <section className="w-5/6 mt-2 py-4">
+            <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
+              <EpisodesList Eps={EpisodesData} />
+            </EpisodesSearchContext.Provider>
+          </section>
+        )}
         {/* Recommendation: anime/${id}/recommendations */}
         <section className="w-5/6 bg-bgi-whiter"></section>
       </div>
@@ -328,14 +361,16 @@ function SpecialInfo({
   AgeRating,
   AlternativeTitle,
   duration,
+  studios,
 }: SpecialInfoProps) {
   const TagsSpecialInfoData = [
     AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
     ...Object.keys(AlternativeTitle)
       .map((key) => AlternativeTitle[key].length > 0 && AlternativeTitle[key])
       .filter((data) => data),
-    `${duration.split(" ")[0]} Min/Eps`,
-  ];
+    duration && `${duration.split(" ")[0]} Min/Eps`,
+    studios && <StudiosComponent studio={studios[0]} />,
+  ].filter((d) => d);
   const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
     <SpecialInfoItem dataToShow={data} key={i} />
   ));
@@ -343,7 +378,9 @@ function SpecialInfo({
   return (
     <div className="flex justify-center">
       <div className="w-2/3">
-        <p className="text-headline font-bold text-lg">Special info:</p>
+        <p className="text-headline font-bold text-lg underline">
+          Special info:
+        </p>
         <div className="flex justify-center flex-wrap">{TagsSpecialInfo}</div>
       </div>
     </div>
@@ -366,7 +403,7 @@ function TagsAnime({ Genres, Themes }: TagsAnimesProps) {
   return (
     <div className="flex justify-center">
       <div className="mt-4 w-2/3">
-        <p className="text-headline font-bold text-lg">Tags:</p>
+        <p className="text-headline font-bold text-lg underline">Tags:</p>
         <div className="flex justify-center flex-wrap">{Tags}</div>
       </div>
     </div>
@@ -398,6 +435,7 @@ function SynopsisComponent({ Synopsis }: { Synopsis: string }) {
     </Fragment>
   );
 }
+
 function StudiosComponent({ studio }: { studio: StudiosShape }) {
   return (
     <a href={studio?.url} target="_blank" rel="noreferrer">

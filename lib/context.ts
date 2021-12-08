@@ -11,6 +11,9 @@ interface ScPosterCtx {
   reqTitle: string;
   SeeAnimeInfo: SeeAnimeInfoFunc;
 }
+interface EpsSearchCtx {
+  photoLink: string;
+}
 
 /* Context */
 export const UserContext = createContext<UserCtx>({
@@ -21,5 +24,9 @@ export const UserContext = createContext<UserCtx>({
 
 export const SearchPosterContext = createContext<ScPosterCtx>({
   reqTitle: "",
-  SeeAnimeInfo: Function,
+  SeeAnimeInfo: () => {},
+});
+
+export const EpisodesSearchContext = createContext<EpsSearchCtx>({
+  photoLink: "",
 });

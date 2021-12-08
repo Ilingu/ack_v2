@@ -1,6 +1,7 @@
 import { DocumentSnapshot } from "@firebase/firestore";
 import {
   AnimeShape,
+  EpisodesShape,
   JikanApiResAnime,
   JikanApiResAnimeEpisodes,
   JikanApiResEpisodes,
@@ -55,6 +56,23 @@ export function removeDuplicates<T>(ary: T[]) {
  * Transform JikanApi obj to AnimeShape obj
  * @param {any[]} ary
  */
+export function JikanApiToEpisodesShape(
+  JikanObj: JikanApiResAnimeEpisodes[]
+): EpisodesShape[] {
+  return JikanObj.map((epData) => ({
+    epsId: epData.episode_id,
+    title: epData.title,
+    Filler: epData.filler,
+    Recap: epData.recap,
+    EpsURL: epData.video_url,
+    ForumURL: epData.forum_url,
+  }));
+}
+
+/**
+ * Transform JikanApi obj to AnimeShape obj
+ * @param {any[]} ary
+ */
 export function JikanApiToAnimeShape(
   JikanObj: [
     JikanApiResAnime,
@@ -89,8 +107,8 @@ export function JikanApiToAnimeShape(
       JikanObj[0].type === "Movie"
         ? JikanObj[0].duration
         : JikanObj[0].duration,
-    Recommendations: JikanObj[2].recommendations.slice(0, 10),
-    EpisodesData: JikanObj[1],
+    Recommendations: JikanObj[2]?.recommendations.slice(0, 10) || [],
+    EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
   };
 }
 
