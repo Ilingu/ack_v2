@@ -203,7 +203,7 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
             <div className="w-5/6">
               <div className="grid grid-cols-4 text-headline font-bold mb-6 text-2xl justify-items-center">
                 <div>
-                  <FaTv className="inline transform -translate-y-0.5" />{" "}
+                  <FaTv className="inline -translate-y-0.5" />{" "}
                   <span className="text-primary-whiter">{type}</span>{" "}
                   {type === "TV" && (
                     <span className="italic text-description text-xl">
@@ -212,14 +212,14 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                   )}
                 </div>
                 <div>
-                  <FaStar className="inline text-yellow-500 transform -translate-y-0.5" />{" "}
+                  <FaStar className="inline text-yellow-500 -translate-y-0.5" />{" "}
                   <span className="text-primary-whiter">{OverallScore}</span>{" "}
                   <span className="italic text-description text-xl">
                     ({ScoredByTransform()} people)
                   </span>
                 </div>
                 <div>
-                  <FaCalendarAlt className="inline transform -translate-y-0.5" />{" "}
+                  <FaCalendarAlt className="inline -translate-y-0.5" />{" "}
                   <span className="text-primary-whiter">{ReleaseDate}</span>
                   <span className="italic text-description text-xl">
                     {Airing || " (Finished)"}
@@ -228,14 +228,14 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                 <div>
                   {type === "TV" ? (
                     <Fragment>
-                      <FaFilm className="inline transform -translate-y-0.5" />{" "}
+                      <FaFilm className="inline -translate-y-0.5" />{" "}
                       <span className="text-primary-whiter">
                         <StudiosComponent studio={Studios[0]} />
                       </span>
                     </Fragment>
                   ) : (
                     <Fragment>
-                      <FaClock className="inline transform -translate-y-0.5" />{" "}
+                      <FaClock className="inline -translate-y-0.5" />{" "}
                       <span className="text-primary-whiter">
                         {duration.toUpperCase()}
                       </span>
@@ -253,7 +253,7 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                   <a href={MalPage} target="_blank" rel="noreferrer">
                     <FaInfo
                       onClick={() => router.push(MalPage)}
-                      className="absolute -top-3 -left-3 text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full transform 
+                      className="absolute -top-3 -left-3 text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
                 hover:scale-110 transition cursor-pointer"
                     />
                   </a>
