@@ -14,7 +14,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: { anime: null },
-    revalidate: 60000,
+    revalidate: 60,
   };
 };
 export const getStaticPaths: GetStaticPaths = async () => {

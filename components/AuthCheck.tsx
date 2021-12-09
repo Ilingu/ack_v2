@@ -40,9 +40,12 @@ const AuthCheck = ({ children }) => {
     <div className="flex flex-col justify-center items-center h-screen text-center">
       <Link href="/sign-up">
         <a className="text-headline">
-          <FaUserAltSlash className="inline text-6xl bg-gray-600 rounded-full py-2 px-2 text-primary-main -mt-6 mb-6" />
+          <FaUserAltSlash
+            className="inline transform -translate-y-0.5 text-6xl 
+          bg-gray-600 rounded-full py-2 px-2 text-primary-main -mt-6 mb-6"
+          />
           <h1 className="font-bold text-4xl hover:underline">
-            <FaSignInAlt className="inline text-red-500 mr-4" />
+            <FaSignInAlt className="inline transform -translate-y-0.5 text-red-500 mr-4" />
             You must be{" "}
             <span className="text-primary-main hover:text-secondary transition">
               signed in!

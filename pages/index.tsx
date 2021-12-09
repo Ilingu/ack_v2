@@ -17,7 +17,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: { myAnime: null },
-    revalidate: 25000,
+    revalidate: 60,
   };
 };
 

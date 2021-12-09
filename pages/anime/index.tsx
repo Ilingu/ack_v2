@@ -1,5 +1,12 @@
-import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
+import React, {
+  FC,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 // UI
@@ -30,7 +37,7 @@ import { SearchPosterContext } from "../../lib/context";
 
 /* Interface */
 interface SearchPageProps {
-  animes: AnimeShape[];
+  animesISR: AnimeShape[];
 }
 interface FormInputProps {
   Submit: SubmitShape;
@@ -44,28 +51,42 @@ interface AnimeFoundListProps {
 type SubmitShape = (title: string, api?: boolean) => void;
 
 /* SSR */
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const animesRef = collection(db, "animes");
-  const animes =
+  const animesISR =
     (await getDocs(animesRef))?.docs
       ?.map(postToJSON)
       .filter((dt) => !dt.AllAnimeId) || [];
 
   return {
     props: {
-      animes,
+      animesISR,
     },
+    revalidate: 120,
   };
 };
 
 /* Components */
-const SearchPage: FC<SearchPageProps> = ({ animes }) => {
+const SearchPage: FC<SearchPageProps> = ({ animesISR }) => {
   const push = useRouter().push;
 
+  const animes = useRef(animesISR);
   const [{ animesFound, reqTitle }, setResSearch] = useState<{
     animesFound: PosterSearchData[];
     reqTitle: string;
   }>({ animesFound: [], reqTitle: "" });
+
+  // Rehydratate
+  useEffect(() => {
+    const animesRef = collection(db, "animes");
+    (async () => {
+      const animesFb = ((await getDocs(animesRef))?.docs
+        ?.map(postToJSON)
+        .filter((dt) => !dt.AllAnimeId) || []) as AnimeShape[];
+      if (animesFb.length <= 0) return;
+      animes.current = animesFb;
+    })();
+  }, []);
 
   const Submit = useCallback(
     async (title: string, api: boolean = false) => {
@@ -110,7 +131,7 @@ const SearchPage: FC<SearchPageProps> = ({ animes }) => {
       const filterIt = (searchKey: string) => {
         const strEquality = (base: string) =>
           base.includes(searchKey.toLowerCase());
-        return animes.filter((obj) => {
+        return animes.current.filter((obj) => {
           const {
             title_english: te,
             title_japanese: tj,
