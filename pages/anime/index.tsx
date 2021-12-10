@@ -50,7 +50,7 @@ interface AnimeFoundListProps {
 }
 type SubmitShape = (title: string, api?: boolean) => void;
 
-/* SSR */
+/* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   const animesRef = collection(db, "animes");
   const animesISR =

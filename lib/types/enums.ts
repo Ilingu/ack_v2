@@ -8,3 +8,9 @@ export enum AnimeWatchType {
   WONT_WATCH = "wont_watch",
   DROPPED = "dropped",
 }
+export enum TheFourSeasonEnum {
+  WINTER = "winter",
+  SPRING = "spring",
+  SUMMER = "summer",
+  FALL = "fall",
+}

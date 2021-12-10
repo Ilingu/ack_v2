@@ -48,6 +48,16 @@ export interface RecommendationsShape {
   title: string;
   recommendationCount: number;
 }
+/* SeasonAnimesShape */
+export interface SeasonAnimesShape {
+  title: string;
+  PhotoUrl: string;
+  score: number;
+  type: AnimeType;
+  r18: boolean;
+  BeginAiring: string;
+  MalId: number;
+}
 /* AnimeDB */
 export interface AnimeShape {
   title: string;
@@ -207,7 +217,7 @@ export interface JikanApiResSeasonAnime {
   title: string;
   image_url: string;
   synopsis: string;
-  type: string;
+  type: AnimeType;
   airing_start?: string;
   episodes?: number;
   members: number;

@@ -7,7 +7,9 @@ import {
   JikanApiResAnimeRecommandations,
   JikanApiResEpisodes,
   JikanApiResRecommandations,
+  JikanApiResSeasonAnime,
   RecommendationsShape,
+  SeasonAnimesShape,
 } from "./types/interface";
 import { AnimeStatusType, TheFourSeason } from "./types/types";
 
@@ -84,6 +86,24 @@ export function JikanApiToRecommendationShape(
     recommendationCount: recomData.recommendation_count,
     title: recomData.title,
   }));
+}
+
+/**
+ * Transform JikanApi obj to JikanApiToRecommendationShape obj
+ * @param {JikanApiResAnimeEpisodes[]} JikanObj
+ */
+export function JikanApiToSeasonAnimeShape(
+  JikanObj: JikanApiResSeasonAnime[]
+): SeasonAnimesShape[] {
+  return JikanObj.map((SeasonData) => ({
+    title: SeasonData.title,
+    type: SeasonData.type,
+    PhotoUrl: SeasonData.image_url,
+    BeginAiring: new Date(SeasonData.airing_start).toLocaleDateString(),
+    score: SeasonData.score,
+    r18: SeasonData.r18,
+    MalId: SeasonData.mal_id,
+  })).filter((Sd) => !Sd.r18);
 }
 
 /**
