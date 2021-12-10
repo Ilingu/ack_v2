@@ -26,7 +26,7 @@ const EpisodesList: FC<EpisodesListProps> = ({ Eps }) => {
   useEffect(
     () => LoadEps(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [Eps]
   );
 
   const LoadEps = (withRestriction = true) => {
@@ -98,7 +98,7 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
         Episode {epsId}
       </h2>
       <a href={EpsURL} target="_blank" rel="noreferrer">
-        <h1 className="text-headline font-semi-bold text-xl hover:text-gray-200 transition">
+        <h1 className="text-headline font-semibold text-xl hover:text-gray-200 transition">
           {title}
         </h1>
       </a>

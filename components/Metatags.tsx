@@ -14,7 +14,7 @@ const MetaTags: FC<Props> = ({
 }) => {
   return (
     <Head>
-      <title>{title}</title>
+      <title>ACK: {title}</title>
       <meta
         name="viewport"
         content="minimum-scale=1, initial-scale=1, width=device-width"

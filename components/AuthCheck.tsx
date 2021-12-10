@@ -8,12 +8,18 @@ import { GlobalAppContext } from "../lib/context";
 import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
 import Loader from "./Loader";
 
-const AuthCheck = ({ children }) => {
+interface AuthCheckProps {
+  children: React.ReactElement;
+  fallback?: React.ReactElement;
+}
+
+const AuthCheck = ({ children, fallback }: AuthCheckProps) => {
   const { user, username, reqFinished } = useContext(GlobalAppContext);
   const router = useRouter();
   const ClearTimeout = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
+    if (fallback) return;
     if (user && username)
       return ClearTimeout.current.forEach((Timeout) => clearTimeout(Timeout));
     ClearTimeout.current = [
@@ -22,10 +28,15 @@ const AuthCheck = ({ children }) => {
         router.push("/sign-up");
       }, 15000),
     ];
+    return () => {
+      ClearTimeout.current.forEach((Timeout) => clearTimeout(Timeout));
+    };
   }, [user, username]);
 
-  return !reqFinished ? (
-    <div className="flex flex-col justify-center items-center h-screen text-center ">
+  return user && username ? (
+    children
+  ) : !reqFinished && !fallback ? (
+    <div className="flex flex-col justify-center items-center h-screen text-center">
       <h1 className="font-bold text-xl text-headline bg-gray-700 py-4 px-4 rounded-md">
         <Loader show />
         <span className="text-primary-main hover:text-secondary transition">
@@ -34,9 +45,12 @@ const AuthCheck = ({ children }) => {
         to your account
       </h1>
     </div>
-  ) : user && username ? (
-    children
-  ) : (
+  ) : !reqFinished && fallback ? (
+    <h1 className="font-bold text-xl text-center text-headline py-4 px-4 rounded-md">
+      <Loader show />
+      <span className="text-primary-main">Connecting</span> to your account
+    </h1>
+  ) : !fallback ? (
     <div className="flex flex-col justify-center items-center h-screen text-center">
       <Link href="/sign-up">
         <a className="text-headline">
@@ -57,6 +71,8 @@ const AuthCheck = ({ children }) => {
         </a>
       </Link>
     </div>
+  ) : (
+    fallback
   );
 };
 

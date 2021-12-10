@@ -4,8 +4,10 @@ import {
   EpisodesShape,
   JikanApiResAnime,
   JikanApiResAnimeEpisodes,
+  JikanApiResAnimeRecommandations,
   JikanApiResEpisodes,
   JikanApiResRecommandations,
+  RecommendationsShape,
 } from "./types/interface";
 import { AnimeStatusType } from "./types/types";
 
@@ -53,8 +55,8 @@ export function removeDuplicates<T>(ary: T[]) {
 }
 
 /**
- * Transform JikanApi obj to AnimeShape obj
- * @param {any[]} ary
+ * Transform JikanApi obj to EpisodeShape obj
+ * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToEpisodesShape(
   JikanObj: JikanApiResAnimeEpisodes[]
@@ -66,6 +68,21 @@ export function JikanApiToEpisodesShape(
     Recap: epData.recap,
     EpsURL: epData.video_url,
     ForumURL: epData.forum_url,
+  }));
+}
+
+/**
+ * Transform JikanApi obj to JikanApiToRecommendationShape obj
+ * @param {JikanApiResAnimeEpisodes[]} JikanObj
+ */
+export function JikanApiToRecommendationShape(
+  JikanObj: JikanApiResAnimeRecommandations[]
+): RecommendationsShape[] {
+  return JikanObj.map((recomData) => ({
+    malId: recomData.mal_id,
+    photoUrl: recomData.image_url,
+    recommendationCount: recomData.recommendation_count,
+    title: recomData.title,
   }));
 }
 
@@ -98,7 +115,7 @@ export function JikanApiToAnimeShape(
     Synopsis: JikanObj[0].synopsis,
     Studios: JikanObj[0].studios,
     Theme: JikanObj[0].themes,
-    photoPath: JikanObj[0].image_url,
+    photoPath: removeParamsFromPhotoUrl(JikanObj[0].image_url),
     malId: JikanObj[0].mal_id,
     trailer_url: JikanObj[0].trailer_url,
     nbEp: JikanObj[0].episodes,
@@ -107,7 +124,11 @@ export function JikanApiToAnimeShape(
       JikanObj[0].type === "Movie"
         ? JikanObj[0].duration
         : JikanObj[0].duration,
-    Recommendations: JikanObj[2]?.recommendations.slice(0, 10) || [],
+    Recommendations:
+      JikanObj[2]?.recommendations.slice(0, 7).map((recom) => ({
+        ...recom,
+        image_url: removeParamsFromPhotoUrl(recom.image_url),
+      })) || [],
     EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
   };
 }

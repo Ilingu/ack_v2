@@ -41,6 +41,13 @@ export interface EpisodesShape {
   EpsURL: string;
   ForumURL: string;
 }
+/* RecommendationsShape */
+export interface RecommendationsShape {
+  malId: number;
+  photoUrl: string;
+  title: string;
+  recommendationCount: number;
+}
 /* AnimeDB */
 export interface AnimeShape {
   title: string;

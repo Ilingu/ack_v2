@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 // Type
 import {
@@ -27,6 +28,7 @@ import {
   postToJSON,
 } from "../../lib/utilityfunc";
 // FB
+import AuthCheck from "../../components/AuthCheck";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
@@ -291,7 +293,7 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
             allowFullScreen
           ></iframe>
         </section>
-        {/* Episodes -> Render Only on Change */}
+        {/* Episodes */}
         {EpisodesData && (
           <section className="w-5/6 mt-2 py-4">
             <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
@@ -299,8 +301,12 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
             </EpisodesSearchContext.Provider>
           </section>
         )}
-        {/* Recommendation: anime/${id}/recommendations */}
-        <section className="w-5/6 bg-bgi-whiter"></section>
+        {/* Recommendation */}
+        <section className="w-5/6 bg-bgi-whiter rounded-xl mt-2 py-4">
+          <RecommandationsList
+            RecommandationsData={Recommendations.slice(0, 7)}
+          />
+        </section>
       </div>
     </Fragment>
   );
@@ -328,11 +334,27 @@ function MyAnimes() {
   }, [SelectValue]);
 
   return (
-    <div className="flex justify-center mb-4">
-      <div className="w-2/3">
-        <p className="text-headline font-bold text-xl tracking-wide">
-          MY ANIME:
-        </p>
+    <AuthCheck
+      fallback={
+        <MyAnimesCore>
+          <Link href="/sign-up">
+            <a>
+              <div
+                className="w-full group bg-bgi-black text-headline font-semibold text-center text-2xl outline-none 
+             rounded-lg py-3 px-1 transition hover:text-red-400 hover:underline hover:decoration-red-500"
+              >
+                You{" "}
+                <span className="font-bold tracking-wide text-red-400 group-hover:text-red-500">
+                  must
+                </span>{" "}
+                be sign-in !
+              </div>
+            </a>
+          </Link>
+        </MyAnimesCore>
+      }
+    >
+      <MyAnimesCore>
         <form
           onSubmit={(e) => e.preventDefault()}
           className="flex justify-center"
@@ -352,6 +374,19 @@ function MyAnimes() {
             <option value={WONT_WATCH}>⛔ Won&apos;t Watch</option>
           </select>
         </form>
+      </MyAnimesCore>
+    </AuthCheck>
+  );
+}
+
+function MyAnimesCore({ children }) {
+  return (
+    <div className="flex justify-center mb-4">
+      <div className="w-2/3">
+        <p className="text-headline font-bold text-xl tracking-wide">
+          MY ANIME:
+        </p>
+        {children}
       </div>
     </div>
   );
