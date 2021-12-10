@@ -1,8 +1,22 @@
-import { AnimeStatusType, AnimeType } from "./types";
+import { ChangeEvent } from "react";
+import {
+  AnimeStatusType,
+  AnimeType,
+  NetworkEffectiveType,
+  NetworkType,
+} from "./types";
 
 // Others
 export interface AnimeConfigPathsIdShape {
   AllAnimeId: string[];
+}
+export interface NetworkInformationShape {
+  downlink: number;
+  effectiveType: NetworkEffectiveType;
+  onchange?: (e: Event) => void;
+  rtt: number;
+  saveData: boolean;
+  type: NetworkType;
 }
 /* User */
 export interface UserShape {

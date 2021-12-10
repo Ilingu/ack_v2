@@ -21,7 +21,7 @@ import debounce from "lodash.debounce";
 // UI
 import MetaTags from "../components/Metatags";
 import Divider from "../components/Divider";
-import { UserContext } from "../lib/context";
+import { GlobalAppContext } from "../lib/context";
 import toast from "react-hot-toast";
 // Icon
 import { FcGoogle } from "react-icons/fc";
@@ -37,7 +37,7 @@ const GithubProvider = new GithubAuthProvider();
 
 /* Components */
 const SignUpPage: FC = () => {
-  const { user, username } = useContext(UserContext);
+  const { user, username } = useContext(GlobalAppContext);
 
   return (
     <Fragment>
@@ -140,7 +140,7 @@ function UsernameForm() {
   const [formValue, setFormValue] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { user } = useContext(UserContext);
+  const { user } = useContext(GlobalAppContext);
 
   useEffect(() => {
     checkUsername(formValue);

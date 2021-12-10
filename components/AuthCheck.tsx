@@ -3,13 +3,13 @@ import { useContext, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 // Ctx
-import { UserContext } from "../lib/context";
+import { GlobalAppContext } from "../lib/context";
 // UI
 import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
 import Loader from "./Loader";
 
 const AuthCheck = ({ children }) => {
-  const { user, username, reqFinished } = useContext(UserContext);
+  const { user, username, reqFinished } = useContext(GlobalAppContext);
   const router = useRouter();
   const ClearTimeout = useRef<NodeJS.Timeout[]>([]);
 

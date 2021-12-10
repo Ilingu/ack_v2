@@ -11,3 +11,13 @@ export type AnimeStatusType =
   | "to_be_aired"
   | "upcoming";
 export type SeeAnimeInfoFunc = (mal_id: number) => void;
+export type NetworkEffectiveType = "slow-2g" | "2g" | "3g" | "4g";
+export type NetworkType =
+  | "bluetooth"
+  | "cellular"
+  | "ethernet"
+  | "none"
+  | "wifi"
+  | "wimax"
+  | "other"
+  | "unknown";
