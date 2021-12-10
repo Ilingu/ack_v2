@@ -21,3 +21,4 @@ export type NetworkType =
   | "wimax"
   | "other"
   | "unknown";
+export type TheFourSeason = "winter" | "spring" | "summer" | "fall";

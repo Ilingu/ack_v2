@@ -109,7 +109,6 @@ export interface JikanApiResSearchAnime {
 }
 
 /* JikanRes on /anime */
-//#region
 export interface JikanApiResAnime {
   request_hash: string;
   request_cached: boolean;
@@ -145,12 +144,106 @@ export interface JikanApiResAnime {
   licensors: Licensor[];
   studios: Studio[];
   genres: TagsShape[];
-  explicit_genres: any[];
+  explicit_genres: ExplicitGenre[];
   demographics: Demographic[];
   themes: TagsShape[];
   opening_themes: string[];
   ending_themes: string[];
   external_links: ExternalLink[];
+}
+
+/* JikanRes on /anime/episodes */
+export interface JikanApiResEpisodes {
+  request_hash: string;
+  request_cached: boolean;
+  request_cache_expiry: number;
+  episodes_last_page: number;
+  episodes: JikanApiResAnimeEpisodes[];
+  status: number;
+}
+export interface JikanApiResAnimeEpisodes {
+  episode_id: number;
+  title: string;
+  title_japanese: string;
+  title_romanji: string;
+  aired: Date;
+  filler: boolean;
+  recap: boolean;
+  video_url: string;
+  forum_url: string;
+}
+
+/* JikanRes on /anime/recommendations */
+export interface JikanApiResRecommandations {
+  request_hash: string;
+  request_cached: boolean;
+  request_cache_expiry: number;
+  recommendations: JikanApiResAnimeRecommandations[];
+  status: number;
+}
+export interface JikanApiResAnimeRecommandations {
+  mal_id: number;
+  url: string;
+  image_url: string;
+  recommendation_url: string;
+  title: string;
+  recommendation_count: number;
+}
+
+/* JikanRes on /season */
+export interface JikanApiResSeasonRoot {
+  request_hash: string;
+  request_cached: boolean;
+  request_cache_expiry: number;
+  season_name: string;
+  season_year: number;
+  status: number;
+  anime: JikanApiResSeasonAnime[];
+}
+
+export interface JikanApiResSeasonAnime {
+  mal_id: number;
+  url: string;
+  title: string;
+  image_url: string;
+  synopsis: string;
+  type: string;
+  airing_start?: string;
+  episodes?: number;
+  members: number;
+  genres: Genre[];
+  explicit_genres: ExplicitGenre[];
+  themes: Theme[];
+  demographics: Demographic[];
+  source: string;
+  producers: Producer[];
+  score?: number;
+  licensors: string[];
+  r18: boolean;
+  kids: boolean;
+  continuing: boolean;
+}
+
+/* Sub Interface */
+export interface Genre {
+  mal_id: number;
+  type: string;
+  name: string;
+  url: string;
+}
+
+export interface ExplicitGenre {
+  mal_id: number;
+  type: string;
+  name: string;
+  url: string;
+}
+
+export interface Theme {
+  mal_id: number;
+  type: string;
+  name: string;
+  url: string;
 }
 
 export interface From {
@@ -266,43 +359,4 @@ export interface TagsShape {
 export interface ExternalLink {
   name: string;
   url: string;
-}
-//#endregion
-
-/* JikanRes on /anime/episodes */
-export interface JikanApiResEpisodes {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  episodes_last_page: number;
-  episodes: JikanApiResAnimeEpisodes[];
-  status: number;
-}
-export interface JikanApiResAnimeEpisodes {
-  episode_id: number;
-  title: string;
-  title_japanese: string;
-  title_romanji: string;
-  aired: Date;
-  filler: boolean;
-  recap: boolean;
-  video_url: string;
-  forum_url: string;
-}
-
-/* JikanRes on /anime/recommendations */
-export interface JikanApiResRecommandations {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  recommendations: JikanApiResAnimeRecommandations[];
-  status: number;
-}
-export interface JikanApiResAnimeRecommandations {
-  mal_id: number;
-  url: string;
-  image_url: string;
-  recommendation_url: string;
-  title: string;
-  recommendation_count: number;
 }

@@ -45,3 +45,6 @@ yarn-error.log*
 #Styles
 /styles/globals.scss
 /styles/globals.css.map
+
+#Template
+/lib/template.ts

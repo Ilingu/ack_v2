@@ -26,6 +26,7 @@ import {
   getAllTheEpisodes,
   JikanApiToAnimeShape,
   postToJSON,
+  Return404,
 } from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/AuthCheck";
@@ -115,21 +116,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       batch.update(animesConfigPathsRef, newAnimeConfigPaths);
 
       await batch.commit();
-    } else {
-      return {
-        notFound: true,
-      };
-    }
+    } else return Return404();
   } catch (err) {
-    return {
-      notFound: true,
-    };
+    return Return404();
   }
-
-  if (!animeData)
-    return {
-      notFound: true,
-    };
+  if (!animeData) return Return404();
 
   return {
     props: { animeData },

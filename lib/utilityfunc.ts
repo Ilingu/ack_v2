@@ -9,7 +9,7 @@ import {
   JikanApiResRecommandations,
   RecommendationsShape,
 } from "./types/interface";
-import { AnimeStatusType } from "./types/types";
+import { AnimeStatusType, TheFourSeason } from "./types/types";
 
 /**
  * Is the string a valid url (https://www.example.com)
@@ -156,7 +156,12 @@ export function getAllTheEpisodes(
         const eps: JikanApiResEpisodes = await callApi(
           `https://api.jikan.moe/v3/anime/${id}/episodes/${i}`
         );
-        if (!eps?.episodes || eps?.episodes?.length <= 0 || eps?.status === 404)
+        if (
+          !eps?.episodes ||
+          eps?.episodes?.length <= 0 ||
+          eps?.status === 404 ||
+          i >= 5
+        )
           return resolve(Episodes);
         Episodes = [...Episodes, ...eps.episodes];
         if (i === eps?.episodes_last_page) return resolve(Episodes);
@@ -168,4 +173,51 @@ export function getAllTheEpisodes(
     };
     fetchOtherEP();
   });
+}
+
+/**
+ * @returns 404's Page
+ */
+export const Return404 = (): {
+  notFound: true;
+} => ({
+  notFound: true,
+});
+
+/**
+ * @returns The current season: "winter" | "spring" | "summer" | "fall"
+ */
+export function WhitchSeason() {
+  const Month = new Date().getMonth() + 1;
+  const Day = new Date().getDate();
+  let season: TheFourSeason;
+  switch (true) {
+    case Month === 12 && Day >= 21:
+    case Month === 1:
+    case Month === 2:
+    case Month === 3 && Day < 20:
+      season = "winter";
+      break;
+    case Month === 3 && Day >= 20:
+    case Month === 4:
+    case Month === 5:
+    case Month === 6 && Day < 20:
+      season = "spring";
+      break;
+    case Month === 6 && Day >= 20:
+    case Month === 7:
+    case Month === 8:
+    case Month === 9 && Day < 22:
+      season = "summer";
+      break;
+    case Month === 9 && Day >= 22:
+    case Month === 10:
+    case Month === 11:
+    case Month === 12 && Day < 21:
+      season = "fall";
+      break;
+    default:
+      break;
+  }
+  return season;
 }
