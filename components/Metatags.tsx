@@ -8,7 +8,7 @@ interface Props {
 }
 
 const MetaTags: FC<Props> = ({
-  title = "ACK:Anim-Checker",
+  title = "Anim-Checker",
   description = "Make your list of Anime",
   image = null,
 }) => {

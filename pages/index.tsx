@@ -28,7 +28,10 @@ const Home: FC<HomeProps> = ({ myAnime }) => {
   return (
     <AuthCheck>
       <main>
-        <MetaTags description="Home Page, Your anime list" />
+        <MetaTags
+          title="Anim-Checker"
+          description="Home Page, Your anime list"
+        />
       </main>
     </AuthCheck>
   );

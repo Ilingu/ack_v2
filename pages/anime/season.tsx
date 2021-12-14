@@ -175,8 +175,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
                 className="opacity-95 hover:opacity-50 transition cursor-pointer rounded-lg"
               />
               <div className="absolute top-0 left-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
-                <FaStar className="inline text-yellow-500 -translate-y-0.5" />{" "}
-                {score}
+                <FaStar className="icon text-yellow-500" /> {score}
               </div>
               <div className="absolute top-0 right-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
                 {type}
@@ -185,7 +184,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 font-semibold text-headline bg-bgi-darker 
             bg-opacity-80 px-1 py-2 rounded-lg"
               >
-                <FaCalendarAlt className="inline text-primary-whiter -translate-y-0.5" />{" "}
+                <FaCalendarAlt className="icon text-primary-whiter" />{" "}
                 {BeginAiring}
               </div>
             </div>

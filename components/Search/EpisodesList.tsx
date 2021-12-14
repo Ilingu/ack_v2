@@ -53,7 +53,7 @@ const EpisodesList: FC<EpisodesListProps> = ({ Eps }) => {
             className="text-center text-headline bg-primary-darker py-2 px-2 rounded-lg font-bold w-56 outline-none focus:ring-2
              focus:ring-primary-whiter transition"
           >
-            <FaEye className="inline transform -translate-y-0.5" /> Load All
+            <FaEye className="icon" /> Load All
           </button>
         </div>
       ) : null}

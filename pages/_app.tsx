@@ -27,7 +27,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           ConnInfo.effectiveType === "2g")
       ) {
         toast.error(
-          `Connexion internet faible/instable (${ConnInfo.effectiveType})`
+          `Connexion internet faible/instable (${ConnInfo.effectiveType})`,
+          {
+            position: "bottom-right",
+          }
         );
       }
     };
@@ -46,7 +49,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     >
       <Navbar />
       <Component {...pageProps} />
-      <Toaster />
+      <Toaster position="top-right" />
     </GlobalAppContext.Provider>
   );
 }

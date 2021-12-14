@@ -196,7 +196,7 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
             <div className="w-5/6">
               <div className="grid grid-cols-4 text-headline font-bold mb-6 text-2xl justify-items-center">
                 <div>
-                  <FaTv className="inline -translate-y-0.5" />{" "}
+                  <FaTv className="icon" />{" "}
                   <span className="text-primary-whiter">{type}</span>{" "}
                   {type === "TV" && (
                     <span className="italic text-description text-xl">
@@ -205,14 +205,14 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                   )}
                 </div>
                 <div>
-                  <FaStar className="inline text-yellow-500 -translate-y-0.5" />{" "}
+                  <FaStar className="icon text-yellow-500" />{" "}
                   <span className="text-primary-whiter">{OverallScore}</span>{" "}
                   <span className="italic text-description text-xl">
                     ({ScoredByTransform()} people)
                   </span>
                 </div>
                 <div>
-                  <FaCalendarAlt className="inline -translate-y-0.5" />{" "}
+                  <FaCalendarAlt className="icon" />{" "}
                   <span className="text-primary-whiter">{ReleaseDate}</span>
                   <span className="italic text-description text-xl">
                     {Airing || " (Finished)"}
@@ -221,14 +221,14 @@ const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
                 <div>
                   {type === "TV" ? (
                     <Fragment>
-                      <FaFilm className="inline -translate-y-0.5" />{" "}
+                      <FaFilm className="icon" />{" "}
                       <span className="text-primary-whiter">
                         <StudiosComponent studio={Studios[0]} />
                       </span>
                     </Fragment>
                   ) : (
                     <Fragment>
-                      <FaClock className="inline -translate-y-0.5" />{" "}
+                      <FaClock className="icon" />{" "}
                       <span className="text-primary-whiter">
                         {duration.toUpperCase()}
                       </span>

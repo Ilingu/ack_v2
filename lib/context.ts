@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import { User } from "@firebase/auth";
-import { SeeAnimeInfoFunc } from "./types/types";
 
 interface GlobalAppContext {
   user: User;
@@ -10,7 +9,6 @@ interface GlobalAppContext {
 }
 interface ScPosterCtx {
   reqTitle: string;
-  SeeAnimeInfo: SeeAnimeInfoFunc;
 }
 interface EpsSearchCtx {
   photoLink: string;
@@ -26,7 +24,6 @@ export const GlobalAppContext = createContext<GlobalAppContext>({
 
 export const SearchPosterContext = createContext<ScPosterCtx>({
   reqTitle: "",
-  SeeAnimeInfo: () => {},
 });
 
 export const EpisodesSearchContext = createContext<EpsSearchCtx>({

@@ -31,7 +31,7 @@ const WatchAnime: FC<AnimeProps> = ({}) => {
   // Get user anime progress -> ISR then Rehydrate with Realtime
   return (
     <AuthCheck>
-      <div></div>
+      <main></main>
     </AuthCheck>
   );
 };

@@ -6,8 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { GetStaticProps } from "next";
-import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 // UI
 import MetaTags from "../../components/Metatags";
@@ -30,15 +28,11 @@ import {
   JikanApiResSearchAnime,
   PosterSearchData,
 } from "../../lib/types/interface";
-import { SeeAnimeInfoFunc } from "../../lib/types/types";
 // Icon
 import { FaSearch, FaGlobe } from "react-icons/fa";
 import { SearchPosterContext } from "../../lib/context";
 
 /* Interface */
-interface SearchPageProps {
-  animesISR: AnimeShape[];
-}
 interface FormInputProps {
   Submit: SubmitShape;
 }
@@ -46,37 +40,18 @@ interface AnimeFoundListProps {
   animeFound: PosterSearchData[];
   reqTitle: string;
   Submit: SubmitShape;
-  SeeAnimeInfo: SeeAnimeInfoFunc;
 }
 type SubmitShape = (title: string, api?: boolean) => void;
 
-/* ISR */
-export const getStaticProps: GetStaticProps = async () => {
-  const animesRef = collection(db, "animes");
-  const animesISR =
-    (await getDocs(animesRef))?.docs
-      ?.map(postToJSON)
-      .filter((dt) => !dt.AllAnimeId) || [];
-
-  return {
-    props: {
-      animesISR,
-    },
-    revalidate: 120,
-  };
-};
-
 /* Components */
-const SearchPage: FC<SearchPageProps> = ({ animesISR }) => {
-  const push = useRouter().push;
-
-  const animes = useRef(animesISR);
+const SearchPage: FC = () => {
+  const animes = useRef<AnimeShape[]>();
   const [{ animesFound, reqTitle }, setResSearch] = useState<{
     animesFound: PosterSearchData[];
     reqTitle: string;
   }>({ animesFound: [], reqTitle: "" });
 
-  // Rehydratate
+  // GET All Anime From FB
   useEffect(() => {
     const animesRef = collection(db, "animes");
     (async () => {
@@ -128,9 +103,11 @@ const SearchPage: FC<SearchPageProps> = ({ animesISR }) => {
             malId,
           })
         );
+
       const filterIt = (searchKey: string) => {
         const strEquality = (base: string) =>
           base.includes(searchKey.toLowerCase());
+        if (!animes.current) return [];
         return animes.current.filter((obj) => {
           const {
             title_english: te,
@@ -156,11 +133,6 @@ const SearchPage: FC<SearchPageProps> = ({ animesISR }) => {
     [animes]
   );
 
-  const SeeAnimeInfo = useCallback((mal_id: number) => {
-    push(`/anime/${mal_id}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <Fragment>
       <MetaTags
@@ -173,7 +145,6 @@ const SearchPage: FC<SearchPageProps> = ({ animesISR }) => {
           animeFound={animesFound}
           reqTitle={reqTitle}
           Submit={Submit}
-          SeeAnimeInfo={SeeAnimeInfo}
         />
       </main>
     </Fragment>
@@ -204,7 +175,7 @@ function FormInput({ Submit }: FormInputProps) {
       className="flex flex-col justify-evenly items-center row-span-3"
     >
       <h1 className="tracking-wider text-5xl font-bold text-headline">
-        <FaSearch className="inline" /> Find your{" "}
+        <FaSearch className="icon" /> Find your{" "}
         <span className="text-primary-darker">anime</span>
       </h1>
       <input
@@ -221,7 +192,7 @@ function FormInput({ Submit }: FormInputProps) {
           onClick={() => Submit(title, true)}
           className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
         >
-          Chercher Globalement <FaGlobe className="inline text-thirdly" />
+          Chercher Globalement <FaGlobe className="icon text-thirdly" />
         </span>
       </p>
       <Divider />
@@ -229,12 +200,7 @@ function FormInput({ Submit }: FormInputProps) {
   );
 }
 
-function AnimeFoundList({
-  animeFound,
-  reqTitle,
-  Submit,
-  SeeAnimeInfo,
-}: AnimeFoundListProps) {
+function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
   return (
     <div className="row-span-9">
       {reqTitle && (
@@ -247,14 +213,14 @@ function AnimeFoundList({
               onClick={() => Submit(reqTitle, true)}
               className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
             >
-              Chercher Globalement <FaGlobe className="inline text-thirdly" />
+              Chercher Globalement <FaGlobe className="icon text-thirdly" />
             </p>
           )}
         </h1>
       )}
       {animeFound && (
         <div className="grid grid-cols-7 gap-2">
-          <SearchPosterContext.Provider value={{ reqTitle, SeeAnimeInfo }}>
+          <SearchPosterContext.Provider value={{ reqTitle }}>
             <AnimePoster AnimeToTransform={animeFound} />
           </SearchPosterContext.Provider>
         </div>

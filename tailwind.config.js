@@ -16,7 +16,10 @@ module.exports = {
         secondary: "#3b82f680",
         // Main Colors
         headline: "#ffffff",
-        description: "#ffffff99",
+        description: {
+          DEFAULT: "#ffffff99",
+          whiter: "rgb(209 213 219)",
+        },
         black: "rgb(17, 24, 39)",
         // BackGround
         bgi: {

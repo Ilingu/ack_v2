@@ -1,12 +1,19 @@
-import React, { FC } from "react";
+import React, { FC, Fragment } from "react";
 import AuthCheck from "../components/AuthCheck";
+import MetaTags from "../components/Metatags";
 
 /* Components */
 const Settings: FC = () => {
   return (
-    <AuthCheck>
-      <main></main>
-    </AuthCheck>
+    <Fragment>
+      <MetaTags
+        title="User's Settings"
+        description="Private Page, Only For ACK Users"
+      />
+      <AuthCheck>
+        <main></main>
+      </AuthCheck>
+    </Fragment>
   );
 };
 

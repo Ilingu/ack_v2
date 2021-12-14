@@ -42,7 +42,7 @@ const SignUpPage: FC = () => {
   return (
     <Fragment>
       <MetaTags title="ACK:Sign up" description="Sign up Page for ACK" />
-      <main className="w-screen h-screen flex flex-col justify-center items-center">
+      <main className="h-screen flex flex-col justify-center items-center">
         <div className="bg-bgi-whiter text-primary-main h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
           {user ? (
             !username ? (
@@ -69,7 +69,7 @@ function SignOutButton() {
         onClick={() => auth.signOut()}
         className="mt-4 py-2 px-2 bg-red-400 w-1/3 text-headline font-semibold text-lg rounded-md"
       >
-        <FaSignOutAlt className="inline" />
+        <FaSignOutAlt className="icon" />
         Sign Out
       </button>
     </Fragment>
@@ -88,7 +88,7 @@ function SignInButton() {
           : GithubProvider
       );
       toast.success(
-        `Welcome ${auth.currentUser.displayName}! Successfully Sign in with ${method}.`
+        `Welcome ${auth.currentUser.displayName}! Successfully Sign in !`
       );
     } catch (err) {
       toast.error("Error in authentification.");
@@ -115,21 +115,21 @@ function SignInButton() {
           className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
           focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
         >
-          <FcGoogle className="inline" /> Google
+          <FcGoogle className="icon" /> Google
         </button>
         <button
           onClick={() => signIn("twitter")}
           className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
           focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
         >
-          <FaTwitter className="inline text-blue-500" /> Twitter
+          <FaTwitter className="icon text-blue-500" /> Twitter
         </button>
         <button
           onClick={() => signIn("github")}
           className="py-2 px-2 bg-bgi-darker rounded text-headline outline-none focus:ring-4 
           focus:ring-headline hover:bg-gray-600 transition text-xl w-5/6 font-semibold"
         >
-          <AiFillGithub className="inline" /> Github
+          <AiFillGithub className="icon" /> Github
         </button>
       </aside>
     </Fragment>

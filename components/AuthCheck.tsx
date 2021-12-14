@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
+import { useContext } from "react";
 import Link from "next/link";
 // Ctx
 import { GlobalAppContext } from "../lib/context";
@@ -15,23 +14,6 @@ interface AuthCheckProps {
 
 const AuthCheck = ({ children, fallback }: AuthCheckProps) => {
   const { user, username, reqFinished } = useContext(GlobalAppContext);
-  const router = useRouter();
-  const ClearTimeout = useRef<NodeJS.Timeout[]>([]);
-
-  useEffect(() => {
-    if (fallback) return;
-    if (user && username)
-      return ClearTimeout.current.forEach((Timeout) => clearTimeout(Timeout));
-    ClearTimeout.current = [
-      ...ClearTimeout.current,
-      setTimeout(() => {
-        router.push("/sign-up");
-      }, 15000),
-    ];
-    return () => {
-      ClearTimeout.current.forEach((Timeout) => clearTimeout(Timeout));
-    };
-  }, [user, username]);
 
   return user && username ? (
     children
@@ -55,19 +37,16 @@ const AuthCheck = ({ children, fallback }: AuthCheckProps) => {
       <Link href="/sign-up">
         <a className="text-headline">
           <FaUserAltSlash
-            className="inline transform -translate-y-0.5 text-6xl 
+            className="icon text-6xl 
           bg-gray-600 rounded-full py-2 px-2 text-primary-main -mt-6 mb-6"
           />
           <h1 className="font-bold text-4xl hover:underline">
-            <FaSignInAlt className="inline transform -translate-y-0.5 text-red-500 mr-4" />
+            <FaSignInAlt className="icon text-red-500 mr-4" />
             You must be{" "}
             <span className="text-primary-main hover:text-secondary transition">
               signed in!
             </span>
           </h1>
-          <p className="text-white mt-2 text-xl">
-            You&apos;ll be redirect in 15s
-          </p>
         </a>
       </Link>
     </div>

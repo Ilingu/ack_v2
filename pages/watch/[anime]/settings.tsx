@@ -4,7 +4,7 @@ interface AnimeParamsProps {}
 
 // ex: delete, drop, season, alleviate...
 const AnimeParams: FC<AnimeParamsProps> = ({}) => {
-  return <div></div>;
+  return <main></main>;
 };
 
 export default AnimeParams;
