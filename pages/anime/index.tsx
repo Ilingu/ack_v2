@@ -2,6 +2,7 @@ import React, {
   FC,
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -11,13 +12,9 @@ import debounce from "lodash.debounce";
 import MetaTags from "../../components/Metatags";
 import Divider from "../../components/Divider";
 import AnimePoster from "../../components/Poster/SearchPoster";
-// FB
-import { collection, getDocs } from "@firebase/firestore";
-import { db } from "../../lib/firebase";
 // Utility Func
 import {
   callApi,
-  postToJSON,
   removeDuplicates,
   removeParamsFromPhotoUrl,
 } from "../../lib/utilityfunc";
@@ -30,7 +27,7 @@ import {
 } from "../../lib/types/interface";
 // Icon
 import { FaSearch, FaGlobe } from "react-icons/fa";
-import { SearchPosterContext } from "../../lib/context";
+import { GlobalAppContext, SearchPosterContext } from "../../lib/context";
 
 /* Interface */
 interface FormInputProps {
@@ -45,23 +42,12 @@ type SubmitShape = (title: string, api?: boolean) => void;
 
 /* Components */
 const SearchPage: FC = () => {
-  const animes = useRef<AnimeShape[]>();
+  const { GlobalAnime } = useContext(GlobalAppContext);
+  const animes = useRef<AnimeShape[]>(GlobalAnime);
   const [{ animesFound, reqTitle }, setResSearch] = useState<{
     animesFound: PosterSearchData[];
     reqTitle: string;
   }>({ animesFound: [], reqTitle: "" });
-
-  // GET All Anime From FB
-  useEffect(() => {
-    const animesRef = collection(db, "animes");
-    (async () => {
-      const animesFb = ((await getDocs(animesRef))?.docs
-        ?.map(postToJSON)
-        .filter((dt) => !dt.AllAnimeId) || []) as AnimeShape[];
-      if (animesFb.length <= 0) return;
-      animes.current = animesFb;
-    })();
-  }, []);
 
   const Submit = useCallback(
     async (title: string, api: boolean = false) => {

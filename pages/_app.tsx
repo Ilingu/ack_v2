@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useUserData } from "../lib/hooks";
+import { useGlobalAnimeData, useUserData } from "../lib/hooks";
 // TS
 import { AppProps } from "next/app";
 import { NetworkInformationShape } from "../lib/types/interface";
@@ -11,6 +11,7 @@ import { GlobalAppContext } from "../lib/context";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
+  const { GlobalAnimeData: GlobalAnime } = useGlobalAnimeData();
   const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
@@ -45,6 +46,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       value={{
         ...userData,
         IsWebVersion,
+        UserAnime: [],
+        GlobalAnime,
       }}
     >
       <Navbar />

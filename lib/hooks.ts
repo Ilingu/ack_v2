@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+// Auth
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { User } from "@firebase/auth";
-import { doc, onSnapshot } from "@firebase/firestore";
-import { UserShape } from "./types/interface";
+import { doc, onSnapshot, collection } from "@firebase/firestore";
+// Types
+import { AnimeShape, UserShape } from "./types/interface";
+// Func
+import { postToJSON } from "./utilityfunc";
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
@@ -38,4 +42,21 @@ export function useUserData() {
   }, []);
 
   return { user, username: usernameState, reqFinished };
+}
+
+export function useGlobalAnimeData() {
+  const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
+
+  useEffect(() => {
+    let unsub = onSnapshot(collection(db, "animes"), (Snapdocs) => {
+      const GlobalAnime = (Snapdocs?.docs
+        ?.map(postToJSON)
+        .filter((dt) => !dt.AllAnimeId) || []) as AnimeShape[];
+      setGlobalAnime(GlobalAnime);
+    });
+
+    return unsub;
+  }, []);
+
+  return { GlobalAnimeData };
 }

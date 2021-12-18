@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, DocumentSnapshot } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 // Init
 const firebaseConfig = {
