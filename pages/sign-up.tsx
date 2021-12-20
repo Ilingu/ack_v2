@@ -1,12 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
-  FC,
-  Fragment,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import { NextPage } from "next";
+import { Fragment, useContext, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 // Auth
 import {
@@ -19,8 +13,8 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import debounce from "lodash.debounce";
 // UI
-import MetaTags from "../components/Metatags";
-import Divider from "../components/Divider";
+import MetaTags from "../components/Common/Metatags";
+import Divider from "../components/Design/Divider";
 import { GlobalAppContext } from "../lib/context";
 import toast from "react-hot-toast";
 // Icon
@@ -36,7 +30,7 @@ const TwitterProvider = new TwitterAuthProvider();
 const GithubProvider = new GithubAuthProvider();
 
 /* Components */
-const SignUpPage: FC = () => {
+const SignUpPage: NextPage = () => {
   const { user, username } = useContext(GlobalAppContext);
 
   return (

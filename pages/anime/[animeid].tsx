@@ -1,13 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import React, {
-  FC,
   Fragment,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { GetStaticProps, GetStaticPaths } from "next";
+import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 // Type
@@ -29,12 +28,12 @@ import {
   Return404,
 } from "../../lib/utilityfunc";
 // FB
-import AuthCheck from "../../components/AuthCheck";
+import AuthCheck from "../../components/Common/AuthCheck";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
-import MetaTags from "../../components/Metatags";
-import Loader from "../../components/Loader";
+import MetaTags from "../../components/Common/Metatags";
+import Loader from "../../components/Design/Loader";
 import EpisodesList from "../../components/Search/EpisodesList";
 import RecommandationsList from "../../components/Search/RecommandationsList";
 import {
@@ -144,7 +143,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 /* Components */
-const AnimeInfo: FC<AnimeInfoProps> = ({ animeData }) => {
+const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const router = useRouter();
   const {
     title,

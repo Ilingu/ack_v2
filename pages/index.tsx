@@ -1,8 +1,7 @@
-import { FC } from "react";
-import AuthCheck from "../components/AuthCheck";
-import { GetStaticProps } from "next";
+import AuthCheck from "../components/Common/AuthCheck";
+import { GetStaticProps, NextPage } from "next";
 // UI
-import MetaTags from "../components/Metatags";
+import MetaTags from "../components/Common/Metatags";
 // Types
 import { AnimeShape } from "../lib/types/interface";
 
@@ -22,7 +21,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 /* Components */
-const Home: FC<HomeProps> = ({ myAnime }) => {
+const Home: NextPage<HomeProps> = ({ myAnime }) => {
   // Rehydrate With Realtime
 
   return (

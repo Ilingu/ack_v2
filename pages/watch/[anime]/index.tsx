@@ -1,7 +1,7 @@
-import React, { FC } from "react";
-import { GetStaticProps, GetStaticPaths } from "next";
+import React from "react";
+import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 // UI
-import AuthCheck from "../../../components/AuthCheck";
+import AuthCheck from "../../../components/Common/AuthCheck";
 
 /* Interface */
 interface AnimeProps {}
@@ -27,7 +27,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 /* Components */
-const WatchAnime: FC<AnimeProps> = ({}) => {
+const WatchAnime: NextPage<AnimeProps> = ({}) => {
   // Get user anime progress -> ISR then Rehydrate with Realtime
   return (
     <AuthCheck>

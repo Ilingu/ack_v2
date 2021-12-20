@@ -6,7 +6,7 @@ import { AppProps } from "next/app";
 import { NetworkInformationShape } from "../lib/types/interface";
 // UI
 import "../styles/globals.css";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Common/Navbar";
 import { GlobalAppContext } from "../lib/context";
 
 export default function MyApp({ Component, pageProps }: AppProps) {

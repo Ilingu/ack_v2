@@ -1,5 +1,5 @@
+import { NextPage } from "next";
 import React, {
-  FC,
   Fragment,
   useCallback,
   useContext,
@@ -9,8 +9,8 @@ import React, {
 } from "react";
 import debounce from "lodash.debounce";
 // UI
-import MetaTags from "../../components/Metatags";
-import Divider from "../../components/Divider";
+import MetaTags from "../../components/Common/Metatags";
+import Divider from "../../components/Design/Divider";
 import AnimePoster from "../../components/Poster/SearchPoster";
 // Utility Func
 import {
@@ -41,7 +41,7 @@ interface AnimeFoundListProps {
 type SubmitShape = (title: string, api?: boolean) => void;
 
 /* Components */
-const SearchPage: FC = () => {
+const SearchPage: NextPage = () => {
   const { GlobalAnime } = useContext(GlobalAppContext);
   const animes = useRef<AnimeShape[]>(GlobalAnime);
   const [{ animesFound, reqTitle }, setResSearch] = useState<{

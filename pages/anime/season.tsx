@@ -1,8 +1,8 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import debounce from "lodash.debounce";
-import { GetStaticProps } from "next";
+import { GetStaticProps, NextPage } from "next";
 // Types
 import {
   callApi,
@@ -19,8 +19,8 @@ import { TheFourSeason } from "../../lib/types/types";
 import { TheFourSeasonEnum } from "../../lib/types/enums";
 // UI
 import { FaCalendarAlt, FaStar } from "react-icons/fa";
-import Divider from "../../components/Divider";
-import MetaTags from "../../components/Metatags";
+import Divider from "../../components/Design/Divider";
+import MetaTags from "../../components/Common/Metatags";
 
 /* Interface */
 interface SeasonAnimesProps {
@@ -48,7 +48,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 /* Components */
-const SeasonAnimes: FC<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
+const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
   const [SeasonAnimesData, setSeasonAnimes] = useState(() => seasonAnimesISR);
   const [RenderedSeasonAnime, setRenderedSeasonAnime] =
     useState<JSX.Element[]>();

@@ -2,10 +2,10 @@
 import { useContext } from "react";
 import Link from "next/link";
 // Ctx
-import { GlobalAppContext } from "../lib/context";
+import { GlobalAppContext } from "../../lib/context";
 // UI
 import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
-import Loader from "./Loader";
+import Loader from "../Design/Loader";
 
 interface AuthCheckProps {
   children: React.ReactElement;

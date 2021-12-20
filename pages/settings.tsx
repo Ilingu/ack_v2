@@ -1,9 +1,10 @@
-import React, { FC, Fragment } from "react";
-import AuthCheck from "../components/AuthCheck";
-import MetaTags from "../components/Metatags";
+import { NextPage } from "next";
+import React, { Fragment } from "react";
+import AuthCheck from "../components/Common/AuthCheck";
+import MetaTags from "../components/Common/Metatags";
 
 /* Components */
-const Settings: FC = () => {
+const Settings: NextPage = () => {
   return (
     <Fragment>
       <MetaTags
