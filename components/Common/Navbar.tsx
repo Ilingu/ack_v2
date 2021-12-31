@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { FC } from "react";
 // Auth
-import { auth } from "../lib/firebase";
+import { auth } from "../../lib/firebase";
 import AuthCheck from "./AuthCheck";
 // UI
 import { FaLeaf, FaSearch, FaSignOutAlt } from "react-icons/fa";

@@ -12,24 +12,16 @@ import { useRouter } from "next/router";
 // Type
 import {
   AnimeShape,
-  JikanApiResAnime,
   AnimeConfigPathsIdShape,
   StudiosShape,
   TagsShape,
   AlternativeTitleShape,
-  JikanApiResRecommandations,
 } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
-import {
-  callApi,
-  getAllTheEpisodes,
-  JikanApiToAnimeShape,
-  postToJSON,
-  Return404,
-} from "../../lib/utilityfunc";
+import { callApi, postToJSON, Return404 } from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
-import { doc, getDoc, writeBatch } from "@firebase/firestore";
+import { doc, getDoc } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
 import MetaTags from "../../components/Common/Metatags";
@@ -74,51 +66,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     };
   }
 
-  // Does not exists on FB -> API Req
-  let animeData: AnimeShape;
-  try {
-    const endpoint = `https://api.jikan.moe/v3/anime/${animeId}`;
-    // Req
-    const animeRes: JikanApiResAnime = await callApi(endpoint);
-    let animeEpsRes = await getAllTheEpisodes(animeId);
-    const animeRecommendationsRes: JikanApiResRecommandations = await callApi(
-      endpoint + "/recommendations"
-    );
-    if (animeEpsRes.length <= 0) animeEpsRes = null;
-    const AllAnimeData = await Promise.all([
-      animeRes,
-      animeEpsRes,
-      animeRecommendationsRes,
-    ]);
-
-    let IsGood = true;
-    AllAnimeData || (IsGood = false);
-    [AllAnimeData[0], AllAnimeData[2]].forEach((oneData) => {
-      if (!oneData || oneData.status === 404) IsGood = false;
-    });
-
-    if (IsGood) {
-      animeData = JikanApiToAnimeShape(AllAnimeData);
-      // Send To FB
-      const batch = writeBatch(db);
-
-      const newAnimesRef = doc(db, "animes", animeId);
-      batch.set(newAnimesRef, animeData);
-
-      const animesConfigPathsRef = doc(db, "animes", "animes-config");
-      const animesConfigPaths = (
-        await getDoc(animesConfigPathsRef)
-      ).data() as AnimeConfigPathsIdShape;
-      const newAnimeConfigPaths = {
-        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
-      };
-      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
-
-      await batch.commit();
-    } else return Return404();
-  } catch (err) {
-    return Return404();
-  }
+  // No Anime -> Api Req
+  const animeData = await callApi(`http://localhost:3000/api/${animeId}`);
   if (!animeData) return Return404();
 
   return {
