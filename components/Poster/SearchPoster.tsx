@@ -6,6 +6,8 @@ import { PosterSearchData } from "../../lib/types/interface";
 // Icon
 import { FaInfo, FaStar } from "react-icons/fa";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useState } from "react";
 
 /* Interface */
 interface AnimePosterProps {
@@ -16,10 +18,16 @@ interface AnimeItemProps {
 }
 
 const AnimePoster: FC<AnimePosterProps> = ({ AnimeToTransform }) => {
-  const JsonToPoster = AnimeToTransform.map((animeData, i) => (
-    <AnimeItem key={i} animeData={animeData} />
-  ));
-  return <Fragment>{JsonToPoster}</Fragment>;
+  const [RenderElements, setNewRender] = useState<JSX.Element[]>();
+
+  useEffect(() => {
+    const SearchPosters = AnimeToTransform.map((animeData, i) => (
+      <AnimeItem key={i} animeData={animeData} />
+    ));
+    setNewRender(SearchPosters);
+  }, [AnimeToTransform]);
+
+  return <Fragment>{RenderElements}</Fragment>;
 };
 
 function AnimeItem({ animeData }: AnimeItemProps) {

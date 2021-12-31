@@ -66,6 +66,10 @@ export interface UserAnimeShape {
   PersonnalRate: number;
   Fav: boolean;
 }
+export interface UserGroupShape {
+  GroupAnimesId: string[];
+  GroupName: string;
+}
 export interface UserAnimePosterShape {
   AnimeId: number;
   WatchType: AnimeWatchType;

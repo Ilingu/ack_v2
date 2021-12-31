@@ -1,29 +1,12 @@
+import { NextPage } from "next";
+// Auth
 import AuthCheck from "../components/Common/AuthCheck";
-import { GetStaticProps, NextPage } from "next";
 // UI
 import MetaTags from "../components/Common/Metatags";
-// Types
-import { AnimeShape } from "../lib/types/interface";
-
-/* Interface */
-interface HomeProps {
-  myAnime: AnimeShape; // To Change, just here for placeholder
-}
-
-/* ISR */
-export const getStaticProps: GetStaticProps = async () => {
-  // Fetch From FB
-
-  return {
-    props: { myAnime: null },
-    revalidate: 60,
-  };
-};
+import HomePoster from "../components/Poster/HomePoster";
 
 /* Components */
-const Home: NextPage<HomeProps> = ({ myAnime }) => {
-  // Rehydrate With Realtime
-
+const Home: NextPage = () => {
   return (
     <AuthCheck>
       <main>
@@ -31,6 +14,7 @@ const Home: NextPage<HomeProps> = ({ myAnime }) => {
           title="Anim-Checker"
           description="Home Page, Your anime list"
         />
+        <HomePoster />
       </main>
     </AuthCheck>
   );

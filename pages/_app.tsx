@@ -11,8 +11,11 @@ import { GlobalAppContext } from "../lib/context";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
-  const { GlobalAnimeData: GlobalAnime, UserAnimesData: UserAnimes } =
-    useGlobalAnimeData(userData?.user?.uid);
+  const {
+    GlobalAnimeData: GlobalAnime,
+    UserAnimesData: UserAnimes,
+    UserGroupsData: UserGroups,
+  } = useGlobalAnimeData(userData?.user?.uid);
   const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         IsWebVersion,
         UserAnimes,
         GlobalAnime,
+        UserGroups,
       }}
     >
       <Navbar />

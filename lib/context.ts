@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { User } from "@firebase/auth";
-import { AnimeShape, UserAnimeShape } from "./types/interface";
+import { AnimeShape, UserAnimeShape, UserGroupShape } from "./types/interface";
 
 interface GlobalAppContext {
   user: User;
@@ -9,6 +9,7 @@ interface GlobalAppContext {
   IsWebVersion: boolean;
   UserAnimes: UserAnimeShape[]; // Interface User anime
   GlobalAnime: AnimeShape[];
+  UserGroups: UserGroupShape[];
 }
 interface ScPosterCtx {
   reqTitle: string;
@@ -25,6 +26,7 @@ export const GlobalAppContext = createContext<GlobalAppContext>({
   UserAnimes: [],
   GlobalAnime: [],
   IsWebVersion: false,
+  UserGroups: [],
 });
 
 export const SearchPosterContext = createContext<ScPosterCtx>({

@@ -288,15 +288,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
 };
 
 function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
-  const {
-    WATCHING,
-    WATCHED,
-    UNWATCHED,
-    STALLED,
-    WANT_TO_WATCH,
-    WONT_WATCH,
-    DROPPED,
-  } = AnimeWatchType;
+  const { WATCHING, WATCHED, UNWATCHED, WANT_TO_WATCH, WONT_WATCH, DROPPED } =
+    AnimeWatchType;
   const [SelectValue, setSelectValue] = useState(AnimeType);
   const FirstEffectSkipped = useRef(false);
 
@@ -345,7 +338,6 @@ function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
             <option value={WATCHING}>👀 Whatching</option>
             <option value={WATCHED}>✅ Watched</option>
             <option value={WANT_TO_WATCH}>⌚ Want to Watch</option>
-            <option value={STALLED}>🙃 Stalled</option>
             <option value={DROPPED}>🚮 Dropped</option>
             <option value={WONT_WATCH}>⛔ Won&apos;t Watch</option>
           </select>

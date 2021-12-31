@@ -4,7 +4,6 @@ export enum AnimeWatchType {
   WATCHED = "watched",
   WATCHING = "watching",
   WANT_TO_WATCH = "want_to_watch",
-  STALLED = "stalled",
   WONT_WATCH = "wont_watch",
   DROPPED = "dropped",
 }

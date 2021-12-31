@@ -5,7 +5,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { User } from "@firebase/auth";
 import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
-import { AnimeShape, UserAnimeShape, UserShape } from "./types/interface";
+import {
+  AnimeShape,
+  UserAnimeShape,
+  UserGroupShape,
+  UserShape,
+} from "./types/interface";
 // Func
 import { postToJSON } from "./utilityfunc";
 
@@ -47,6 +52,7 @@ export function useUserData() {
 export function useGlobalAnimeData(userUid: string) {
   const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
+  const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
 
   useEffect(() => {
     let unsub = onSnapshot(collection(db, "animes"), (Snapdocs) => {
@@ -60,17 +66,31 @@ export function useGlobalAnimeData(userUid: string) {
   }, []);
 
   useEffect(() => {
-    if (!userUid) return;
-    const UserAnimeRef = collection(doc(db, "users", userUid), "animes");
-    let unsub = onSnapshot(UserAnimeRef, (Snapdocs) => {
-      const UserAnime = (Snapdocs?.docs?.map(postToJSON) ||
+    if (!userUid) return null;
+
+    const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
+    let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
+      const UserAnimes = (Snapdocs?.docs?.map(postToJSON) ||
         []) as UserAnimeShape[];
 
-      setUserAnimesData(UserAnime);
+      setUserAnimesData(UserAnimes);
     });
 
     return unsub;
   }, [userUid]);
 
-  return { GlobalAnimeData, UserAnimesData };
+  useEffect(() => {
+    if (!userUid) return null;
+
+    const UserGroupsRef = collection(doc(db, "users", userUid), "Groups");
+    let unsub = onSnapshot(UserGroupsRef, (Snapdocs) => {
+      const UserGroups = (Snapdocs?.docs?.map(postToJSON) ||
+        []) as UserGroupShape[];
+      setUserGroupsData(UserGroups);
+    });
+
+    return unsub;
+  }, [userUid]);
+
+  return { GlobalAnimeData, UserAnimesData, UserGroupsData };
 }

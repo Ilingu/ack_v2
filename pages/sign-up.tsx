@@ -35,7 +35,7 @@ const SignUpPage: NextPage = () => {
 
   return (
     <Fragment>
-      <MetaTags title="ACK:Sign up" description="Sign up Page for ACK" />
+      <MetaTags title="Sign up" description="Sign up Page for ACK" />
       <main className="h-screen flex flex-col justify-center items-center">
         <div className="bg-bgi-whiter text-primary-main h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
           {user ? (
