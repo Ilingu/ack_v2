@@ -10,9 +10,9 @@ import { FiSettings } from "react-icons/fi";
 
 const Navbar: FC = () => {
   return (
-    <nav className="w-full h-20 bg-bgi-black relative flex">
+    <nav className="w-full h-20 bg-bgi-black relative flex rounded-bl-lg rounded-br-lg">
       <Link href="/" replace passHref>
-        <a className="absolute flex items-center h-full ml-2">
+        <a className="absolute flex items-center h-full ml-2 sm:scale-100 scale-90">
           <Image
             title="Go Home"
             src="/IconAck192.png"
@@ -23,7 +23,7 @@ const Navbar: FC = () => {
           />
         </a>
       </Link>
-      <div className="flex justify-end mr-3 md:justify-center md:mr-0 items-center w-full h-full text-headline">
+      <div className="flex sm:justify-end md:justify-center md:mr-0 ml-11 items-center w-full h-full text-headline sm:scale-100 scale-75">
         <Link href="/anime" passHref>
           <a>
             <button className="btn-navbar group">

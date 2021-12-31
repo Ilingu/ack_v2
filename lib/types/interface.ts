@@ -63,7 +63,6 @@ export interface SeasonAnimesShape {
 export interface UserAnimeShape {
   AnimeId: number;
   WatchType: AnimeWatchType;
-  PersonnalRate: number;
   Fav: boolean;
 }
 export interface UserGroupShape {
@@ -73,7 +72,6 @@ export interface UserGroupShape {
 export interface UserAnimePosterShape {
   AnimeId: number;
   WatchType: AnimeWatchType;
-  PersonnalRate: number;
   Fav: boolean;
   title: string;
   photoURL: string;

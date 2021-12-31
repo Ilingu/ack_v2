@@ -1,7 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+// Push notif from anime
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json({ name: "On Build..." });
+export default async function PushNotif(
+  { query: { token } }: NextApiRequest,
+  res: NextApiResponse
+) {
+  // res.status(404).json({ message: `404` });
+  // res.status(200).json();
 }

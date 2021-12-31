@@ -19,6 +19,8 @@ import {
 // Func
 import { shuffleArray } from "../../lib/utilityfunc";
 import Image from "next/image";
+// Icon
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
@@ -79,7 +81,7 @@ const HomePoster: FC = () => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
 
     const AnimesHomePostersData: UserAnimePosterShape[] = UserAnimes.map(
-      ({ AnimeId, Fav, PersonnalRate, WatchType }) => {
+      ({ AnimeId, Fav, WatchType }) => {
         const { title, photoPath, type } = GlobalAnime.find(
           ({ malId }) => malId === AnimeId
         );
@@ -87,7 +89,6 @@ const HomePoster: FC = () => {
         return {
           AnimeId,
           Fav,
-          PersonnalRate,
           WatchType,
           title,
           photoURL: photoPath,
@@ -114,9 +115,10 @@ const HomePoster: FC = () => {
       }: UserGroupShape): UserGroupPosterShape => {
         const FilteredAnimesForGroup = AnimesHomePostersData.filter(
           ({ AnimeId }) => {
-            let Pass = true;
+            let Pass = false;
+
             GroupAnimesId.forEach((GroupAnimeId) => {
-              if (AnimeId.toString() !== GroupAnimeId) Pass = false;
+              if (AnimeId.toString() === GroupAnimeId) Pass = true;
             });
             return Pass;
           }
@@ -166,8 +168,57 @@ const HomePoster: FC = () => {
   }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups]);
 
   return (
-    <div className="mt-5 flex justify-center">
-      <div className="w-11/12">
+    <div className="mt-5 flex flex-col items-center">
+      <header className="mb-4 flex">
+        <h1
+          className={`${
+            HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
+          } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
+            HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
+            " underline decoration-primary-darker text-headline"
+          }`}
+          onClick={() =>
+            HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
+            setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
+          }
+        >
+          <span
+            className={
+              HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
+              "text-primary-main"
+            }
+          >
+            Animes
+          </span>{" "}
+          Folder
+        </h1>
+        <div className="h-full w-2 rounded-sm cursor-default translate-y-1 text-headline overflow-hidden bg-headline">
+          TEXT
+        </div>
+        <h1
+          className={`${
+            HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
+          } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase ml-2 ${
+            HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
+            " underline decoration-primary-darker text-headline"
+          }`}
+          onClick={() =>
+            HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
+            setHomeDisplayType(HomeDisplayTypeEnum.GROUP)
+          }
+        >
+          <span
+            className={
+              HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
+              "text-primary-main"
+            }
+          >
+            Group
+          </span>{" "}
+          Folder
+        </h1>
+      </header>
+      <div className="w-10/12">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
@@ -186,7 +237,11 @@ const HomePoster: FC = () => {
 function AnimePosterComponent({
   AnimeRenderedElements,
 }: AnimePosterComponentProps) {
-  return <div className="grid grid-cols-5">{AnimeRenderedElements}</div>;
+  return (
+    <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
+      {AnimeRenderedElements}
+    </div>
+  );
 }
 
 function GroupComponent({
@@ -213,9 +268,9 @@ function GroupComponent({
                 </motion.span>{" "}
                 Group
               </motion.h1>
-              <motion.div className="grid grid-cols-3">
+              <motion.div className="grid grid-cols-4 justify-items-center mt-3">
                 {selectedGroupName.data.Animes.map((AnimeData, i) => (
-                  <AnimeItemPoster
+                  <AnimeGroupItemPoster
                     key={AnimeData?.AnimeId || i}
                     AnimeData={AnimeData}
                   />
@@ -230,9 +285,48 @@ function GroupComponent({
 }
 
 // [DYNAMIC-COMPONENTS]
+function AnimeGroupItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
+  return (
+    <div className="w-36 h-56 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg p-1">
+      <div className="row-span-5">
+        <Image
+          src={AnimeData.photoURL}
+          alt="PosterImg"
+          height="125"
+          width="100%"
+          layout="responsive"
+          className="rounded-lg object-cover"
+        />
+      </div>
+      <h1 className="text-headline text-center text-sm font-semibold capitalize row-span-1 flex justify-center items-center">
+        {AnimeData.title}
+      </h1>
+    </div>
+  );
+}
+
 function AnimeItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
-  console.log(AnimeData);
-  return <div></div>;
+  return (
+    <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
+      <div>
+        <div className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
+          {/* <AiFillStar className="icon text-yellow-500" /> */}
+          <AiOutlineStar className="icon text-yellow-500" />
+        </div>
+      </div>
+      <Image
+        src={AnimeData.photoURL}
+        alt="PosterImg"
+        height="132"
+        width="100%"
+        layout="responsive"
+        className="rounded-lg object-cover"
+      />
+      <h1 className="text-primary-whiter text-center text-xl font-bold capitalize flex justify-center items-center">
+        {AnimeData.title}
+      </h1>
+    </div>
+  );
 }
 
 function GroupItemPoster({
@@ -247,7 +341,7 @@ function GroupItemPoster({
       width={30}
       height={30}
       layout="responsive"
-      className="object-cover rounded-tl-lg rounded-bl-lg"
+      className="object-cover rounded-lg"
     />
   );
 

@@ -139,7 +139,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     await setDoc(UserAnimeRef, {
       AnimeId: malId,
       WatchType: newType,
-      PersonnalRate: 0,
       Fav: false,
     });
   };
