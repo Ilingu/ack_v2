@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { User } from "@firebase/auth";
 import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
-import { AnimeShape, UserShape } from "./types/interface";
+import { AnimeShape, UserAnimeShape, UserShape } from "./types/interface";
 // Func
 import { postToJSON } from "./utilityfunc";
 
@@ -44,8 +44,9 @@ export function useUserData() {
   return { user, username: usernameState, reqFinished };
 }
 
-export function useGlobalAnimeData() {
+export function useGlobalAnimeData(userUid: string) {
   const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
+  const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
 
   useEffect(() => {
     let unsub = onSnapshot(collection(db, "animes"), (Snapdocs) => {
@@ -58,5 +59,18 @@ export function useGlobalAnimeData() {
     return unsub;
   }, []);
 
-  return { GlobalAnimeData };
+  useEffect(() => {
+    if (!userUid) return;
+    const UserAnimeRef = collection(doc(db, "users", userUid), "animes");
+    let unsub = onSnapshot(UserAnimeRef, (Snapdocs) => {
+      const UserAnime = (Snapdocs?.docs?.map(postToJSON) ||
+        []) as UserAnimeShape[];
+
+      setUserAnimesData(UserAnime);
+    });
+
+    return unsub;
+  }, [userUid]);
+
+  return { GlobalAnimeData, UserAnimesData };
 }

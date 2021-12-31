@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { AnimeWatchType } from "./enums";
 import {
   AnimeStatusType,
   AnimeType,
@@ -57,6 +58,19 @@ export interface SeasonAnimesShape {
   r18: boolean;
   BeginAiring: string;
   MalId: number;
+}
+/* User Anime */
+export interface UserAnimeShape {
+  AnimeId: number;
+  WatchType: AnimeWatchType;
+  PersonnalRate: number;
+  Fav: boolean;
+}
+export interface UserAnimePosterShape {
+  AnimeId: number;
+  WatchType: AnimeWatchType;
+  PersonnalRate: number;
+  Fav: boolean;
 }
 /* AnimeDB */
 export interface AnimeShape {

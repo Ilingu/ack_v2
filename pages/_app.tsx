@@ -11,7 +11,8 @@ import { GlobalAppContext } from "../lib/context";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
-  const { GlobalAnimeData: GlobalAnime } = useGlobalAnimeData();
+  const { GlobalAnimeData: GlobalAnime, UserAnimesData: UserAnimes } =
+    useGlobalAnimeData(userData?.user?.uid);
   const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       value={{
         ...userData,
         IsWebVersion,
-        UserAnime: [],
+        UserAnimes,
         GlobalAnime,
       }}
     >

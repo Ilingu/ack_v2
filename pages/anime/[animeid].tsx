@@ -2,6 +2,7 @@
 import React, {
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -21,7 +22,7 @@ import { AnimeWatchType } from "../../lib/types/enums";
 import { callApi, postToJSON, Return404 } from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
-import { doc, getDoc } from "@firebase/firestore";
+import { doc, getDoc, setDoc } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
 import MetaTags from "../../components/Common/Metatags";
@@ -36,7 +37,7 @@ import {
   FaStar,
   FaTv,
 } from "react-icons/fa";
-import { EpisodesSearchContext } from "../../lib/context";
+import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -51,6 +52,10 @@ interface SpecialInfoProps {
 interface TagsAnimesProps {
   Genres: TagsShape[];
   Themes: TagsShape[];
+}
+interface MyAnimeProps {
+  AnimeType: null | AnimeWatchType;
+  ChangeFBStatus: (newType: AnimeWatchType) => void;
 }
 
 /* SSG */
@@ -94,6 +99,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 /* Components */
 const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const router = useRouter();
+  const [CurrentAnimeWatchType, setAnimeWatchType] = useState<AnimeWatchType>(
+    AnimeWatchType.UNWATCHED
+  );
+  const { user, UserAnimes } = useContext(GlobalAppContext);
   const {
     title,
     photoPath,
@@ -114,11 +123,35 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     duration,
     EpisodesData,
     Recommendations,
+    malId,
   } = animeData || {};
   const ScoredByTransform = useCallback((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
     return ScoredBy.toString();
   }, [ScoredBy]);
+
+  const ChangeFBStatus = async (newType: AnimeWatchType) => {
+    const UserAnimeRef = doc(
+      doc(db, "users", user.uid),
+      "animes",
+      malId.toString()
+    );
+    await setDoc(UserAnimeRef, {
+      AnimeId: malId,
+      WatchType: newType,
+      PersonnalRate: 0,
+      Fav: false,
+    });
+  };
+
+  useEffect(() => {
+    if (UserAnimes) {
+      const CurrentAnime =
+        UserAnimes.filter(({ AnimeId }) => AnimeId === malId)[0] || null;
+      console.log(UserAnimes);
+      setAnimeWatchType(CurrentAnime?.WatchType || null);
+    }
+  }, [UserAnimes, malId]);
 
   if (router.isFallback)
     return (
@@ -212,7 +245,10 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 duration={type === "TV" && duration}
                 studios={type === "Movie" && Studios}
               />
-              <MyAnimes />
+              <MyAnimes
+                AnimeType={CurrentAnimeWatchType}
+                ChangeFBStatus={ChangeFBStatus}
+              />
             </div>
           </div>
         </section>
@@ -251,7 +287,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   );
 };
 
-function MyAnimes() {
+function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
   const {
     WATCHING,
     WATCHED,
@@ -261,7 +297,7 @@ function MyAnimes() {
     WONT_WATCH,
     DROPPED,
   } = AnimeWatchType;
-  const [SelectValue, setSelectValue] = useState(UNWATCHED);
+  const [SelectValue, setSelectValue] = useState(AnimeType);
   const FirstEffectSkipped = useRef(false);
 
   useEffect(() => {
@@ -269,7 +305,8 @@ function MyAnimes() {
       FirstEffectSkipped.current = true;
       return;
     }
-    // Action Change to FB
+    ChangeFBStatus(SelectValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [SelectValue]);
 
   return (
