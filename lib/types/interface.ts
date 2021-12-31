@@ -75,6 +75,13 @@ export interface UserAnimePosterShape {
   WatchType: AnimeWatchType;
   PersonnalRate: number;
   Fav: boolean;
+  title: string;
+  photoURL: string;
+  type: AnimeType;
+}
+export interface UserGroupPosterShape {
+  GroupName: string;
+  Animes: UserAnimePosterShape[];
 }
 /* AnimeDB */
 export interface AnimeShape {

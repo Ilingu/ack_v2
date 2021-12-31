@@ -207,7 +207,7 @@ export const Return404 = (): {
 /**
  * @returns The current season: "winter" | "spring" | "summer" | "fall"
  */
-export function WhitchSeason() {
+export const WhitchSeason = () => {
   const Month = new Date().getMonth() + 1;
   const Day = new Date().getDate();
   let season: TheFourSeason;
@@ -240,4 +240,12 @@ export function WhitchSeason() {
       break;
   }
   return season;
-}
+};
+
+/**
+ * Randomly Suffle the Array in params
+ * @param {Array} ArrayToShuffle
+ * @returns The randomly shuffled array
+ */
+export const shuffleArray = <T>(array: T[]): T[] =>
+  array.sort(() => Math.random() - 0.5);

@@ -1,4 +1,3 @@
-// Example
 export enum AnimeWatchType {
   UNWATCHED = "unwatched",
   WATCHED = "watched",
@@ -7,9 +6,15 @@ export enum AnimeWatchType {
   WONT_WATCH = "wont_watch",
   DROPPED = "dropped",
 }
+
 export enum TheFourSeasonEnum {
   WINTER = "winter",
   SPRING = "spring",
   SUMMER = "summer",
   FALL = "fall",
+}
+
+export enum HomeDisplayTypeEnum {
+  GROUP,
+  ANIMES,
 }
