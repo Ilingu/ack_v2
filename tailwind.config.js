@@ -29,10 +29,20 @@ module.exports = {
           whiter: "rgb(53, 54, 58)",
         },
       },
+      // Custom Size
       gridTemplateRows: {
         12: "repeat(12, minmax(0, 1fr))",
       },
-
+      // Animation
+      animation: {
+        fadeIn: "fadeIn 0.1s ease-in 0s 1 forwards",
+      },
+      keyframes: {
+        fadeIn: {
+          from: { opacity: "0.2", transform: "scale(0.1)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+      },
       // EnableVariant
       ringWidth: ["hover", "active"],
       ringColor: ["hover", "active"],

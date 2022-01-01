@@ -7,8 +7,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-// UI
-import { AnimatePresence, motion } from "framer-motion";
 // Types
 import { GlobalAppContext } from "../../lib/context";
 import { AnimeWatchType, HomeDisplayTypeEnum } from "../../lib/types/enums";
@@ -101,22 +99,21 @@ const HomePoster: FC = () => {
           WatchType !== AnimeWatchType.UNWATCHED
       );
 
-    const AnimesHomePostersData: UserAnimePosterShape[] = filterUserAnime().map(
-      ({ AnimeId, Fav, WatchType }) => {
-        const { title, photoPath, type } = GlobalAnime.find(
-          ({ malId }) => malId === AnimeId
-        );
+    const AnimesHomePostersData: UserAnimePosterShape[] = filterUserAnime()
+      .map(({ AnimeId, Fav, WatchType }) => {
+        const AnimeData = GlobalAnime.find(({ malId }) => malId === AnimeId);
+        if (!AnimeData) return null;
 
         return {
           AnimeId,
           Fav,
           WatchType,
-          title,
-          photoURL: photoPath,
-          type,
+          title: AnimeData.title,
+          photoURL: AnimeData.photoPath,
+          type: AnimeData.type,
         };
-      }
-    );
+      })
+      .filter((UAP) => UAP);
 
     // Group Render
     if (HomeDisplayType === HomeDisplayTypeEnum.GROUP) {
@@ -233,6 +230,7 @@ const HomePoster: FC = () => {
       const AnimeData = AnimesHomePostersData.find(
         ({ AnimeId }) => AnimeId.toString() === animeId
       );
+      if (!AnimeData) return null;
 
       return (
         <AnimeItemPoster
@@ -343,94 +341,70 @@ function GroupComponent({
 }: GroupComponentProps) {
   return (
     <Fragment>
-      <div className="grid grid-cols-5">{GroupRenderedElements}</div>
+      <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
+        {GroupRenderedElements}
+      </div>
 
       <div className="flex justify-center items-center">
-        <AnimatePresence>
-          {selectedGroupName?.name && (
-            <motion.div
-              layoutId={selectedGroupName.name}
-              animate={{ scale: 1.5 }}
-              className="w-1/2 h-96 absolute -translate-x-1/2 -translate-y-1/2 bg-bgi-darker cursor-pointer rounded-lg"
+        {selectedGroupName?.name && (
+          <div className="animate-fadeIn md:w-1/2 w-10/12 p-2 absolute bg-bgi-darker bg-opacity-90 cursor-pointer rounded-lg">
+            <h1 className="text-headline font-bold text-2xl capitalize text-center">
+              <span className="text-primary-main">
+                {selectedGroupName.data.GroupName}
+              </span>{" "}
+              Group
+            </h1>
+            <button
+              className="text-headline absolute top-0 right-2 text-4xl"
+              onClick={() => setSelectedGroup(null)}
             >
-              <motion.h1 className="text-headline font-bold text-2xl capitalize text-center">
-                <motion.span className="text-primary-main">
-                  {selectedGroupName.data.GroupName}
-                </motion.span>{" "}
-                Group
-              </motion.h1>
-              <motion.button
-                className="text-headline absolute top-0 right-2 text-4xl"
-                onClick={() => setSelectedGroup(null)}
-              >
-                <AiFillCloseCircle className="icon" />
-              </motion.button>
-              <motion.div className="grid grid-cols-4 justify-items-center mt-3">
-                {selectedGroupName.data.Animes.map((AnimeData, i) => (
-                  <AnimeGroupItemPoster
-                    key={AnimeData?.AnimeId || i}
-                    AnimeData={AnimeData}
-                  />
-                ))}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <AiFillCloseCircle className="icon" />
+            </button>
+            <div className="grid 2xl:grid-cols-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center mt-3">
+              {selectedGroupName.data.Animes.map((AnimeData, i) => (
+                <AnimeItemPoster
+                  key={AnimeData?.AnimeId || i}
+                  AnimeData={AnimeData}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Fragment>
   );
 }
 
 // [DYNAMIC-COMPONENTS]
-function AnimeGroupItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
-  return (
-    <div className="w-36 h-56 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg p-1 relative">
-      <Link href={`/watch/${AnimeData.AnimeId}`}>
-        <a>
-          <div className="row-span-5">
-            <Image
-              src={AnimeData.photoURL}
-              alt="PosterImg"
-              height="125"
-              width="100%"
-              layout="responsive"
-              className="rounded-lg object-cover"
-            />
-          </div>
-          <h1 className="text-headline text-center text-sm font-semibold capitalize row-span-1 flex justify-center items-center">
-            {AnimeData.title}
-          </h1>
-        </a>
-      </Link>
-    </div>
-  );
-}
-
-function AnimeItemPoster({ AnimeData, ToggleFav }: HomeAnimeItemPosterProp) {
-  const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
+function AnimeItemPoster({
+  AnimeData: { AnimeId, Fav, WatchType, photoURL, title },
+  ToggleFav,
+}: HomeAnimeItemPosterProp) {
+  const { WATCHED, WATCHING } = AnimeWatchType;
   const Color =
-    AnimeData.WatchType === AnimeWatchType.WATCHING
+    WatchType === WATCHING
       ? "text-primary-whiter"
-      : "";
+      : WatchType === WATCHED
+      ? "text-green-500"
+      : "text-red-500";
 
   return (
     <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
-      <div>
-        <div
-          className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
-          onClick={() => ToggleFav(AnimeData.AnimeId.toString(), AnimeData.Fav)}
-        >
-          {AnimeData.Fav ? (
-            <AiFillStar className="icon text-yellow-500" />
-          ) : (
-            <AiOutlineStar className="icon text-yellow-500" />
-          )}
-        </div>
+      <div
+        className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+        onClick={() => ToggleFav && ToggleFav(AnimeId.toString(), Fav)}
+      >
+        {Fav ? (
+          <AiFillStar className="icon text-yellow-500" />
+        ) : (
+          <AiOutlineStar className="icon text-yellow-500" />
+        )}
       </div>
-      <Link href={`/watch/${AnimeData.AnimeId}`}>
+
+      <Link href={`/watch/${AnimeId}`}>
         <a>
           <Image
-            src={AnimeData.photoURL}
+            src={photoURL}
             alt="PosterImg"
             height="132"
             width="100%"
@@ -438,9 +412,9 @@ function AnimeItemPoster({ AnimeData, ToggleFav }: HomeAnimeItemPosterProp) {
             className="rounded-lg object-cover"
           />
           <h1
-            className={`text-primary-whiter text-center text-xl font-bold capitalize flex justify-center items-center`}
+            className={`${Color} text-center text-xl font-bold capitalize flex justify-center items-center`}
           >
-            {AnimeData.title}
+            {title}
           </h1>
         </a>
       </Link>
@@ -465,22 +439,21 @@ function GroupItemPoster({
   );
 
   return (
-    <motion.div
-      layoutId={GroupData.GroupName}
+    <div
       className="w-52 h-80 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg"
       onClick={() =>
         setSelectedGroup({ name: GroupData.GroupName, data: GroupData })
       }
     >
-      <motion.div className="row-span-5 grid grid-cols-2">
+      <div className="row-span-5 grid grid-cols-2">
         {GroupData.Animes.slice(0, 2).map(({ photoURL }, i) => (
           <PreviewImg key={i} src={photoURL} />
         ))}
-      </motion.div>
-      <motion.h1 className="text-headline font-bold text-2xl capitalize row-span-1 flex items-center">
+      </div>
+      <h1 className="text-headline font-bold text-xl capitalize row-span-1 flex justify-center items-center">
         {GroupData.GroupName}
-      </motion.h1>
-    </motion.div>
+      </h1>
+    </div>
   );
 }
 
