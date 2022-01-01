@@ -93,7 +93,15 @@ const HomePoster: FC = () => {
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
 
-    const AnimesHomePostersData: UserAnimePosterShape[] = UserAnimes.map(
+    const filterUserAnime = () =>
+      UserAnimes.filter(
+        ({ WatchType }) =>
+          WatchType !== AnimeWatchType.WONT_WATCH &&
+          WatchType !== AnimeWatchType.WANT_TO_WATCH &&
+          WatchType !== AnimeWatchType.UNWATCHED
+      );
+
+    const AnimesHomePostersData: UserAnimePosterShape[] = filterUserAnime().map(
       ({ AnimeId, Fav, WatchType }) => {
         const { title, photoPath, type } = GlobalAnime.find(
           ({ malId }) => malId === AnimeId
@@ -112,14 +120,38 @@ const HomePoster: FC = () => {
 
     // Group Render
     if (HomeDisplayType === HomeDisplayTypeEnum.GROUP) {
-      const AnimesGroupId: string[] = UserGroups.map(
-        ({ GroupName }) => GroupName
-      );
-
-      // Shuffle Array -> Order
       if (!GroupsElementsOrder.current) {
+        // Render Order
+        const AnimesGroupId: string[] = UserGroups.map(
+          ({ GroupName }) => GroupName
+        );
+
         const GroupsOrder = shuffleArray(AnimesGroupId);
         GroupsElementsOrder.current = GroupsOrder;
+      }
+      if (UserGroups.length !== GroupsElementsOrder.current.length) {
+        const ToObjRA = UserGroups.reduce(
+          (a, { GroupName }) => ({ ...a, [GroupName]: GroupName }),
+          {}
+        );
+        const ToObjCA = GroupsElementsOrder.current.reduce(
+          (a, GrName) => ({ ...a, [GrName]: GrName }),
+          {}
+        );
+
+        // Check If New Group To Add
+        UserGroups.forEach(({ GroupName }) => {
+          if (!ToObjCA[GroupName])
+            GroupsElementsOrder.current.unshift(GroupName);
+        });
+        // Check If Group To Delete
+        GroupsElementsOrder.current.forEach((GrName) => {
+          if (!ToObjRA[GrName]) {
+            const CurrentGroups = GroupsElementsOrder.current;
+            const indexToDel = CurrentGroups.indexOf(GrName);
+            CurrentGroups.splice(indexToDel, 1);
+          }
+        });
       }
 
       const TransformToPosterGroupData = ({
@@ -161,12 +193,40 @@ const HomePoster: FC = () => {
     }
 
     // Animes Render
-    const AllAnimesId = UserAnimes.map(({ AnimeId }) => AnimeId.toString());
-
-    // Shuffle Array -> Order
     if (!AnimesElementsOrder.current) {
+      // Shuffle Array -> Order
+      const AllAnimesId = filterUserAnime().map(({ AnimeId }) =>
+        AnimeId.toString()
+      );
+
       const AnimesOrder = shuffleArray(AllAnimesId);
       AnimesElementsOrder.current = AnimesOrder;
+    }
+    if (filterUserAnime().length !== AnimesElementsOrder.current.length) {
+      const AllRealAnime = filterUserAnime();
+
+      const ToObjRA = AllRealAnime.reduce(
+        (a, { AnimeId }) => ({ ...a, [AnimeId]: AnimeId }),
+        {}
+      );
+      const ToObjCA = AnimesElementsOrder.current.reduce(
+        (a, id) => ({ ...a, [id]: id }),
+        {}
+      );
+
+      // Check If New Anime To Add
+      AllRealAnime.forEach(({ AnimeId }) => {
+        if (!ToObjCA[AnimeId])
+          AnimesElementsOrder.current.unshift(AnimeId.toString());
+      });
+      // Check If Anime To Delete
+      AnimesElementsOrder.current.forEach((AnimeID) => {
+        if (!ToObjRA[AnimeID]) {
+          const CurrentAnimes = AnimesElementsOrder.current;
+          const indexToDel = CurrentAnimes.indexOf(AnimeID);
+          CurrentAnimes.splice(indexToDel, 1);
+        }
+      });
     }
 
     const AnimesPosterJSX = AnimesElementsOrder.current.map((animeId, i) => {
@@ -347,7 +407,11 @@ function AnimeGroupItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
 }
 
 function AnimeItemPoster({ AnimeData, ToggleFav }: HomeAnimeItemPosterProp) {
-  const Color = AnimeData.WatchType === AnimeWatchType.WATCHING ? "" : "";
+  const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
+  const Color =
+    AnimeData.WatchType === AnimeWatchType.WATCHING
+      ? "text-primary-whiter"
+      : "";
 
   return (
     <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">

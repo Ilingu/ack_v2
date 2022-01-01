@@ -22,7 +22,7 @@ import { AnimeWatchType } from "../../lib/types/enums";
 import { callApi, postToJSON, Return404 } from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
-import { doc, getDoc, setDoc } from "@firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
 import MetaTags from "../../components/Common/Metatags";
@@ -139,6 +139,10 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       "animes",
       malId.toString()
     );
+
+    if (newType === AnimeWatchType.UNWATCHED)
+      return await deleteDoc(UserAnimeRef);
+
     await setDoc(UserAnimeRef, {
       AnimeId: malId,
       WatchType: newType,
