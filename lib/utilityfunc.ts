@@ -150,6 +150,7 @@ export function JikanApiToAnimeShape(
         image_url: removeParamsFromPhotoUrl(recom.image_url),
       })) || [],
     EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
+    LastRefresh: Date.now(),
   };
 }
 

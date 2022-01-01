@@ -65,7 +65,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Check on FB
   const animeFBRef = doc(db, "animes", animeId);
   const animeFB = await getDoc(animeFBRef);
-  if (animeFB.exists()) {
+  if (
+    animeFB.exists() &&
+    Date.now() - postToJSON(animeFB).LastRefresh < 2592000000
+  ) {
     return {
       props: { animeData: postToJSON(animeFB) }, // Exists on FB
     };
@@ -100,7 +103,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const router = useRouter();
   const [CurrentAnimeWatchType, setAnimeWatchType] = useState<AnimeWatchType>(
-    AnimeWatchType.UNWATCHED
+    () => AnimeWatchType.UNWATCHED
   );
   const { user, UserAnimes } = useContext(GlobalAppContext);
   const {
@@ -146,8 +149,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   useEffect(() => {
     if (UserAnimes) {
       const CurrentAnime =
-        UserAnimes.filter(({ AnimeId }) => AnimeId === malId)[0] || null;
-      console.log(UserAnimes);
+        UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
+      console.log(CurrentAnime?.WatchType);
       setAnimeWatchType(CurrentAnime?.WatchType || null);
     }
   }, [UserAnimes, malId]);
@@ -297,9 +300,13 @@ function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
       FirstEffectSkipped.current = true;
       return;
     }
-    ChangeFBStatus(SelectValue);
+    SelectValue !== AnimeType && ChangeFBStatus(SelectValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [SelectValue]);
+
+  useEffect(() => {
+    setSelectValue(AnimeType);
+  }, [AnimeType]);
 
   return (
     <AuthCheck

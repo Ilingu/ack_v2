@@ -27,7 +27,10 @@ export default async function AddNewAnimeToFB(
     const animeRecommendationsRes: JikanApiResRecommandations = await callApi(
       endpoint + "/recommendations"
     );
-    if (animeEpsRes.length <= 0) animeEpsRes = null;
+    if (animeEpsRes.length <= 0)
+      animeEpsRes = Array.apply(null, Array(12)).map((_: null, i: number) => ({
+        episode_id: i + 1,
+      }));
     const AllAnimeData = await Promise.all([
       animeRes,
       animeEpsRes,

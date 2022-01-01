@@ -49,6 +49,10 @@ const SearchPage: NextPage = () => {
     reqTitle: string;
   }>({ animesFound: [], reqTitle: "" });
 
+  useEffect(() => {
+    animes.current = GlobalAnime;
+  }, [GlobalAnime]);
+
   const Submit = useCallback(
     async (title: string, api: boolean = false) => {
       if (typeof title !== "string" || title.length < 3) return;

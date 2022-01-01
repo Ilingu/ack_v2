@@ -1,38 +1,26 @@
-import React from "react";
-import { GetStaticProps, GetStaticPaths, NextPage } from "next";
-// UI
+import React, { Fragment, useContext, useState } from "react";
+import { NextPage } from "next";
+// Auth
 import AuthCheck from "../../../components/Common/AuthCheck";
-
-/* Interface */
-interface AnimeProps {}
-
-/* ISR */
-export const getStaticProps: GetStaticProps = async () => {
-  // Router
-  // Get anime from firebase
-  // Get user anime progress
-
-  return {
-    props: { anime: null },
-    revalidate: 60,
-  };
-};
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Get all anime name from DB
-
-  return {
-    paths: null,
-    fallback: "blocking",
-  };
-};
+import MetaTags from "../../../components/Common/Metatags";
+// Ctx
+import { GlobalAppContext } from "../../../lib/context";
+// Type
+import { UserAnimeShape } from "../../../lib/types/interface";
 
 /* Components */
-const WatchAnime: NextPage<AnimeProps> = ({}) => {
-  // Get user anime progress -> ISR then Rehydrate with Realtime
+const WatchAnime: NextPage = () => {
+  const { UserAnimes, GlobalAnime } = useContext(GlobalAppContext);
+  const [CurrentAnime, setCurrentAnime] = useState<UserAnimeShape>();
+
   return (
-    <AuthCheck>
-      <main></main>
-    </AuthCheck>
+    <Fragment>
+      <AuthCheck>
+        <main>
+          <MetaTags title={""} description="" />
+        </main>
+      </AuthCheck>
+    </Fragment>
   );
 };
 

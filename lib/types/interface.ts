@@ -64,6 +64,7 @@ export interface UserAnimeShape {
   AnimeId: number;
   WatchType: AnimeWatchType;
   Fav: boolean;
+  Progress: number[] | null;
 }
 export interface UserGroupShape {
   GroupAnimesId: string[];
@@ -104,6 +105,7 @@ export interface AnimeShape {
   nbEp: number;
   duration: string;
   malId: number;
+  LastRefresh: number;
 }
 export interface StudiosShape {
   name: string;
@@ -196,14 +198,14 @@ export interface JikanApiResEpisodes {
 }
 export interface JikanApiResAnimeEpisodes {
   episode_id: number;
-  title: string;
-  title_japanese: string;
-  title_romanji: string;
-  aired: Date;
-  filler: boolean;
-  recap: boolean;
-  video_url: string;
-  forum_url: string;
+  title?: string;
+  title_japanese?: string;
+  title_romanji?: string;
+  aired?: Date;
+  filler?: boolean;
+  recap?: boolean;
+  video_url?: string;
+  forum_url?: string;
 }
 
 /* JikanRes on /anime/recommendations */

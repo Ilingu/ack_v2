@@ -1,6 +1,7 @@
 import React, {
   FC,
   Fragment,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -10,21 +11,26 @@ import React, {
 import { AnimatePresence, motion } from "framer-motion";
 // Types
 import { GlobalAppContext } from "../../lib/context";
-import { HomeDisplayTypeEnum } from "../../lib/types/enums";
+import { AnimeWatchType, HomeDisplayTypeEnum } from "../../lib/types/enums";
 import {
   UserAnimePosterShape,
   UserGroupPosterShape,
   UserGroupShape,
 } from "../../lib/types/interface";
+// Auth
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 // Func
 import { shuffleArray } from "../../lib/utilityfunc";
 import Image from "next/image";
 // Icon
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
+import Link from "next/link";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
   AnimeData: UserAnimePosterShape;
+  ToggleFav?: (AnimeId: string, currentVal: boolean) => Promise<void>;
 }
 interface HomeGroupItemPosterProp {
   GroupData: UserGroupPosterShape;
@@ -54,7 +60,8 @@ interface GroupComponentProps {
 
 /* COMPONENTS */
 const HomePoster: FC = () => {
-  const { UserAnimes, UserGroups, GlobalAnime } = useContext(GlobalAppContext);
+  const { UserAnimes, UserGroups, GlobalAnime, user } =
+    useContext(GlobalAppContext);
 
   const [AnimeRenderedElements, setNewRenderForAnimes] =
     useState<JSX.Element[]>();
@@ -65,8 +72,10 @@ const HomePoster: FC = () => {
   const GroupsElementsOrder = useRef<string[]>();
 
   const [HomeDisplayType, setHomeDisplayType] = useState<HomeDisplayTypeEnum>(
-    HomeDisplayTypeEnum.GROUP
-  ); // LocalStorage
+    JSON.parse(localStorage.getItem("HomeDisplayType")) !== 0
+      ? HomeDisplayTypeEnum.ANIMES
+      : HomeDisplayTypeEnum.GROUP
+  );
 
   // Group
   const [selectedGroupName, setSelectedGroup] = useState<{
@@ -76,6 +85,10 @@ const HomePoster: FC = () => {
     name: null,
     data: null,
   });
+
+  useEffect(() => {
+    localStorage.setItem("HomeDisplayType", JSON.stringify(HomeDisplayType));
+  }, [HomeDisplayType]);
 
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
@@ -161,11 +174,28 @@ const HomePoster: FC = () => {
         ({ AnimeId }) => AnimeId.toString() === animeId
       );
 
-      return <AnimeItemPoster key={animeId || i} AnimeData={AnimeData} />;
+      return (
+        <AnimeItemPoster
+          key={animeId || i}
+          AnimeData={AnimeData}
+          ToggleFav={ToggleFav}
+        />
+      );
     });
 
     setNewRenderForAnimes(AnimesPosterJSX);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups]);
+
+  const ToggleFav = useCallback(
+    async (AnimeId: string, currentVal: boolean) => {
+      const AnimeRef = doc(doc(db, "users", user.uid), "animes", AnimeId);
+      await updateDoc(AnimeRef, {
+        Fav: !currentVal,
+      });
+    },
+    [user]
+  );
 
   return (
     <div className="mt-5 flex flex-col items-center">
@@ -184,8 +214,9 @@ const HomePoster: FC = () => {
         >
           <span
             className={
-              HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-              "text-primary-main"
+              HomeDisplayType === HomeDisplayTypeEnum.ANIMES
+                ? "text-primary-main"
+                : ""
             }
           >
             Animes
@@ -209,8 +240,9 @@ const HomePoster: FC = () => {
         >
           <span
             className={
-              HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-              "text-primary-main"
+              HomeDisplayType === HomeDisplayTypeEnum.GROUP
+                ? "text-primary-main"
+                : ""
             }
           >
             Group
@@ -260,7 +292,6 @@ function GroupComponent({
               layoutId={selectedGroupName.name}
               animate={{ scale: 1.5 }}
               className="w-1/2 h-96 absolute -translate-x-1/2 -translate-y-1/2 bg-bgi-darker cursor-pointer rounded-lg"
-              onClick={() => setSelectedGroup(null)}
             >
               <motion.h1 className="text-headline font-bold text-2xl capitalize text-center">
                 <motion.span className="text-primary-main">
@@ -268,6 +299,12 @@ function GroupComponent({
                 </motion.span>{" "}
                 Group
               </motion.h1>
+              <motion.button
+                className="text-headline absolute top-0 right-2 text-4xl"
+                onClick={() => setSelectedGroup(null)}
+              >
+                <AiFillCloseCircle className="icon" />
+              </motion.button>
               <motion.div className="grid grid-cols-4 justify-items-center mt-3">
                 {selectedGroupName.data.Animes.map((AnimeData, i) => (
                   <AnimeGroupItemPoster
@@ -287,44 +324,62 @@ function GroupComponent({
 // [DYNAMIC-COMPONENTS]
 function AnimeGroupItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
   return (
-    <div className="w-36 h-56 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg p-1">
-      <div className="row-span-5">
-        <Image
-          src={AnimeData.photoURL}
-          alt="PosterImg"
-          height="125"
-          width="100%"
-          layout="responsive"
-          className="rounded-lg object-cover"
-        />
-      </div>
-      <h1 className="text-headline text-center text-sm font-semibold capitalize row-span-1 flex justify-center items-center">
-        {AnimeData.title}
-      </h1>
+    <div className="w-36 h-56 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg p-1 relative">
+      <Link href={`/watch/${AnimeData.AnimeId}`}>
+        <a>
+          <div className="row-span-5">
+            <Image
+              src={AnimeData.photoURL}
+              alt="PosterImg"
+              height="125"
+              width="100%"
+              layout="responsive"
+              className="rounded-lg object-cover"
+            />
+          </div>
+          <h1 className="text-headline text-center text-sm font-semibold capitalize row-span-1 flex justify-center items-center">
+            {AnimeData.title}
+          </h1>
+        </a>
+      </Link>
     </div>
   );
 }
 
-function AnimeItemPoster({ AnimeData }: HomeAnimeItemPosterProp) {
+function AnimeItemPoster({ AnimeData, ToggleFav }: HomeAnimeItemPosterProp) {
+  const Color = AnimeData.WatchType === AnimeWatchType.WATCHING ? "" : "";
+
   return (
     <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
       <div>
-        <div className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
-          {/* <AiFillStar className="icon text-yellow-500" /> */}
-          <AiOutlineStar className="icon text-yellow-500" />
+        <div
+          className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+          onClick={() => ToggleFav(AnimeData.AnimeId.toString(), AnimeData.Fav)}
+        >
+          {AnimeData.Fav ? (
+            <AiFillStar className="icon text-yellow-500" />
+          ) : (
+            <AiOutlineStar className="icon text-yellow-500" />
+          )}
         </div>
       </div>
-      <Image
-        src={AnimeData.photoURL}
-        alt="PosterImg"
-        height="132"
-        width="100%"
-        layout="responsive"
-        className="rounded-lg object-cover"
-      />
-      <h1 className="text-primary-whiter text-center text-xl font-bold capitalize flex justify-center items-center">
-        {AnimeData.title}
-      </h1>
+      <Link href={`/watch/${AnimeData.AnimeId}`}>
+        <a>
+          <Image
+            src={AnimeData.photoURL}
+            alt="PosterImg"
+            height="132"
+            width="100%"
+            layout="responsive"
+            className="rounded-lg object-cover"
+          />
+          <h1
+            className={`text-primary-whiter text-center text-xl font-bold capitalize flex justify-center items-center`}
+          >
+            {AnimeData.title}
+          </h1>
+        </a>
+      </Link>
     </div>
   );
 }
