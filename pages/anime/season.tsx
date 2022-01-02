@@ -6,12 +6,14 @@ import { GetStaticProps, NextPage } from "next";
 // Types
 import {
   callApi,
+  IsError,
   JikanApiToSeasonAnimeShape,
   Return404,
   WhitchSeason,
 } from "../../lib/utilityfunc";
 import {
-  JikanApiResSeasonAnime,
+  JikanApiERROR,
+  JikanApiResSeason,
   JikanApiResSeasonRoot,
   SeasonAnimesShape,
 } from "../../lib/types/interface";
@@ -24,7 +26,7 @@ import MetaTags from "../../components/Common/Metatags";
 
 /* Interface */
 interface SeasonAnimesProps {
-  seasonAnimesISR: JikanApiResSeasonAnime[];
+  seasonAnimesISR: JikanApiResSeason[];
 }
 interface SeasonAnimeItemProps {
   seasonAnimeData: SeasonAnimesShape;
@@ -33,16 +35,20 @@ interface SeasonAnimeItemProps {
 /* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const seasonAnime = (await callApi(
-      `https://api.jikan.moe/v3/season`
-    )) as JikanApiResSeasonRoot;
-    if (seasonAnime.status === 404) return Return404();
+    const seasonAnime: JikanApiResSeasonRoot = await callApi(
+      `https://api.jikan.moe/v4/seasons/upcoming`
+    );
 
     return {
-      props: { seasonAnimesISR: seasonAnime.anime.slice(0, 50) },
-      revalidate: 86400,
+      props: {
+        seasonAnimesISR: IsError(seasonAnime as unknown as JikanApiERROR)
+          ? []
+          : seasonAnime.data.slice(0, 50),
+      },
+      revalidate: IsError(seasonAnime as unknown as JikanApiERROR) ? 60 : 86400,
     };
   } catch (err) {
+    console.error(err);
     return Return404();
   }
 };
@@ -78,13 +84,14 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
   };
   const GetSeason = async (year: string, season: TheFourSeason) => {
     try {
-      const seasonAnimeFetch = (await callApi(
-        `https://api.jikan.moe/v3/season/${year}/${season}`
-      )) as JikanApiResSeasonRoot;
-      if (seasonAnimeFetch.status === 404) return;
-      setSeasonAnimes(seasonAnimeFetch.anime.slice(0, 50));
+      const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi(
+        `https://api.jikan.moe/v4/seasons/${year}/${season}`
+      );
+      if (IsError(seasonAnimeFetch as unknown as JikanApiERROR)) return;
+
+      setSeasonAnimes(seasonAnimeFetch.data.slice(0, 50));
     } catch (err) {
-      return;
+      console.error(err);
     }
   };
 
@@ -157,9 +164,8 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
 };
 
 function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
-  const { title, type, PhotoUrl, BeginAiring, score, MalId, r18 } =
+  const { title, type, PhotoUrl, BeginAiring, score, MalId } =
     seasonAnimeData || {};
-  if (r18) return <div></div>;
 
   return (
     <div className="px-4 py-2 rounded-md text-center">

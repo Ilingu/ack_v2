@@ -2,12 +2,12 @@ import { DocumentSnapshot } from "@firebase/firestore";
 import {
   AnimeShape,
   EpisodesShape,
+  JikanApiERROR,
   JikanApiResAnime,
-  JikanApiResAnimeEpisodes,
-  JikanApiResAnimeRecommandations,
   JikanApiResEpisodes,
+  JikanApiResEpisodesRoot,
   JikanApiResRecommandations,
-  JikanApiResSeasonAnime,
+  JikanApiResSeason,
   RecommendationsShape,
   SeasonAnimesShape,
 } from "./types/interface";
@@ -28,7 +28,7 @@ export function isValidUrl(url: string) {
 }
 
 /**
- * Get Data with SWR
+ * Fetch Data From Api
  * @param {URL} url
  */
 export async function callApi(url: string) {
@@ -61,14 +61,14 @@ export function removeDuplicates<T>(ary: T[]) {
  * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToEpisodesShape(
-  JikanObj: JikanApiResAnimeEpisodes[]
+  JikanObj: JikanApiResEpisodes[]
 ): EpisodesShape[] {
-  return JikanObj.map((epData) => ({
-    epsId: epData.episode_id,
+  return JikanObj.map((epData, i) => ({
+    epsId: epData.mal_id || i + 1,
     title: epData.title,
     Filler: epData.filler,
     Recap: epData.recap,
-    EpsURL: epData.video_url,
+    EpsURL: epData.url,
     ForumURL: epData.forum_url,
   }));
 }
@@ -78,13 +78,13 @@ export function JikanApiToEpisodesShape(
  * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToRecommendationShape(
-  JikanObj: JikanApiResAnimeRecommandations[]
+  JikanObj: JikanApiResRecommandations[]
 ): RecommendationsShape[] {
   return JikanObj.map((recomData) => ({
-    malId: recomData.mal_id,
-    photoUrl: recomData.image_url,
-    recommendationCount: recomData.recommendation_count,
-    title: recomData.title,
+    malId: recomData.entry.mal_id,
+    photoUrl: recomData.entry.images.jpg.image_url,
+    recommendationCount: recomData.votes,
+    title: recomData.entry.title,
   }));
 }
 
@@ -93,17 +93,16 @@ export function JikanApiToRecommendationShape(
  * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToSeasonAnimeShape(
-  JikanObj: JikanApiResSeasonAnime[]
+  JikanObj: JikanApiResSeason[]
 ): SeasonAnimesShape[] {
   return JikanObj.map((SeasonData) => ({
     title: SeasonData.title,
     type: SeasonData.type,
-    PhotoUrl: SeasonData.image_url,
-    BeginAiring: new Date(SeasonData.airing_start).toLocaleDateString(),
+    PhotoUrl: SeasonData.images.jpg.image_url,
+    BeginAiring: new Date(SeasonData.aired.from).toLocaleDateString(),
     score: SeasonData.score,
-    r18: SeasonData.r18,
     MalId: SeasonData.mal_id,
-  })).filter((Sd) => !Sd.r18);
+  }));
 }
 
 /**
@@ -113,8 +112,8 @@ export function JikanApiToSeasonAnimeShape(
 export function JikanApiToAnimeShape(
   JikanObj: [
     JikanApiResAnime,
-    JikanApiResAnimeEpisodes[],
-    JikanApiResRecommandations
+    JikanApiResEpisodes[],
+    JikanApiResRecommandations[]
   ]
 ): AnimeShape {
   return {
@@ -131,26 +130,27 @@ export function JikanApiToAnimeShape(
     ScoredBy: JikanObj[0].scored_by,
     Status: JikanObj[0].status as AnimeStatusType,
     type: JikanObj[0].type,
-    ReleaseDate: JikanObj[0].premiered,
+    ReleaseDate: `${JikanObj[0].season} ${JikanObj[0].year}`,
     Synopsis: JikanObj[0].synopsis,
     Studios: JikanObj[0].studios,
     Theme: JikanObj[0].themes,
-    photoPath: removeParamsFromPhotoUrl(JikanObj[0].image_url),
+    photoPath: removeParamsFromPhotoUrl(JikanObj[0].images.jpg.image_url),
     malId: JikanObj[0].mal_id,
-    trailer_url: JikanObj[0].trailer_url,
-    nbEp: JikanObj[0].episodes,
+    trailer_url: JikanObj[0].trailer.embed_url,
+    nbEp: JikanObj[0].episodes || 12,
     MalPage: JikanObj[0].url,
     duration:
       JikanObj[0].type === "Movie"
         ? JikanObj[0].duration
         : JikanObj[0].duration,
     Recommendations:
-      JikanObj[2]?.recommendations.slice(0, 7).map((recom) => ({
+      JikanObj[2]?.slice(0, 7).map((recom) => ({
         ...recom,
-        image_url: removeParamsFromPhotoUrl(recom.image_url),
+        image_url: removeParamsFromPhotoUrl(recom.entry.images.jpg.image_url),
       })) || [],
     EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
     LastRefresh: Date.now(),
+    broadcast: JikanObj[0].broadcast.string,
   };
 }
 
@@ -162,32 +162,41 @@ export const removeParamsFromPhotoUrl = (photoUrl: string) =>
   photoUrl.split("?s=")[0];
 
 /**
+ * Is the Api Req an error ?
+ * @param {JikanApiERROR} api_response
+ * @returns {boolean} true | false
+ */
+export const IsError = (api_response: JikanApiERROR): boolean => {
+  if (!!api_response.error) return true;
+  return false;
+};
+
+/**
  * Fetch All Ep Of An Anime
  * @param {string} animeId
+ * @returns {Promise<JikanApiResEpisodes[]>} Promise Array with all anime eps
  */
-export function getAllTheEpisodes(
-  id: string
-): Promise<JikanApiResAnimeEpisodes[]> {
+export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
   return new Promise(async (resolve, reject) => {
-    let Episodes: JikanApiResAnimeEpisodes[] = [];
+    let Episodes: JikanApiResEpisodes[] = [];
     let i = 1;
 
     const fetchOtherEP = async () => {
       try {
-        const eps: JikanApiResEpisodes = await callApi(
-          `https://api.jikan.moe/v3/anime/${id}/episodes/${i}`
+        let eps: JikanApiResEpisodesRoot = await callApi(
+          `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`
         );
         if (
-          !eps?.episodes ||
-          eps?.episodes?.length <= 0 ||
-          eps?.status === 404 ||
+          IsError(eps as unknown as JikanApiERROR) ||
+          !eps?.data ||
+          eps?.data?.length <= 0 ||
           i >= 5
         )
           return resolve(Episodes);
-        Episodes = [...Episodes, ...eps.episodes];
-        if (i === eps?.episodes_last_page) return resolve(Episodes);
+        Episodes = [...Episodes, ...eps.data];
+        if (i === eps?.pagination.last_visible_page) return resolve(Episodes);
         i++;
-        setTimeout(fetchOtherEP, 500);
+        setTimeout(fetchOtherEP, 335);
       } catch (err) {
         reject(err);
       }

@@ -14,8 +14,8 @@ import { useRouter } from "next/router";
 import {
   AnimeShape,
   AnimeConfigPathsIdShape,
-  StudiosShape,
-  TagsShape,
+  Studio as StudioShape,
+  GenreTag,
   AlternativeTitleShape,
 } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
@@ -47,11 +47,12 @@ interface SpecialInfoProps {
   AgeRating: string;
   AlternativeTitle: AlternativeTitleShape;
   duration: string;
-  studios: StudiosShape[];
+  studios: StudioShape[];
+  OtherInfos: string[];
 }
 interface TagsAnimesProps {
-  Genres: TagsShape[];
-  Themes: TagsShape[];
+  Genres: GenreTag[];
+  Themes: GenreTag[];
 }
 interface MyAnimeProps {
   AnimeType: null | AnimeWatchType;
@@ -127,10 +128,11 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     EpisodesData,
     Recommendations,
     malId,
+    broadcast,
   } = animeData || {};
   const ScoredByTransform = useCallback((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
-    return ScoredBy.toString();
+    return ScoredBy?.toString();
   }, [ScoredBy]);
 
   const ChangeFBStatus = async (newType: AnimeWatchType) => {
@@ -154,7 +156,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     if (UserAnimes) {
       const CurrentAnime =
         UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
-      console.log(CurrentAnime?.WatchType);
       setAnimeWatchType(CurrentAnime?.WatchType || null);
     }
   }, [UserAnimes, malId]);
@@ -193,20 +194,29 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 </div>
                 <div>
                   <FaStar className="icon text-yellow-500" />{" "}
-                  <span className="text-primary-whiter">{OverallScore}</span>{" "}
+                  <span className="text-primary-whiter">
+                    {OverallScore || "No score yet"}
+                  </span>{" "}
                   <span className="italic text-description text-xl">
-                    ({ScoredByTransform()} people)
+                    {ScoredByTransform() && `(${ScoredByTransform()} people)`}
                   </span>
                 </div>
                 <div>
                   <FaCalendarAlt className="icon" />{" "}
-                  <span className="text-primary-whiter">{ReleaseDate}</span>
+                  <span className="text-primary-whiter capitalize">
+                    {ReleaseDate}
+                  </span>
                   <span className="italic text-description text-xl">
                     {Airing || " (Finished)"}
                   </span>
                 </div>
                 <div>
-                  {type === "TV" ? (
+                  {Airing && broadcast ? (
+                    <Fragment>
+                      <FaClock className="icon" />{" "}
+                      <span className="text-primary-whiter">{broadcast}</span>
+                    </Fragment>
+                  ) : type === "TV" ? (
                     <Fragment>
                       <FaFilm className="icon" />{" "}
                       <span className="text-primary-whiter">
@@ -249,7 +259,13 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 AgeRating={AgeRating}
                 AlternativeTitle={AlternativeTitle}
                 duration={type === "TV" && duration}
-                studios={type === "Movie" && Studios}
+                studios={
+                  (Airing && broadcast) || type === "Movie" ? Studios : null
+                }
+                OtherInfos={[
+                  Airing && broadcast,
+                  Airing ? "Ongoing" : "Finished",
+                ]}
               />
               <MyAnimes
                 AnimeType={CurrentAnimeWatchType}
@@ -375,14 +391,16 @@ function SpecialInfo({
   AlternativeTitle,
   duration,
   studios,
+  OtherInfos,
 }: SpecialInfoProps) {
   const TagsSpecialInfoData = [
-    AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
+    ...OtherInfos,
+    duration && `${duration.split(" ")[0]} Min/Eps`,
     ...Object.keys(AlternativeTitle)
       .map((key) => AlternativeTitle[key].length > 0 && AlternativeTitle[key])
       .filter((data) => data),
-    duration && `${duration.split(" ")[0]} Min/Eps`,
     studios && <StudiosComponent studio={studios[0]} />,
+    AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
   ].filter((d) => d);
   const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
     <SpecialInfoItem dataToShow={data} key={i} />
@@ -449,7 +467,7 @@ function SynopsisComponent({ Synopsis }: { Synopsis: string }) {
   );
 }
 
-function StudiosComponent({ studio }: { studio: StudiosShape }) {
+function StudiosComponent({ studio }: { studio: StudioShape }) {
   return (
     <a href={studio?.url} target="_blank" rel="noreferrer">
       {studio?.name}

@@ -1,4 +1,3 @@
-import { ChangeEvent } from "react";
 import { AnimeWatchType } from "./enums";
 import {
   AnimeStatusType,
@@ -55,7 +54,6 @@ export interface SeasonAnimesShape {
   PhotoUrl: string;
   score: number;
   type: AnimeType;
-  r18: boolean;
   BeginAiring: string;
   MalId: number;
 }
@@ -89,8 +87,8 @@ export interface AnimeShape {
   photoPath: string;
   OverallScore: number;
   ScoredBy: number;
-  EpisodesData?: JikanApiResAnimeEpisodes[];
-  Recommendations: JikanApiResAnimeRecommandations[];
+  EpisodesData?: JikanApiResEpisodes[];
+  Recommendations: JikanApiResRecommandations[];
   Airing: boolean;
   Status: AnimeStatusType;
   ReleaseDate: string;
@@ -98,20 +96,15 @@ export interface AnimeShape {
   Synopsis: string;
   trailer_url: string;
   MalPage: string;
+  broadcast: string;
   type: AnimeType;
-  Studios: StudiosShape[];
-  Genre: TagsShape[];
-  Theme: TagsShape[];
+  Studios: Studio[];
+  Genre: GenreTag[];
+  Theme: GenreTag[];
   nbEp: number;
   duration: string;
   malId: number;
   LastRefresh: number;
-}
-export interface StudiosShape {
-  name: string;
-  mal_id: number;
-  type: string;
-  url: string;
 }
 export interface AlternativeTitleShape {
   title_english: string;
@@ -119,47 +112,33 @@ export interface AlternativeTitleShape {
   title_synonyms: string[];
 }
 
-/* JikanRes on /search */
-export interface JikanApiResSearch {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  results: JikanApiResSearchAnime[];
-  last_page: number;
+/* JikanRes Error */
+export interface JikanApiERROR {
+  status: number;
+  type: string;
+  message: string;
+  error: string;
+  report_url: string;
 }
-export interface JikanApiResSearchAnime {
-  mal_id: number;
-  url: string;
-  image_url: string;
-  title: string;
-  airing: boolean;
-  synopsis: string;
-  type: AnimeType;
-  episodes: number;
-  score: number;
-  start_date?: Date | string;
-  end_date?: Date | string;
-  members: number;
-  rated: string;
+/* JikanRes on /search */
+export interface JikanApiResSearchRoot {
+  pagination: Pagination;
+  data: JikanApiResSearch[];
 }
 
-/* JikanRes on /anime */
-export interface JikanApiResAnime {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
+export interface JikanApiResSearch {
   mal_id: number;
   url: string;
-  image_url: string;
-  trailer_url: string;
+  images: Images;
+  trailer: Trailer;
   title: string;
-  title_english: string;
+  title_english?: string;
   title_japanese: string;
   title_synonyms: string[];
   type: AnimeType;
   source: string;
-  episodes: number;
-  status: AnimeStatusType | number;
+  episodes?: number;
+  status: string;
   airing: boolean;
   aired: Aired;
   duration: string;
@@ -171,114 +150,184 @@ export interface JikanApiResAnime {
   members: number;
   favorites: number;
   synopsis: string;
-  background?: any;
-  premiered: string;
-  broadcast: string;
-  related: Related;
+  background?: string;
+  season?: string;
+  year?: number;
+  broadcast: Broadcast;
   producers: Producer[];
   licensors: Licensor[];
   studios: Studio[];
-  genres: TagsShape[];
-  explicit_genres: ExplicitGenre[];
+  genres: GenreTag[];
+  explicit_genres: any[];
+  themes: GenreTag[];
   demographics: Demographic[];
-  themes: TagsShape[];
-  opening_themes: string[];
-  ending_themes: string[];
-  external_links: ExternalLink[];
+}
+
+/* JikanRes on /anime */
+export interface JikanApiResAnimeRoot {
+  data: JikanApiResAnime;
+}
+
+export interface JikanApiResAnime {
+  mal_id: number;
+  url: string;
+  images: Images;
+  trailer: Trailer;
+  title: string;
+  title_english: string;
+  title_japanese: string;
+  title_synonyms: string[];
+  type: AnimeType;
+  source: string;
+  episodes: number;
+  status: string;
+  airing: boolean;
+  aired: Aired;
+  duration: string;
+  rating: string;
+  score: number;
+  scored_by: number;
+  rank: number;
+  popularity: number;
+  members: number;
+  favorites: number;
+  synopsis: string;
+  background: any;
+  season: string;
+  year: number;
+  broadcast: Broadcast;
+  producers: Producer[];
+  licensors: Licensor[];
+  studios: Studio[];
+  genres: GenreTag[];
+  explicit_genres: any[];
+  themes: GenreTag[];
+  demographics: Demographic[];
 }
 
 /* JikanRes on /anime/episodes */
-export interface JikanApiResEpisodes {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  episodes_last_page: number;
-  episodes: JikanApiResAnimeEpisodes[];
-  status: number;
+export interface JikanApiResEpisodesRoot {
+  pagination: Pagination;
+  data: JikanApiResEpisodes[];
 }
-export interface JikanApiResAnimeEpisodes {
-  episode_id: number;
-  title?: string;
+
+export interface JikanApiResEpisodes {
+  mal_id: number;
+  url: string;
+  title: string;
   title_japanese?: string;
   title_romanji?: string;
-  aired?: Date;
-  filler?: boolean;
-  recap?: boolean;
-  video_url?: string;
-  forum_url?: string;
+  aired?: string;
+  filler: boolean;
+  recap: boolean;
+  forum_url: string;
 }
 
 /* JikanRes on /anime/recommendations */
-export interface JikanApiResRecommandations {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  recommendations: JikanApiResAnimeRecommandations[];
-  status: number;
+export interface JikanApiResRecommandationsRoot {
+  data: JikanApiResRecommandations[];
 }
-export interface JikanApiResAnimeRecommandations {
+
+export interface JikanApiResRecommandations {
+  entry: Entry;
+  url: string;
+  votes: number;
+}
+
+export interface Entry {
   mal_id: number;
   url: string;
-  image_url: string;
-  recommendation_url: string;
+  images: Images;
   title: string;
-  recommendation_count: number;
 }
 
 /* JikanRes on /season */
 export interface JikanApiResSeasonRoot {
-  request_hash: string;
-  request_cached: boolean;
-  request_cache_expiry: number;
-  season_name: string;
-  season_year: number;
-  status: number;
-  anime: JikanApiResSeasonAnime[];
+  pagination: Pagination;
+  data: JikanApiResSeason[];
 }
 
-export interface JikanApiResSeasonAnime {
+export interface JikanApiResSeason {
   mal_id: number;
   url: string;
+  images: Images;
+  trailer: Trailer;
   title: string;
-  image_url: string;
-  synopsis: string;
+  title_english?: string;
+  title_japanese: string;
+  title_synonyms: string[];
   type: AnimeType;
-  airing_start?: string;
-  episodes?: number;
-  members: number;
-  genres: Genre[];
-  explicit_genres: ExplicitGenre[];
-  themes: Theme[];
-  demographics: Demographic[];
   source: string;
-  producers: Producer[];
+  episodes?: number;
+  status: string;
+  airing: boolean;
+  aired: Aired;
+  duration: string;
+  rating: string;
   score?: number;
-  licensors: string[];
-  r18: boolean;
-  kids: boolean;
-  continuing: boolean;
+  scored_by?: number;
+  rank?: number;
+  popularity: number;
+  members: number;
+  favorites: number;
+  synopsis: string;
+  background: any;
+  season: string;
+  year: number;
+  broadcast: Broadcast;
+  producers: Producer[];
+  licensors: Licensor[];
+  studios: Studio[];
+  genres: GenreTag[];
+  explicit_genres: any[];
+  themes: GenreTag[];
+  demographics: Demographic[];
 }
 
 /* Sub Interface */
-export interface Genre {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
+
+export interface Images {
+  jpg: Jpg;
+  webp: Webp;
 }
 
-export interface ExplicitGenre {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
+export interface Jpg {
+  image_url: string;
+  small_image_url: string;
+  large_image_url: string;
 }
 
-export interface Theme {
-  mal_id: number;
-  type: string;
-  name: string;
+export interface Webp {
+  image_url: string;
+  small_image_url: string;
+  large_image_url: string;
+}
+
+export interface Trailer {
+  youtube_id: string;
   url: string;
+  embed_url: string;
+  images: Images2;
+}
+
+export interface Images2 {
+  image_url: string;
+  small_image_url: string;
+  medium_image_url: string;
+  large_image_url: string;
+  maximum_image_url: string;
+}
+
+export interface Aired {
+  from: string;
+  to: string | null;
+  prop: Prop;
+  string: string;
+}
+
+export interface Prop {
+  from: From;
+  to: To;
 }
 
 export interface From {
@@ -293,67 +342,11 @@ export interface To {
   year: number;
 }
 
-export interface Prop {
-  from: From;
-  to: To;
-}
-
-export interface Aired {
-  from: Date;
-  to: Date;
-  prop: Prop;
+export interface Broadcast {
+  day: string;
+  time: string;
+  timezone: string;
   string: string;
-}
-
-export interface Adaptation {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface Prequel {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface SideStory {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface SpinOff {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface Other {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface Sequel {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface Related {
-  Adaptation: Adaptation[];
-  Prequel: Prequel[];
-  Sidestory: SideStory[];
-  Spinoff: SpinOff[];
-  Other: Other[];
-  Sequel: Sequel[];
 }
 
 export interface Producer {
@@ -377,6 +370,13 @@ export interface Studio {
   url: string;
 }
 
+export interface GenreTag {
+  mal_id: number;
+  type: string;
+  name: string;
+  url: string;
+}
+
 export interface Demographic {
   mal_id: number;
   type: string;
@@ -384,14 +384,7 @@ export interface Demographic {
   url: string;
 }
 
-export interface TagsShape {
-  mal_id: number;
-  type: string;
-  name: string;
-  url: string;
-}
-
-export interface ExternalLink {
-  name: string;
-  url: string;
+export interface Pagination {
+  last_visible_page: number;
+  has_next_page: boolean;
 }

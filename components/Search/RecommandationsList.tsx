@@ -3,13 +3,13 @@ import Link from "next/link";
 import React, { FC, Fragment, useEffect, useState } from "react";
 // Types
 import {
-  JikanApiResAnimeRecommandations,
+  JikanApiResRecommandations,
   RecommendationsShape,
 } from "../../lib/types/interface";
 import { JikanApiToRecommendationShape } from "../../lib/utilityfunc";
 
 interface RecommandationsListProps {
-  RecommandationsData: JikanApiResAnimeRecommandations[];
+  RecommandationsData: JikanApiResRecommandations[];
 }
 interface RecommandationItemProps {
   RecomData: RecommendationsShape;

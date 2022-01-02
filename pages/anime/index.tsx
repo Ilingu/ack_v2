@@ -22,7 +22,7 @@ import {
 import {
   AnimeShape,
   JikanApiResSearch,
-  JikanApiResSearchAnime,
+  JikanApiResSearchRoot,
   PosterSearchData,
 } from "../../lib/types/interface";
 // Icon
@@ -58,19 +58,19 @@ const SearchPage: NextPage = () => {
       if (typeof title !== "string" || title.length < 3) return;
 
       if (api) {
-        const JikanDataToPosterData = (JikanObj: JikanApiResSearchAnime[]) =>
+        const JikanDataToPosterData = (JikanObj: JikanApiResSearch[]) =>
           JikanObj.map(
-            ({ type, title, image_url, score, mal_id }): PosterSearchData => ({
+            ({ type, title, images, score, mal_id }): PosterSearchData => ({
               title,
               OverallScore: score,
-              photoPath: removeParamsFromPhotoUrl(image_url),
+              photoPath: removeParamsFromPhotoUrl(images.jpg.image_url),
               type,
               malId: mal_id,
             })
           );
         // Request to api
-        const { results: animesRes }: JikanApiResSearch = await callApi(
-          `https://api.jikan.moe/v3/search/anime?q=${title}&limit=16`
+        const { data: animesRes }: JikanApiResSearchRoot = await callApi(
+          `https://api.jikan.moe/v4/anime?q=${title}&limit=16`
         );
         const ToPosterShape = JikanDataToPosterData(animesRes);
         setResSearch({ animesFound: ToPosterShape, reqTitle: title });

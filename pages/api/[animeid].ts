@@ -4,12 +4,16 @@ import { db } from "../../lib/firebase";
 import {
   AnimeConfigPathsIdShape,
   AnimeShape,
+  JikanApiERROR,
   JikanApiResAnime,
+  JikanApiResAnimeRoot,
   JikanApiResRecommandations,
+  JikanApiResRecommandationsRoot,
 } from "../../lib/types/interface";
 import {
   callApi,
   getAllTheEpisodes,
+  IsError,
   JikanApiToAnimeShape,
 } from "../../lib/utilityfunc";
 
@@ -20,17 +24,27 @@ export default async function AddNewAnimeToFB(
   let animeData: AnimeShape;
   const animeId = animeid.toString();
   try {
-    const endpoint = `https://api.jikan.moe/v3/anime/${animeId}`;
+    const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
-    const animeRes: JikanApiResAnime = await callApi(endpoint);
+    const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
     let animeEpsRes = await getAllTheEpisodes(animeId);
-    const animeRecommendationsRes: JikanApiResRecommandations = await callApi(
-      endpoint + "/recommendations"
-    );
+    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
+      await callApi(endpoint + "/recommendations");
+
+    if (
+      IsError(animeRes as unknown as JikanApiERROR) ||
+      IsError(animeRecommendationsRes as unknown as JikanApiERROR)
+    ) {
+      return res
+        .status((animeRes as unknown as JikanApiERROR).status)
+        .json({ message: `Error when fetching: ${animeId}.` });
+    }
+
     if (animeEpsRes.length <= 0)
       animeEpsRes = Array.apply(null, Array(12)).map((_: null, i: number) => ({
-        episode_id: i + 1,
+        mal_id: i + 1,
       }));
+
     const AllAnimeData = await Promise.all([
       animeRes,
       animeEpsRes,
@@ -39,8 +53,8 @@ export default async function AddNewAnimeToFB(
 
     let IsGood = true;
     AllAnimeData || (IsGood = false);
-    [AllAnimeData[0], AllAnimeData[2]].forEach((oneData) => {
-      if (!oneData || oneData.status === 404) IsGood = false;
+    AllAnimeData.forEach((oneData) => {
+      if (!oneData) IsGood = false;
     });
 
     if (IsGood) {
@@ -55,17 +69,27 @@ export default async function AddNewAnimeToFB(
       const animesConfigPaths = (
         await getDoc(animesConfigPathsRef)
       ).data() as AnimeConfigPathsIdShape;
-      const newAnimeConfigPaths = {
-        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
-      };
-      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+
+      const ArrayPathsToObjPaths = animesConfigPaths.AllAnimeId.reduce(
+        (a, id) => ({ ...a, [id]: id }),
+        {}
+      );
+      if (!ArrayPathsToObjPaths[animeId]) {
+        const newAnimeConfigPaths = {
+          AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
+        };
+        batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+      }
 
       await batch.commit();
-    } else
-      res.status(404).json({ message: `User with id: ${animeId} not found.` });
+      return res.status(200).json(animeData);
+    }
+    return res
+      .status(404)
+      .json({ message: `Anime with id: ${animeId} not found.` });
   } catch (err) {
-    res.status(404).json({ message: `User with id: ${animeId} not found.` });
+    return res
+      .status(404)
+      .json({ message: `Anime with id: ${animeId} not found.`, err });
   }
-
-  res.status(200).json(animeData);
 }

@@ -2,10 +2,7 @@ import React, { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { EpisodesSearchContext } from "../../lib/context";
 // Types
-import {
-  EpisodesShape,
-  JikanApiResAnimeEpisodes,
-} from "../../lib/types/interface";
+import { EpisodesShape, JikanApiResEpisodes } from "../../lib/types/interface";
 // Imp
 import { JikanApiToEpisodesShape } from "../../lib/utilityfunc";
 // UI
@@ -13,7 +10,7 @@ import { FaEye } from "react-icons/fa";
 
 /* Interface */
 interface EpisodesListProps {
-  Eps: JikanApiResAnimeEpisodes[];
+  Eps: JikanApiResEpisodes[];
 }
 interface EpisodeItemProps {
   EpisodeData: EpisodesShape;
