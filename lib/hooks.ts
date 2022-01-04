@@ -82,7 +82,7 @@ export function useGlobalAnimeData(userUid: string) {
   useEffect(() => {
     if (!userUid) return null;
 
-    const UserGroupsRef = collection(doc(db, "users", userUid), "Groups");
+    const UserGroupsRef = collection(doc(db, "users", userUid), "groups");
     let unsub = onSnapshot(UserGroupsRef, (Snapdocs) => {
       const UserGroups = (Snapdocs?.docs?.map(postToJSON) ||
         []) as UserGroupShape[];

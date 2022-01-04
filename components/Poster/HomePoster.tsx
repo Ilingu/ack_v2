@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import kebabCase from "lodash.kebabcase";
 // Types
 import { GlobalAppContext } from "../../lib/context";
 import { AnimeWatchType, HomeDisplayTypeEnum } from "../../lib/types/enums";
@@ -16,19 +17,39 @@ import {
   UserGroupShape,
 } from "../../lib/types/interface";
 // Auth
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 // Func
-import { shuffleArray } from "../../lib/utilityfunc";
+import { removeDuplicates, shuffleArray } from "../../lib/utilityfunc";
 import Image from "next/image";
 // Icon
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import Link from "next/link";
+import { FaCheck, FaMinus, FaPlus } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
   AnimeData: UserAnimePosterShape;
-  ToggleFav?: (AnimeId: string, currentVal: boolean) => Promise<void>;
+  ToggleFav?: (AnimeId: string, currentVal: boolean) => void;
+  RenderType: "animeList" | "groupList";
+  IsAnimeToAdd?: boolean;
+  ToggleGroup: (
+    id: string,
+    method: "ADD" | "DELETE" | "DELETE_DB",
+    GrName?: string
+  ) => void;
+  NameOfGroup?: string;
+}
+interface HomeHeaderProps {
+  IsModeGroup: boolean;
+  HomeDisplayType: HomeDisplayTypeEnum;
+  setHomeDisplayType: React.Dispatch<React.SetStateAction<HomeDisplayTypeEnum>>;
+}
+interface GroupFormInputProps {
+  IsModeGroup: boolean;
+  HomeDisplayType: HomeDisplayTypeEnum;
+  AddGroup: (GrName: string) => void;
 }
 interface HomeGroupItemPosterProp {
   GroupData: UserGroupPosterShape;
@@ -54,6 +75,11 @@ interface GroupComponentProps {
       data: UserGroupPosterShape;
     }>
   >;
+  ToggleGroup: (
+    id: string,
+    method: "ADD" | "DELETE" | "DELETE_DB",
+    GrName?: string
+  ) => void;
 }
 
 /* COMPONENTS */
@@ -65,6 +91,8 @@ const HomePoster: FC = () => {
     useState<JSX.Element[]>();
   const [GroupRenderedElements, setNewRenderForGroups] =
     useState<JSX.Element[]>();
+
+  const [AnimesToAdd, setAnimeToAdd] = useState<string[]>([]);
 
   const AnimesElementsOrder = useRef<string[]>();
   const GroupsElementsOrder = useRef<string[]>();
@@ -226,6 +254,13 @@ const HomePoster: FC = () => {
       });
     }
 
+    let AnimesToAddToObj = null;
+    if (AnimesToAdd.length > 0)
+      AnimesToAddToObj = AnimesToAdd.reduce(
+        (a, id) => ({ ...a, [id]: id }),
+        {}
+      );
+
     const AnimesPosterJSX = AnimesElementsOrder.current.map((animeId, i) => {
       const AnimeData = AnimesHomePostersData.find(
         ({ AnimeId }) => AnimeId.toString() === animeId
@@ -237,83 +272,108 @@ const HomePoster: FC = () => {
           key={animeId || i}
           AnimeData={AnimeData}
           ToggleFav={ToggleFav}
+          RenderType="animeList"
+          IsAnimeToAdd={AnimesToAddToObj && !!AnimesToAddToObj[animeId]}
+          ToggleGroup={ToggleGroup}
         />
       );
     });
 
     setNewRenderForAnimes(AnimesPosterJSX);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups]);
+  }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups, AnimesToAdd]);
 
   const ToggleFav = useCallback(
-    async (AnimeId: string, currentVal: boolean) => {
-      const AnimeRef = doc(doc(db, "users", user.uid), "animes", AnimeId);
-      await updateDoc(AnimeRef, {
-        Fav: !currentVal,
-      });
+    (AnimeId: string, currentVal: boolean) => {
+      try {
+        const AnimeRef = doc(doc(db, "users", user.uid), "animes", AnimeId);
+        updateDoc(AnimeRef, {
+          Fav: !currentVal,
+        });
+        toast.success("Successfully added to your favorite");
+      } catch (err) {
+        toast.error("Cannot add this anime to your favorite");
+      }
     },
     [user]
   );
 
+  const ToggleGroup = useCallback(
+    (id: string, method: "ADD" | "DELETE" | "DELETE_DB", GrName?: string) => {
+      if (method === "ADD") setAnimeToAdd((prev) => [...prev, id]);
+      if (method === "DELETE") {
+        const CopyArr = [...AnimesToAdd];
+        const index = CopyArr.indexOf(id);
+        CopyArr.splice(index, 1);
+        setAnimeToAdd(CopyArr);
+      }
+      if (method === "DELETE_DB") {
+        try {
+          const { GroupAnimesId: CurrentGroup } = {
+            ...UserGroups.find((group) => group.GroupName === GrName),
+          };
+          const IndexToDel = CurrentGroup.indexOf(id);
+          CurrentGroup.splice(IndexToDel, 1);
+
+          const GroupRef = doc(doc(db, "users", user.uid), "groups", GrName);
+          updateDoc(GroupRef, {
+            GroupAnimesId: CurrentGroup,
+          });
+          toast.success("Anime removed from this group");
+        } catch (err) {
+          toast.error("Couldn't delete this anime from this group");
+        }
+      }
+    },
+    [AnimesToAdd, UserGroups, user.uid]
+  );
+
+  const AddGroup = useCallback(
+    async (GrName: string) => {
+      const SafeGrName = encodeURI(kebabCase(GrName));
+      try {
+        const GroupRef = doc(doc(db, "users", user.uid), "groups", SafeGrName);
+        const GroupData = await getDoc(GroupRef);
+
+        if (GroupData.exists()) {
+          const { GroupAnimesId } = GroupData.data();
+          updateDoc(GroupRef, {
+            GroupAnimesId: removeDuplicates([...GroupAnimesId, ...AnimesToAdd]),
+          });
+        } else
+          setDoc(GroupRef, {
+            GroupName: SafeGrName,
+            GroupAnimesId: AnimesToAdd,
+          });
+        // Reset
+        setAnimeToAdd([]);
+        toast.success("Anime(s) add successfully in your group!");
+      } catch (err) {
+        toast.error("Couldn't add your anime(s) in your group");
+      }
+    },
+    [AnimesToAdd, user.uid]
+  );
+
   return (
     <div className="mt-5 flex flex-col items-center">
-      <header className="mb-4 flex">
-        <h1
-          className={`${
-            HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
-          } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
-            HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-            " underline decoration-primary-darker text-headline"
-          }`}
-          onClick={() =>
-            HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-            setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
-          }
-        >
-          <span
-            className={
-              HomeDisplayType === HomeDisplayTypeEnum.ANIMES
-                ? "text-primary-main"
-                : ""
-            }
-          >
-            Animes
-          </span>{" "}
-          Folder
-        </h1>
-        <div className="h-full w-2 rounded-sm cursor-default translate-y-1 text-headline overflow-hidden bg-headline">
-          TEXT
-        </div>
-        <h1
-          className={`${
-            HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
-          } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase ml-2 ${
-            HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-            " underline decoration-primary-darker text-headline"
-          }`}
-          onClick={() =>
-            HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-            setHomeDisplayType(HomeDisplayTypeEnum.GROUP)
-          }
-        >
-          <span
-            className={
-              HomeDisplayType === HomeDisplayTypeEnum.GROUP
-                ? "text-primary-main"
-                : ""
-            }
-          >
-            Group
-          </span>{" "}
-          Folder
-        </h1>
-      </header>
+      <HomeHeader
+        IsModeGroup={!!(AnimesToAdd.length > 0)}
+        HomeDisplayType={HomeDisplayType}
+        setHomeDisplayType={setHomeDisplayType}
+      />
+      <GroupFormInput
+        IsModeGroup={!!(AnimesToAdd.length > 0)}
+        AddGroup={AddGroup}
+        HomeDisplayType={HomeDisplayType}
+      />
       <div className="w-10/12">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
             selectedGroupName={selectedGroupName}
             setSelectedGroup={setSelectedGroup}
+            ToggleGroup={ToggleGroup}
           />
         ) : (
           <AnimePosterComponent AnimeRenderedElements={AnimeRenderedElements} />
@@ -324,6 +384,101 @@ const HomePoster: FC = () => {
 };
 
 // [SUB-COMPONENTS]
+function HomeHeader({
+  IsModeGroup,
+  HomeDisplayType,
+  setHomeDisplayType,
+}: HomeHeaderProps) {
+  return (
+    <header className={`${IsModeGroup ? "mb-2" : "mb-4"} flex`}>
+      <h1
+        className={`${
+          HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
+        } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
+          HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
+          " underline decoration-primary-darker text-headline"
+        }`}
+        onClick={() =>
+          HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
+          setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
+        }
+      >
+        <span
+          className={
+            HomeDisplayType === HomeDisplayTypeEnum.ANIMES
+              ? "text-primary-main"
+              : ""
+          }
+        >
+          Animes
+        </span>{" "}
+        Folder
+      </h1>
+      <div className="h-full w-2 rounded-sm cursor-default translate-y-1 py-3 text-headline overflow-hidden bg-headline"></div>
+      <h1
+        className={`${
+          HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
+        } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase ml-2 ${
+          HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
+          " underline decoration-primary-darker text-headline"
+        }`}
+        onClick={() =>
+          HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
+          setHomeDisplayType(HomeDisplayTypeEnum.GROUP)
+        }
+      >
+        <span
+          className={
+            HomeDisplayType === HomeDisplayTypeEnum.GROUP
+              ? "text-primary-main"
+              : ""
+          }
+        >
+          Group
+        </span>{" "}
+        Folder
+      </h1>
+    </header>
+  );
+}
+
+function GroupFormInput({
+  IsModeGroup,
+  HomeDisplayType,
+  AddGroup,
+}: GroupFormInputProps) {
+  const [InputGroupName, setInputGroupName] = useState("");
+
+  const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    InputGroupName.trim().length >= 3 && AddGroup(InputGroupName);
+    InputGroupName.trim().length >= 3 && setInputGroupName("");
+    InputGroupName.trim().length >= 3 ||
+      toast.error("The Group Name must be minimum 3 characters long !");
+  };
+
+  return (
+    IsModeGroup &&
+    HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
+      <form className="mb-4 mt-2" onSubmit={HandleSubmit}>
+        <input
+          type="text"
+          value={InputGroupName}
+          onChange={(e) => setInputGroupName(e.target.value)}
+          className="bg-black sm:text-lg rounded-l-md py-2 sm:w-96 w-80 text-center font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
+          placeholder="Name of group (Already existing or not)"
+        />
+        <button
+          type="submit"
+          className="bg-black h-11 py-2 px-2 rounded-r-md -translate-y-px font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
+        >
+          <FaCheck className="icon" />
+        </button>
+      </form>
+    )
+  );
+}
+
 function AnimePosterComponent({
   AnimeRenderedElements,
 }: AnimePosterComponentProps) {
@@ -338,6 +493,7 @@ function GroupComponent({
   selectedGroupName,
   setSelectedGroup,
   GroupRenderedElements,
+  ToggleGroup,
 }: GroupComponentProps) {
   return (
     <Fragment>
@@ -365,6 +521,9 @@ function GroupComponent({
                 <AnimeItemPoster
                   key={AnimeData?.AnimeId || i}
                   AnimeData={AnimeData}
+                  RenderType="groupList"
+                  ToggleGroup={ToggleGroup}
+                  NameOfGroup={selectedGroupName.name}
                 />
               ))}
             </div>
@@ -379,6 +538,10 @@ function GroupComponent({
 function AnimeItemPoster({
   AnimeData: { AnimeId, Fav, WatchType, photoURL, title },
   ToggleFav,
+  RenderType,
+  IsAnimeToAdd,
+  ToggleGroup,
+  NameOfGroup,
 }: HomeAnimeItemPosterProp) {
   const { WATCHED, WATCHING } = AnimeWatchType;
   const Color =
@@ -388,17 +551,47 @@ function AnimeItemPoster({
       ? "text-green-500"
       : "text-red-500";
 
+  const AddToGroup = RenderType === "animeList" && (
+    <div
+      onClick={() => ToggleGroup(AnimeId.toString(), "ADD")}
+      className="absolute top-1 right-1 font-semibold z-10 text-lg text-green-400 bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+    >
+      <FaPlus className="icon" />
+    </div>
+  );
+  const RemoveToGroup = (
+    <div
+      onClick={() => {
+        if (RenderType === "groupList") {
+          ToggleGroup(AnimeId.toString(), "DELETE_DB", NameOfGroup);
+          return;
+        }
+        ToggleGroup(AnimeId.toString(), "DELETE");
+      }}
+      className="absolute top-1 right-1 font-semibold z-10 text-lg text-red-500 bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+    >
+      <FaMinus className="icon" />
+    </div>
+  );
+
   return (
     <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
-      <div
-        className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
-        onClick={() => ToggleFav && ToggleFav(AnimeId.toString(), Fav)}
-      >
-        {Fav ? (
-          <AiFillStar className="icon text-yellow-500" />
-        ) : (
-          <AiOutlineStar className="icon text-yellow-500" />
-        )}
+      <div>
+        <div
+          className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+          onClick={() => ToggleFav && ToggleFav(AnimeId.toString(), Fav)}
+        >
+          {Fav ? (
+            <AiFillStar className="icon text-yellow-500" />
+          ) : (
+            <AiOutlineStar className="icon text-yellow-500" />
+          )}
+        </div>
+        {RenderType === "groupList"
+          ? RemoveToGroup
+          : IsAnimeToAdd
+          ? RemoveToGroup
+          : AddToGroup}
       </div>
 
       <Link href={`/watch/${AnimeId}`}>

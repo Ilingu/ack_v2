@@ -63,6 +63,11 @@ export interface UserAnimeShape {
   WatchType: AnimeWatchType;
   Fav: boolean;
   Progress: number[] | null;
+  TimestampDate: UserAnimeTimestampDate;
+}
+export interface UserAnimeTimestampDate {
+  BeganData: number; // Timestamp
+  EndedDate: number; // Timestamp
 }
 export interface UserGroupShape {
   GroupAnimesId: string[];

@@ -5,9 +5,7 @@ import {
   AnimeConfigPathsIdShape,
   AnimeShape,
   JikanApiERROR,
-  JikanApiResAnime,
   JikanApiResAnimeRoot,
-  JikanApiResRecommandations,
   JikanApiResRecommandationsRoot,
 } from "../../lib/types/interface";
 import {
