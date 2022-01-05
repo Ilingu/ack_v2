@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import React, {
-  Fragment,
   useCallback,
   useContext,
   useEffect,
@@ -124,20 +123,18 @@ const SearchPage: NextPage = () => {
   );
 
   return (
-    <Fragment>
+    <main className="h-screen py-2 px-2 grid grid-rows-12">
       <MetaTags
         title="🪐 World Anime"
         description="Find the data anime that you wanted"
       />
-      <main className="h-screen py-2 px-2 grid grid-rows-12">
-        <FormInput Submit={Submit} />
-        <AnimeFoundList
-          animeFound={animesFound}
-          reqTitle={reqTitle}
-          Submit={Submit}
-        />
-      </main>
-    </Fragment>
+      <FormInput Submit={Submit} />
+      <AnimeFoundList
+        animeFound={animesFound}
+        reqTitle={reqTitle}
+        Submit={Submit}
+      />
+    </main>
   );
 };
 

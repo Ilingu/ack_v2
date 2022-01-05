@@ -168,144 +168,142 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     );
 
   return (
-    <Fragment>
+    <div className="py-2 flex flex-col items-center">
       <MetaTags
         title={title}
         description={`${title} anime info page`}
         image={photoPath}
       />
-      <div className="py-2 flex flex-col items-center">
-        {/* Overall Info */}
-        <section className="relative w-5/6">
-          <h1 className="text-4xl font-bold text-primary-main underline">
-            {title}
-          </h1>
-          <div className="mt-6 flex flex-col items-center">
-            <div className="w-5/6">
-              <div className="grid grid-cols-4 text-headline font-bold mb-6 text-2xl justify-items-center">
-                <div>
-                  <FaTv className="icon" />{" "}
-                  <span className="text-primary-whiter">{type}</span>{" "}
-                  {type === "TV" && (
-                    <span className="italic text-description text-xl">
-                      ({nbEp} eps)
+      {/* Overall Info */}
+      <section className="relative w-5/6">
+        <h1 className="text-4xl font-bold text-primary-main underline">
+          {title}
+        </h1>
+        <div className="mt-6 flex flex-col items-center">
+          <div className="w-5/6">
+            <div className="grid grid-cols-4 text-headline font-bold mb-6 text-2xl justify-items-center">
+              <div>
+                <FaTv className="icon" />{" "}
+                <span className="text-primary-whiter">{type}</span>{" "}
+                {type === "TV" && (
+                  <span className="italic text-description text-xl">
+                    ({nbEp} eps)
+                  </span>
+                )}
+              </div>
+              <div>
+                <FaStar className="icon text-yellow-500" />{" "}
+                <span className="text-primary-whiter">
+                  {OverallScore || "No score yet"}
+                </span>{" "}
+                <span className="italic text-description text-xl">
+                  {ScoredByTransform() && `(${ScoredByTransform()} people)`}
+                </span>
+              </div>
+              <div>
+                <FaCalendarAlt className="icon" />{" "}
+                <span className="text-primary-whiter capitalize">
+                  {ReleaseDate}
+                </span>
+                <span className="italic text-description text-xl">
+                  {Airing || " (Finished)"}
+                </span>
+              </div>
+              <div>
+                {Airing && broadcast ? (
+                  <Fragment>
+                    <FaClock className="icon" />{" "}
+                    <span className="text-primary-whiter">{broadcast}</span>
+                  </Fragment>
+                ) : type === "TV" ? (
+                  <Fragment>
+                    <FaFilm className="icon" />{" "}
+                    <span className="text-primary-whiter">
+                      <StudiosComponent studio={Studios[0]} />
                     </span>
-                  )}
-                </div>
-                <div>
-                  <FaStar className="icon text-yellow-500" />{" "}
-                  <span className="text-primary-whiter">
-                    {OverallScore || "No score yet"}
-                  </span>{" "}
-                  <span className="italic text-description text-xl">
-                    {ScoredByTransform() && `(${ScoredByTransform()} people)`}
-                  </span>
-                </div>
-                <div>
-                  <FaCalendarAlt className="icon" />{" "}
-                  <span className="text-primary-whiter capitalize">
-                    {ReleaseDate}
-                  </span>
-                  <span className="italic text-description text-xl">
-                    {Airing || " (Finished)"}
-                  </span>
-                </div>
-                <div>
-                  {Airing && broadcast ? (
-                    <Fragment>
-                      <FaClock className="icon" />{" "}
-                      <span className="text-primary-whiter">{broadcast}</span>
-                    </Fragment>
-                  ) : type === "TV" ? (
-                    <Fragment>
-                      <FaFilm className="icon" />{" "}
-                      <span className="text-primary-whiter">
-                        <StudiosComponent studio={Studios[0]} />
-                      </span>
-                    </Fragment>
-                  ) : (
-                    <Fragment>
-                      <FaClock className="icon" />{" "}
-                      <span className="text-primary-whiter">
-                        {duration.toUpperCase()}
-                      </span>
-                    </Fragment>
-                  )}
-                </div>
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <FaClock className="icon" />{" "}
+                    <span className="text-primary-whiter">
+                      {duration.toUpperCase()}
+                    </span>
+                  </Fragment>
+                )}
               </div>
-              <div className="grid grid-cols-6">
-                <div className="relative col-span-1">
-                  <img
-                    src={photoPath}
-                    alt={`${title}'s cover`}
-                    className="rounded-md ring-2 ring-primary-whiter shadow-md"
-                  />
-                  <a href={MalPage} target="_blank" rel="noreferrer">
-                    <FaInfo
-                      onClick={() => router.push(MalPage)}
-                      className="absolute -top-3 -left-3 text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
-                hover:scale-110 transition cursor-pointer"
-                    />
-                  </a>
-                </div>
-                <p className="col-span-5 px-8 text-justify text-headline font-semibold text-lg">
-                  <SynopsisComponent
-                    Synopsis={Synopsis.replace("[Written by MAL Rewrite]", "")}
-                  />
-                </p>
-              </div>
-              <TagsAnime Genres={Genre} Themes={Theme} />
-              <SpecialInfo
-                AgeRating={AgeRating}
-                AlternativeTitle={AlternativeTitle}
-                duration={type === "TV" && duration}
-                studios={
-                  (Airing && broadcast) || type === "Movie" ? Studios : null
-                }
-                OtherInfos={[
-                  Airing && broadcast,
-                  Airing ? "Ongoing" : "Finished",
-                ]}
-              />
-              <MyAnimes
-                AnimeType={CurrentAnimeWatchType}
-                ChangeFBStatus={ChangeFBStatus}
-              />
             </div>
+            <div className="grid grid-cols-6">
+              <div className="relative col-span-1">
+                <img
+                  src={photoPath}
+                  alt={`${title}'s cover`}
+                  className="rounded-md ring-2 ring-primary-whiter shadow-md"
+                />
+                <a href={MalPage} target="_blank" rel="noreferrer">
+                  <FaInfo
+                    onClick={() => router.push(MalPage)}
+                    className="absolute -top-3 -left-3 text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
+                hover:scale-110 transition cursor-pointer"
+                  />
+                </a>
+              </div>
+              <p className="col-span-5 px-8 text-justify text-headline font-semibold text-lg">
+                <SynopsisComponent
+                  Synopsis={Synopsis.replace("[Written by MAL Rewrite]", "")}
+                />
+              </p>
+            </div>
+            <TagsAnime Genres={Genre} Themes={Theme} />
+            <SpecialInfo
+              AgeRating={AgeRating}
+              AlternativeTitle={AlternativeTitle}
+              duration={type === "TV" && duration}
+              studios={
+                (Airing && broadcast) || type === "Movie" ? Studios : null
+              }
+              OtherInfos={[
+                Airing && broadcast,
+                Airing ? "Ongoing" : "Finished",
+              ]}
+            />
+            <MyAnimes
+              AnimeType={CurrentAnimeWatchType}
+              ChangeFBStatus={ChangeFBStatus}
+            />
           </div>
+        </div>
+      </section>
+      {/* Trailer */}
+      <section className="bg-bgi-whiter w-5/6 flex flex-col items-center rounded-xl py-4">
+        <h1 className="text-4xl font-bold tracking-wider text-headline mb-8">
+          Trailer:
+        </h1>
+        <iframe
+          width="560"
+          height="315"
+          className="rounded-xl ring-primary-main ring-4"
+          src={trailer_url}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </section>
+      {/* Episodes */}
+      {EpisodesData && (
+        <section className="w-5/6 mt-2 py-4">
+          <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
+            <EpisodesList Eps={EpisodesData} />
+          </EpisodesSearchContext.Provider>
         </section>
-        {/* Trailer */}
-        <section className="bg-bgi-whiter w-5/6 flex flex-col items-center rounded-xl py-4">
-          <h1 className="text-4xl font-bold tracking-wider text-headline mb-8">
-            Trailer:
-          </h1>
-          <iframe
-            width="560"
-            height="315"
-            className="rounded-xl ring-primary-main ring-4"
-            src={trailer_url}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </section>
-        {/* Episodes */}
-        {EpisodesData && (
-          <section className="w-5/6 mt-2 py-4">
-            <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
-              <EpisodesList Eps={EpisodesData} />
-            </EpisodesSearchContext.Provider>
-          </section>
-        )}
-        {/* Recommendation */}
-        <section className="w-5/6 bg-bgi-whiter rounded-xl mt-2 py-4">
-          <RecommandationsList
-            RecommandationsData={Recommendations.slice(0, 7)}
-          />
-        </section>
-      </div>
-    </Fragment>
+      )}
+      {/* Recommendation */}
+      <section className="w-5/6 bg-bgi-whiter rounded-xl mt-2 py-4">
+        <RecommandationsList
+          RecommandationsData={Recommendations.slice(0, 7)}
+        />
+      </section>
+    </div>
   );
 };
 

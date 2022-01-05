@@ -619,7 +619,6 @@ function GroupItemPoster({
   GroupData,
   setSelectedGroup,
 }: HomeGroupItemPosterProp) {
-  // eslint-disable-next-line @next/next/no-img-element
   const PreviewImg = ({ src }: { src: string }) => (
     <Image
       src={src}

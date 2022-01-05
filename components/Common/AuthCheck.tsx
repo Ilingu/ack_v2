@@ -6,19 +6,25 @@ import { GlobalAppContext } from "../../lib/context";
 // UI
 import { FaSignInAlt, FaUserAltSlash } from "react-icons/fa";
 import Loader from "../Design/Loader";
+import MetaTags from "./Metatags";
 
 interface AuthCheckProps {
   children: React.ReactElement;
   fallback?: React.ReactElement;
+  PageMetaData?: [string, string];
 }
 
-const AuthCheck = ({ children, fallback }: AuthCheckProps) => {
+const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
   const { user, username, reqFinished } = useContext(GlobalAppContext);
 
   return user && username ? (
     children
   ) : !reqFinished && !fallback ? (
     <div className="flex flex-col justify-center items-center h-screen text-center">
+      <MetaTags
+        title={PageMetaData && PageMetaData[0]}
+        description={PageMetaData && PageMetaData[1]}
+      />
       <h1 className="font-bold text-xl text-headline bg-gray-700 py-4 px-4 rounded-md">
         <Loader show />
         <span className="text-primary-main hover:text-secondary transition">
@@ -29,11 +35,20 @@ const AuthCheck = ({ children, fallback }: AuthCheckProps) => {
     </div>
   ) : !reqFinished && fallback ? (
     <h1 className="font-bold text-xl text-center text-headline py-4 px-4 rounded-md">
+      <MetaTags
+        title={PageMetaData && PageMetaData[0]}
+        description={PageMetaData && PageMetaData[1]}
+      />
       <Loader show />
       <span className="text-primary-main">Connecting</span> to your account
     </h1>
   ) : !fallback ? (
     <div className="flex flex-col justify-center items-center h-screen text-center">
+      <MetaTags
+        title={PageMetaData && PageMetaData[0]}
+        description={PageMetaData && PageMetaData[1]}
+      />
+
       <Link href="/sign-up">
         <a className="text-headline">
           <FaUserAltSlash

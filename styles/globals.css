@@ -52,4 +52,47 @@
   background-color: #161616;
   color: #b3b4ff;
 }
+
+/* GENERAL */
+.watch-container {
+  display: -ms-grid;
+  display: grid;
+      grid-template-areas: "img title title title" "buttons buttons buttons buttons" "content content content content";
+  -ms-grid-columns: 1fr 200 px minmax(0, calc(1240 px - 3.5 rem)) 1fr;
+      grid-template-columns: 1fr 200 px minmax(0, calc(1240 px - 3.5 rem)) 1fr;
+  gap: 2rem;
+}
+
+.watch-container .gta-img {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: img;
+  display: -ms-grid;
+  display: grid;
+  justify-items: end;
+}
+
+.watch-container .gta-title {
+  -ms-grid-row: 1;
+  -ms-grid-column: 2;
+  -ms-grid-column-span: 3;
+  grid-area: title;
+  display: -ms-grid;
+  display: grid;
+  justify-items: start;
+}
+
+.watch-container .gta-buttons {
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 4;
+  grid-area: buttons;
+}
+
+.watch-container .gta-content {
+  -ms-grid-row: 3;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 4;
+  grid-area: content;
+}
 /*# sourceMappingURL=globals.css.map */
