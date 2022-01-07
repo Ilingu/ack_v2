@@ -108,7 +108,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     () => AnimeWatchType.UNWATCHED
   );
   const { UserAnimes } = useContext(GlobalAppContext);
-  console.log(animeData);
+
   const {
     title,
     photoPath,
@@ -131,7 +131,10 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     Recommendations,
     malId,
     broadcast,
+    Status,
+    AiringDate,
   } = animeData || {};
+
   const ScoredByTransform = useCallback((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
     return ScoredBy?.toString();
@@ -188,10 +191,12 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
               <div>
                 <FaCalendarAlt className="icon" />{" "}
                 <span className="text-primary-whiter capitalize">
-                  {ReleaseDate}
+                  {Status === "Not yet aired" ? AiringDate : ReleaseDate}
                 </span>
                 <span className="italic text-description text-xl">
-                  {Airing || " (Finished)"}
+                  {Status === "Not yet aired"
+                    ? " (Not yet aired)"
+                    : Airing || " (Finished)"}
                 </span>
               </div>
               <div>

@@ -1,3 +1,5 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -12,6 +14,7 @@ module.exports = {
           darker: "#4e44ce",
           main: "rgb(99, 102, 241)",
           whiter: "rgb(153, 155, 255)",
+          whitest: "rgb(179, 180, 255)",
         },
         secondary: "#3b82f680",
         // Main Colors
@@ -34,6 +37,16 @@ module.exports = {
       gridTemplateRows: {
         12: "repeat(12, minmax(0, 1fr))",
       },
+      gridTemplateColumns: {
+        24: "repeat(24, minmax(0, 1fr))",
+      },
+      gridColumn: {
+        "span-13": "span 13 / span 13",
+        "span-14": "span 14 / span 14",
+        "span-15": "span 15 / span 15",
+        "span-16": "span 16 / span 16",
+        "span-17": "span 17 / span 17",
+      },
       // Animation
       animation: {
         fadeIn: "fadeIn 0.1s ease-in 0s 1 forwards",
@@ -44,10 +57,16 @@ module.exports = {
           to: { opacity: "1", transform: "scale(1)" },
         },
       },
+
       // EnableVariant
       ringWidth: ["hover", "active"],
       ringColor: ["hover", "active"],
       backgroundColor: ["active"],
+    },
+    // Responsive
+    screens: {
+      xs: "450px",
+      ...defaultTheme.screens,
     },
   },
   plugins: [],

@@ -29,6 +29,6 @@
   "id": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff"
+  "background_color": "#2c2d30",
+  "theme_color": "#6366f1"
 }

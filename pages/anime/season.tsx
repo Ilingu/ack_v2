@@ -214,8 +214,8 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
             </div>
           </div>
 
-          <h1 className="text-headline font-semibold text-center cursor-pointer text-lg hover:text-gray-200 transition">
-            {title.slice(0, 70)}
+          <h1 className="text-headline font-semibold cursor-pointer text-lg hover:text-gray-200 transition truncate">
+            {title}
           </h1>
         </a>
       </Link>

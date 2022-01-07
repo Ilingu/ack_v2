@@ -57,9 +57,7 @@
 .watch-container {
   display: -ms-grid;
   display: grid;
-      grid-template-areas: "img title title title" "buttons buttons buttons buttons" "content content content content";
-  -ms-grid-columns: 1fr 200 px minmax(0, calc(1240 px - 3.5 rem)) 1fr;
-      grid-template-columns: 1fr 200 px minmax(0, calc(1240 px - 3.5 rem)) 1fr;
+      grid-template-areas: "img title title" "buttons buttons buttons" "content content content";
   gap: 2rem;
 }
 
@@ -75,7 +73,7 @@
 .watch-container .gta-title {
   -ms-grid-row: 1;
   -ms-grid-column: 2;
-  -ms-grid-column-span: 3;
+  -ms-grid-column-span: 2;
   grid-area: title;
   display: -ms-grid;
   display: grid;
@@ -85,14 +83,20 @@
 .watch-container .gta-buttons {
   -ms-grid-row: 2;
   -ms-grid-column: 1;
-  -ms-grid-column-span: 4;
+  -ms-grid-column-span: 3;
   grid-area: buttons;
 }
 
 .watch-container .gta-content {
   -ms-grid-row: 3;
   -ms-grid-column: 1;
-  -ms-grid-column-span: 4;
+  -ms-grid-column-span: 3;
   grid-area: content;
+}
+
+@media screen and (max-width: 1024px) {
+  .watch-container {
+        grid-template-areas: "img" "title" "buttons" "content";
+  }
 }
 /*# sourceMappingURL=globals.css.map */

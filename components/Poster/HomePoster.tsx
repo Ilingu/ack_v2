@@ -590,7 +590,7 @@ function AnimeItemPoster({
               setCopyClicked(false);
             }, 2000);
           }}
-          className="group-hover:block absolute hidden bottom-12 left-1/2 z-10 text-xl -translate-x-1/2 -translate-y-1/2 text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+          className="group-hover:block absolute hidden bottom-5 left-1/2 z-10 text-xl -translate-x-1/2 -translate-y-1/2 text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
         >
           {CopyClicked ? <FcOk /> : <FaCopy className="icon" />}
         </div>
@@ -607,9 +607,9 @@ function AnimeItemPoster({
             className="rounded-lg object-cover"
           />
           <h1
-            className={`${Color} text-center text-xl font-bold capitalize flex justify-center items-center`}
+            className={`${Color} text-center text-xl font-bold capitalize items-center truncate`}
           >
-            {title.slice(0, 42)}
+            {title}
           </h1>
         </a>
       </Link>

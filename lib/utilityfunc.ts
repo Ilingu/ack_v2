@@ -125,6 +125,7 @@ export function JikanApiToAnimeShape(
     Genre: JikanObj[0].genres,
     AgeRating: JikanObj[0].rating,
     Airing: JikanObj[0].airing,
+    AiringDate: new Date(JikanObj[0].aired.from).toLocaleDateString(),
     AlternativeTitle: {
       title_english: JikanObj[0].title_english,
       title_japanese: JikanObj[0].title_japanese,

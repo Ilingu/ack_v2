@@ -9,7 +9,8 @@ export type AnimeStatusType =
   | "airing"
   | "completed"
   | "to_be_aired"
-  | "upcoming";
+  | "upcoming"
+  | "Not yet aired";
 export type NetworkEffectiveType = "slow-2g" | "2g" | "3g" | "4g";
 export type NetworkType =
   | "bluetooth"

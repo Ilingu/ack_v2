@@ -63,7 +63,7 @@ export interface UserAnimeShape {
   WatchType: AnimeWatchType;
   Fav: boolean;
   Progress: number[] | null;
-  TimestampDate: UserAnimeTimestampDate;
+  TimestampDate: UserAnimeTimestampDate | null;
 }
 export interface UserAnimeTimestampDate {
   BeganData: number; // Timestamp
@@ -95,6 +95,7 @@ export interface AnimeShape {
   EpisodesData?: JikanApiResEpisodes[];
   Recommendations: JikanApiResRecommandations[];
   Airing: boolean;
+  AiringDate: string;
   Status: AnimeStatusType;
   ReleaseDate: string;
   AgeRating: string;
