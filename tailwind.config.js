@@ -27,6 +27,7 @@ module.exports = {
           darker: "rgb(34, 34, 34)",
           main: "rgb(44, 45, 48)",
           whiter: "rgb(53, 54, 58)",
+          whitest: "rgb(85, 85, 85)",
         },
       },
       // Custom Size

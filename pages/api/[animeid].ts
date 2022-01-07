@@ -26,7 +26,7 @@ export default async function AddNewAnimeToFB(
     // Req
     const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
     let animeEpsRes = await getAllTheEpisodes(animeId);
-    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
+    const animeRecommendationsRes: JikanApiResRecommandationsRoot =
       await callApi(endpoint + "/recommendations");
 
     if (
@@ -35,7 +35,7 @@ export default async function AddNewAnimeToFB(
     ) {
       return res
         .status((animeRes as unknown as JikanApiERROR).status)
-        .json({ message: `Error when fetching: ${animeId}.` });
+        .json({ message: `Error when fetching: ${animeId}.`, err: true });
     }
 
     if (animeEpsRes.length <= 0)
@@ -46,7 +46,7 @@ export default async function AddNewAnimeToFB(
     const AllAnimeData = await Promise.all([
       animeRes,
       animeEpsRes,
-      animeRecommendationsRes,
+      animeRecommendationsRes.data,
     ]);
 
     let IsGood = true;
@@ -84,10 +84,10 @@ export default async function AddNewAnimeToFB(
     }
     return res
       .status(404)
-      .json({ message: `Anime with id: ${animeId} not found.` });
+      .json({ message: `Anime with id: ${animeId} not found.`, err: true });
   } catch (err) {
     return res
       .status(404)
-      .json({ message: `Anime with id: ${animeId} not found.`, err });
+      .json({ message: `Anime with id: ${animeId} not found.`, err: true });
   }
 }

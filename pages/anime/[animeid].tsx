@@ -4,7 +4,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { GetStaticProps, GetStaticPaths, NextPage } from "next";
@@ -22,13 +21,14 @@ import { AnimeWatchType } from "../../lib/types/enums";
 import { callApi, postToJSON, Return404 } from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
-import { doc, getDoc, setDoc, deleteDoc } from "@firebase/firestore";
+import { doc, getDoc } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
 // UI
 import MetaTags from "../../components/Common/Metatags";
 import Loader from "../../components/Design/Loader";
 import EpisodesList from "../../components/Search/EpisodesList";
 import RecommandationsList from "../../components/Search/RecommandationsList";
+import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import {
   FaCalendarAlt,
   FaClock,
@@ -37,6 +37,7 @@ import {
   FaStar,
   FaTv,
 } from "react-icons/fa";
+// DATA
 import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
 
 /* Interface */
@@ -56,7 +57,7 @@ interface TagsAnimesProps {
 }
 interface MyAnimeProps {
   AnimeType: null | AnimeWatchType;
-  ChangeFBStatus: (newType: AnimeWatchType) => void;
+  malId: number;
 }
 
 /* SSG */
@@ -77,7 +78,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // No Anime -> Api Req
   const animeData = await callApi(`http://localhost:3000/api/${animeId}`);
-  if (!animeData) return Return404();
+  if (!animeData || animeData.err) return Return404();
 
   return {
     props: { animeData },
@@ -106,7 +107,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const [CurrentAnimeWatchType, setAnimeWatchType] = useState<AnimeWatchType>(
     () => AnimeWatchType.UNWATCHED
   );
-  const { user, UserAnimes } = useContext(GlobalAppContext);
+  const { UserAnimes } = useContext(GlobalAppContext);
+  console.log(animeData);
   const {
     title,
     photoPath,
@@ -134,23 +136,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
     return ScoredBy?.toString();
   }, [ScoredBy]);
-
-  const ChangeFBStatus = async (newType: AnimeWatchType) => {
-    const UserAnimeRef = doc(
-      doc(db, "users", user.uid),
-      "animes",
-      malId.toString()
-    );
-
-    if (newType === AnimeWatchType.UNWATCHED)
-      return await deleteDoc(UserAnimeRef);
-
-    await setDoc(UserAnimeRef, {
-      AnimeId: malId,
-      WatchType: newType,
-      Fav: false,
-    });
-  };
 
   useEffect(() => {
     if (UserAnimes) {
@@ -226,7 +211,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                   <Fragment>
                     <FaClock className="icon" />{" "}
                     <span className="text-primary-whiter">
-                      {duration.toUpperCase()}
+                      {duration?.toUpperCase()}
                     </span>
                   </Fragment>
                 )}
@@ -249,7 +234,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
               </div>
               <p className="col-span-5 px-8 text-justify text-headline font-semibold text-lg">
                 <SynopsisComponent
-                  Synopsis={Synopsis.replace("[Written by MAL Rewrite]", "")}
+                  Synopsis={Synopsis?.replace("[Written by MAL Rewrite]", "")}
                 />
               </p>
             </div>
@@ -266,10 +251,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 Airing ? "Ongoing" : "Finished",
               ]}
             />
-            <MyAnimes
-              AnimeType={CurrentAnimeWatchType}
-              ChangeFBStatus={ChangeFBStatus}
-            />
+            <MyAnimes AnimeType={CurrentAnimeWatchType} malId={malId} />
           </div>
         </div>
       </section>
@@ -300,32 +282,14 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       {/* Recommendation */}
       <section className="w-5/6 bg-bgi-whiter rounded-xl mt-2 py-4">
         <RecommandationsList
-          RecommandationsData={Recommendations.slice(0, 7)}
+          RecommandationsData={Recommendations?.slice(0, 7)}
         />
       </section>
     </div>
   );
 };
 
-function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
-  const { WATCHING, WATCHED, UNWATCHED, WANT_TO_WATCH, WONT_WATCH, DROPPED } =
-    AnimeWatchType;
-  const [SelectValue, setSelectValue] = useState(AnimeType);
-  const FirstEffectSkipped = useRef(false);
-
-  useEffect(() => {
-    if (!FirstEffectSkipped.current) {
-      FirstEffectSkipped.current = true;
-      return;
-    }
-    SelectValue !== AnimeType && ChangeFBStatus(SelectValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [SelectValue]);
-
-  useEffect(() => {
-    setSelectValue(AnimeType);
-  }, [AnimeType]);
-
+function MyAnimes({ malId, AnimeType }: MyAnimeProps) {
   return (
     <AuthCheck
       fallback={
@@ -348,24 +312,11 @@ function MyAnimes({ ChangeFBStatus, AnimeType }: MyAnimeProps) {
       }
     >
       <MyAnimesCore>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex justify-center"
-        >
-          <select
-            value={SelectValue}
-            onChange={(e) => setSelectValue(e.target.value as AnimeWatchType)}
-            className="w-full bg-bgi-black text-headline text-center text-2xl outline-none focus:ring-2 focus:ring-primary-main
-             rounded-lg py-3 px-1 transition"
-          >
-            <option value={UNWATCHED}>❌ Unwatched</option>
-            <option value={WATCHING}>👀 Whatching</option>
-            <option value={WATCHED}>✅ Watched</option>
-            <option value={WANT_TO_WATCH}>⌚ Want to Watch</option>
-            <option value={DROPPED}>🚮 Dropped</option>
-            <option value={WONT_WATCH}>⛔ Won&apos;t Watch</option>
-          </select>
-        </form>
+        <AnimesWatchType
+          AnimeType={AnimeType}
+          malId={malId}
+          classNameProps="py-3"
+        />
       </MyAnimesCore>
     </AuthCheck>
   );
@@ -395,13 +346,18 @@ function SpecialInfo({
     ...OtherInfos,
     duration && `${duration.split(" ")[0]} Min/Eps`,
     ...Object.keys(AlternativeTitle)
-      .map((key) => AlternativeTitle[key].length > 0 && AlternativeTitle[key])
+      .map(
+        (key) =>
+          AlternativeTitle[key] &&
+          AlternativeTitle[key].length > 0 &&
+          AlternativeTitle[key]
+      )
       .filter((data) => data),
     studios && <StudiosComponent studio={studios[0]} />,
     AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
   ].filter((d) => d);
   const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
-    <SpecialInfoItem dataToShow={data} key={i} />
+    <SpecialInfoItem key={i} dataToShow={data} />
   ));
 
   return (

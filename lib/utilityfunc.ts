@@ -1,4 +1,5 @@
 import { DocumentSnapshot } from "@firebase/firestore";
+import { AnimeWatchType } from "./types/enums";
 import {
   AnimeShape,
   EpisodesShape,
@@ -12,6 +13,9 @@ import {
   SeasonAnimesShape,
 } from "./types/interface";
 import { AnimeStatusType, TheFourSeason } from "./types/types";
+import { doc, updateDoc } from "@firebase/firestore";
+import { auth, db } from "./firebase";
+import toast from "react-hot-toast";
 
 /**
  * Is the string a valid url (https://www.example.com)
@@ -167,7 +171,7 @@ export const removeParamsFromPhotoUrl = (photoUrl: string) =>
  * @returns {boolean} true | false
  */
 export const IsError = (api_response: JikanApiERROR): boolean => {
-  if (!!api_response.error) return true;
+  if (!!api_response?.error) return true;
   return false;
 };
 
@@ -194,9 +198,9 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
         )
           return resolve(Episodes);
         Episodes = [...Episodes, ...eps.data];
-        if (i === eps?.pagination.last_visible_page) return resolve(Episodes);
+        if (!eps?.pagination.has_next_page) return resolve(Episodes);
         i++;
-        setTimeout(fetchOtherEP, 335);
+        setTimeout(fetchOtherEP, 4050);
       } catch (err) {
         reject(err);
       }
@@ -259,3 +263,34 @@ export const WhitchSeason = () => {
  */
 export const shuffleArray = <T>(array: T[]): T[] =>
   array.sort(() => Math.random() - 0.5);
+
+/**
+ * Copy Text To User Clipbord
+ * @param {string} text
+ */
+export const copyToClipboard = (text: string) =>
+  navigator.clipboard.writeText(text);
+
+/**
+ * Toggle User Anime Fav Field
+ * @param {string} AnimeId
+ * @param {boolean} currentVal
+ */
+export const ToggleFav = (AnimeId: string, currentVal: boolean) => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      AnimeId
+    );
+
+    updateDoc(AnimeRef, {
+      Fav: !currentVal,
+    });
+
+    !currentVal && toast.success("Successfully added to your favorite");
+    currentVal && toast.success("Successfully removed from your favorite");
+  } catch (err) {
+    toast.error("Cannot add this anime to your favorite");
+  }
+};

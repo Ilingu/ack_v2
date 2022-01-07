@@ -20,18 +20,23 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 // Func
-import { removeDuplicates, shuffleArray } from "../../lib/utilityfunc";
+import {
+  copyToClipboard,
+  removeDuplicates,
+  shuffleArray,
+  ToggleFav,
+} from "../../lib/utilityfunc";
 import Image from "next/image";
 // Icon
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import Link from "next/link";
-import { FaCheck, FaMinus, FaPlus } from "react-icons/fa";
+import { FaCheck, FaCopy, FaMinus, FaPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { FcOk } from "react-icons/fc";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
   AnimeData: UserAnimePosterShape;
-  ToggleFav?: (AnimeId: string, currentVal: boolean) => void;
   RenderType: "animeList" | "groupList";
   IsAnimeToAdd?: boolean;
   ToggleGroup: (
@@ -271,7 +276,6 @@ const HomePoster: FC = () => {
         <AnimeItemPoster
           key={animeId || i}
           AnimeData={AnimeData}
-          ToggleFav={ToggleFav}
           RenderType="animeList"
           IsAnimeToAdd={AnimesToAddToObj && !!AnimesToAddToObj[animeId]}
           ToggleGroup={ToggleGroup}
@@ -282,21 +286,6 @@ const HomePoster: FC = () => {
     setNewRenderForAnimes(AnimesPosterJSX);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups, AnimesToAdd]);
-
-  const ToggleFav = useCallback(
-    (AnimeId: string, currentVal: boolean) => {
-      try {
-        const AnimeRef = doc(doc(db, "users", user.uid), "animes", AnimeId);
-        updateDoc(AnimeRef, {
-          Fav: !currentVal,
-        });
-        toast.success("Successfully added to your favorite");
-      } catch (err) {
-        toast.error("Cannot add this anime to your favorite");
-      }
-    },
-    [user]
-  );
 
   const ToggleGroup = useCallback(
     (id: string, method: "ADD" | "DELETE" | "DELETE_DB", GrName?: string) => {
@@ -537,12 +526,12 @@ function GroupComponent({
 // [DYNAMIC-COMPONENTS]
 function AnimeItemPoster({
   AnimeData: { AnimeId, Fav, WatchType, photoURL, title },
-  ToggleFav,
   RenderType,
   IsAnimeToAdd,
   ToggleGroup,
   NameOfGroup,
 }: HomeAnimeItemPosterProp) {
+  const [CopyClicked, setCopyClicked] = useState(false);
   const { WATCHED, WATCHING } = AnimeWatchType;
   const Color =
     WatchType === WATCHING
@@ -575,11 +564,11 @@ function AnimeItemPoster({
   );
 
   return (
-    <div className="xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
+    <div className="group xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
       <div>
         <div
           className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
-          onClick={() => ToggleFav && ToggleFav(AnimeId.toString(), Fav)}
+          onClick={() => ToggleFav(AnimeId.toString(), Fav)}
         >
           {Fav ? (
             <AiFillStar className="icon text-yellow-500" />
@@ -592,6 +581,19 @@ function AnimeItemPoster({
           : IsAnimeToAdd
           ? RemoveToGroup
           : AddToGroup}
+        <div
+          onClick={() => {
+            copyToClipboard(title);
+            setCopyClicked(true);
+
+            setTimeout(() => {
+              setCopyClicked(false);
+            }, 2000);
+          }}
+          className="group-hover:block absolute hidden bottom-12 left-1/2 z-10 text-xl -translate-x-1/2 -translate-y-1/2 text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+        >
+          {CopyClicked ? <FcOk /> : <FaCopy className="icon" />}
+        </div>
       </div>
 
       <Link href={`/watch/${AnimeId}`}>
@@ -607,7 +609,7 @@ function AnimeItemPoster({
           <h1
             className={`${Color} text-center text-xl font-bold capitalize flex justify-center items-center`}
           >
-            {title}
+            {title.slice(0, 42)}
           </h1>
         </a>
       </Link>

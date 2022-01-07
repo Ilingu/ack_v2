@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import debounce from "lodash.debounce";
@@ -68,6 +74,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     return y.toString();
   });
   const SkipFirstCallbackInstance = useRef(true);
+  const UpComingAnime = useRef(true);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => LoadSeasonAnime(), [SeasonAnimesData]);
@@ -82,8 +89,10 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     ));
     setRenderedSeasonAnime(JSXElems);
   };
+
   const GetSeason = async (year: string, season: TheFourSeason) => {
     try {
+      UpComingAnime.current = false;
       const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi(
         `https://api.jikan.moe/v4/seasons/${year}/${season}`
       );
@@ -115,8 +124,17 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
       />
       <header>
         <h1 className="text-center text-headline font-semibold text-5xl tracking-wide">
-          <span className="text-primary-main capitalize">{Season}</span>&apos;s
-          <span className="text-primary-main"> {Year}</span> animes
+          {UpComingAnime.current ? (
+            <Fragment>
+              <span className="text-primary-main">Upcoming</span> Animes
+            </Fragment>
+          ) : (
+            <Fragment>
+              <span className="text-primary-main capitalize">{Season}</span>
+              &apos;s
+              <span className="text-primary-main"> {Year}</span> animes
+            </Fragment>
+          )}
         </h1>
         <form
           onSubmit={(e) => e.preventDefault()}
@@ -181,7 +199,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
                 className="opacity-95 hover:opacity-50 transition cursor-pointer rounded-lg"
               />
               <div className="absolute top-0 left-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
-                <FaStar className="icon text-yellow-500" /> {score}
+                <FaStar className="icon text-yellow-500" /> {score || "None"}
               </div>
               <div className="absolute top-0 right-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
                 {type}
