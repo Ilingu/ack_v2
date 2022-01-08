@@ -1,5 +1,4 @@
 import { DocumentSnapshot } from "@firebase/firestore";
-import { AnimeWatchType } from "./types/enums";
 import {
   AnimeShape,
   EpisodesShape,

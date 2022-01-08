@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { useContext, useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -70,15 +69,16 @@ const WatchPage: NextPage = () => {
             />
           </div>
           <div className="flex justify-center">
-            <div className="watch-container sm:w-10/12 mt-24">
+            <div className="watch-container sm:w-10/12 sm:px-0 px-2 mt-24">
               {/* Img */}
               <div className="gta-img lg:block lg:justify-end flex justify-center">
                 <Link href={`/anime/${malId}`} passHref>
                   <a>
-                    <img
+                    <Image
                       src={photoPath}
                       alt={`${title}'s Poster`}
                       width={200}
+                      height={283}
                       className="object-cover rounded-lg"
                     />
                   </a>
@@ -93,7 +93,7 @@ const WatchPage: NextPage = () => {
                 </h1>
               </div>
               {/* Buttons */}
-              <div className="gta-buttons flex flex-wrap 2xl:ml-0 lg:ml-36 justify-center lg:-mt-20">
+              <div className="gta-buttons flex flex-wrap 2xl:ml-16 lg:ml-52 justify-center lg:-mt-20">
                 <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none">
                   <FaPlay className="icon" />
                 </button>

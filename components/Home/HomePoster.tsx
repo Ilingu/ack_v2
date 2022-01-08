@@ -179,6 +179,7 @@ const HomePoster: FC = () => {
           if (!ToObjRA[GrName]) {
             const CurrentGroups = GroupsElementsOrder.current;
             const indexToDel = CurrentGroups.indexOf(GrName);
+            if (indexToDel === -1) return;
             CurrentGroups.splice(indexToDel, 1);
           }
         });
@@ -254,6 +255,7 @@ const HomePoster: FC = () => {
         if (!ToObjRA[AnimeID]) {
           const CurrentAnimes = AnimesElementsOrder.current;
           const indexToDel = CurrentAnimes.indexOf(AnimeID);
+          if (indexToDel === -1) return;
           CurrentAnimes.splice(indexToDel, 1);
         }
       });
@@ -292,8 +294,9 @@ const HomePoster: FC = () => {
       if (method === "ADD") setAnimeToAdd((prev) => [...prev, id]);
       if (method === "DELETE") {
         const CopyArr = [...AnimesToAdd];
-        const index = CopyArr.indexOf(id);
-        CopyArr.splice(index, 1);
+        const indexToDel = CopyArr.indexOf(id);
+        if (indexToDel === -1) return;
+        CopyArr.splice(indexToDel, 1);
         setAnimeToAdd(CopyArr);
       }
       if (method === "DELETE_DB") {
@@ -302,6 +305,7 @@ const HomePoster: FC = () => {
             ...UserGroups.find((group) => group.GroupName === GrName),
           };
           const IndexToDel = CurrentGroup.indexOf(id);
+          if (IndexToDel === -1) return;
           CurrentGroup.splice(IndexToDel, 1);
 
           const GroupRef = doc(doc(db, "users", user.uid), "groups", GrName);

@@ -1,4 +1,9 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
+// DB
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
+import { removeDuplicates } from "../../lib/utilityfunc";
+import toast from "react-hot-toast";
 // Types
 import { JikanApiResEpisodes, UserAnimeShape } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
@@ -14,13 +19,14 @@ interface EpsPosterProps {
 interface EpsPosterItemProps {
   EpisodeData: JikanApiResEpisodes;
   watched: boolean;
+  UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
 }
 type SortOrderType = "descending" | "ascending";
 
 /* COMPONENTS */
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
-  UserAnimeData: { Progress, WatchType },
+  UserAnimeData: { Progress, WatchType, AnimeId },
   Duration,
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
@@ -38,12 +44,19 @@ const EpsPoster: FC<EpsPosterProps> = ({
       const JSXElems = OrderedEpsData.map((epData, i) => {
         let watched = true;
         if (
-          WatchType !== AnimeWatchType.WATCHED &&
-          (!Progress || (Progress && !ProgressToObj[epData.mal_id]))
+          !Progress ||
+          (Progress && Progress[0] !== -2811 && !ProgressToObj[epData.mal_id])
         )
           watched = false;
 
-        return <EpsPosterItem key={i} EpisodeData={epData} watched={watched} />;
+        return (
+          <EpsPosterItem
+            key={i}
+            EpisodeData={epData}
+            watched={watched}
+            UpdateUserAnimeProgress={UpdateUserAnimeProgress}
+          />
+        );
       });
       setNewRender(JSXElems);
     },
@@ -51,12 +64,73 @@ const EpsPoster: FC<EpsPosterProps> = ({
     [EpisodesData, Progress, WatchType, SortOrder]
   );
 
+  /* FUNC */
+  const UpdateUserAnimeProgress = useCallback(
+    (epId: number, remove: boolean) => {
+      try {
+        let NewProgress = Progress
+          ? Progress[0] === -2811
+            ? []
+            : [...Progress, epId]
+          : [epId];
+
+        if (remove && Progress && Progress[0] !== -2811) {
+          const ProgressCopy = [...Progress];
+          const indexToDel = ProgressCopy.indexOf(epId);
+          if (indexToDel === -1) return;
+          ProgressCopy.splice(indexToDel, 1);
+          NewProgress = ProgressCopy;
+        }
+
+        const AnimeRef = doc(
+          doc(db, "users", auth.currentUser.uid),
+          "animes",
+          AnimeId.toString()
+        );
+        updateDoc(AnimeRef, {
+          Progress: removeDuplicates(NewProgress),
+        });
+
+        toast.success("Marked as watched !");
+      } catch (err) {
+        toast.error("Error, cannot execute this action.");
+      }
+    },
+    [AnimeId, Progress]
+  );
+
+  const MarkAllEpWatched = () => {
+    try {
+      const AnimeRef = doc(
+        doc(db, "users", auth.currentUser.uid),
+        "animes",
+        AnimeId.toString()
+      );
+      updateDoc(AnimeRef, {
+        Progress: [-2811],
+      });
+      toast.success("All Marked as watched !");
+    } catch (err) {
+      toast.error("Error, cannot execute this action.");
+    }
+  };
+
   return (
     <div className="w-full relative">
       <h1 className="text-center text-4xl text-headline font-bold mb-3">
         Episodes ({EpisodesData.length})
       </h1>
-      <div className="flex flex-wrap justify-around mb-3">
+      <div className="flex flex-wrap gap-x-2 mb-3">
+        {!isNaN(Duration) && (
+          <div className="font-bold text-primary-main text-xl tracking-wide mr-auto">
+            {((Duration * EpisodesData.length) / 60).toFixed()} Hr{" "}
+            {parseInt((Duration * EpisodesData.length).toFixed(0).slice(2))} min{" "}
+            <span className="text-description font-semibold text-lg">
+              ({EpisodesData.length} eps x {Duration} min)
+            </span>
+          </div>
+        )}
+
         <div
           onClick={() =>
             setSortOrder(
@@ -68,29 +142,29 @@ const EpsPoster: FC<EpsPosterProps> = ({
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </div>
 
-        {!isNaN(Duration) && (
-          <div className="font-bold text-primary-main text-xl tracking-wide">
-            {((Duration * EpisodesData.length) / 60).toFixed()} Hr{" "}
-            {parseInt((Duration * EpisodesData.length).toFixed(0).slice(2))} min{" "}
-            <span className="text-description font-semibold text-lg">
-              ({EpisodesData.length} eps x {Duration} min)
-            </span>
-          </div>
-        )}
+        <div
+          onClick={MarkAllEpWatched}
+          className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer"
+        >
+          Mark as &quot;Watched&quot;
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 mb-5 shadow-md shadow-bgi-whiter">
-        {RenderedEps}
-      </div>
+      <div className="grid grid-cols-1 gap-2 mb-5">{RenderedEps}</div>
     </div>
   );
 };
 
-function EpsPosterItem({ EpisodeData, watched }: EpsPosterItemProps) {
+function EpsPosterItem({
+  EpisodeData,
+  watched,
+  UpdateUserAnimeProgress,
+}: EpsPosterItemProps) {
   const { title, mal_id, filler, recap, aired } = EpisodeData || {};
 
   return (
     <div
+      onClick={() => UpdateUserAnimeProgress(mal_id, watched)}
       className={`grid grid-cols-24 w-full bg-bgi-whitest py-0.5 px-4 items-center rounded-md relative${
         watched || filler || recap ? "" : " border-l-4 border-primary-main"
       }${
