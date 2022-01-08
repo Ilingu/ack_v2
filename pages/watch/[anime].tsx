@@ -93,18 +93,18 @@ const WatchPage: NextPage = () => {
                 </h1>
               </div>
               {/* Buttons */}
-              <div className="gta-buttons flex flex-wrap 2xl:ml-16 lg:ml-52 justify-center lg:-mt-20">
-                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none">
+              <div className="gta-buttons flex flex-wrap gap-x-4 gap-y-2 2xl:ml-16 lg:ml-52 justify-center lg:-mt-20">
+                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
                   <FaPlay className="icon" />
                 </button>
-                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none">
+                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
                   <FaBell className="icon" />
                 </button>
                 <button
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
                   }
-                  className="shadow-md xs:mb-0 mb-2 shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none"
+                  className="shadow-md xs:mb-0 mb-2 shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none"
                 >
                   {Fav ? (
                     <AiFillStar className="icon" />

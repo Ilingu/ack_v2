@@ -99,4 +99,14 @@
         grid-template-areas: "img" "title" "buttons" "content";
   }
 }
+
+#DigitAddEpsInput {
+  -moz-appearance: textfield;
+}
+
+#DigitAddEpsInput::-webkit-outer-spin-button,
+#DigitAddEpsInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 /*# sourceMappingURL=globals.css.map */

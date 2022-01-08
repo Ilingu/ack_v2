@@ -1,14 +1,25 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 // DB
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, increment, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { removeDuplicates } from "../../lib/utilityfunc";
 import toast from "react-hot-toast";
 // Types
-import { JikanApiResEpisodes, UserAnimeShape } from "../../lib/types/interface";
-import { AnimeWatchType } from "../../lib/types/enums";
+import {
+  JikanApiResEpisodes,
+  UserAnimeShape,
+  UserExtraEpisodesShape,
+} from "../../lib/types/interface";
 // UI
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
 
 /* INTERFACES */
 interface EpsPosterProps {
@@ -17,31 +28,68 @@ interface EpsPosterProps {
   Duration: number;
 }
 interface EpsPosterItemProps {
-  EpisodeData: JikanApiResEpisodes;
+  EpisodeData: UserExtraEpisodesShape;
   watched: boolean;
   UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
 }
 type SortOrderType = "descending" | "ascending";
 
+/* FUNC */
+let GlobalAnimeId: string;
+const DecrementExtraEpisode = () => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      GlobalAnimeId
+    );
+
+    updateDoc(AnimeRef, {
+      ExtraEpisodes: increment(-1),
+    });
+
+    toast.success("Deleted!", { duration: 500 });
+  } catch (err) {
+    toast.error("Error, cannot execute this action.");
+  }
+};
+
 /* COMPONENTS */
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
-  UserAnimeData: { Progress, WatchType, AnimeId },
   Duration,
+  UserAnimeData: { Progress, WatchType, AnimeId, ExtraEpisodes },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
+
+  const [LoadAll, setLoadAll] = useState(false);
   const [SortOrder, setSortOrder] = useState<SortOrderType>("descending");
+
+  const [NoOfEpsToAdd, setNoOfEpsToAdd] = useState(0);
+
+  const { current: EpisodesLength } = useRef(
+    EpisodesData.length + (ExtraEpisodes || 0)
+  );
+
+  useEffect(() => {
+    GlobalAnimeId = AnimeId.toString();
+  }, [AnimeId]);
 
   useEffect(
     () => {
+      const EpsData: UserExtraEpisodesShape[] = [
+        ...EpisodesData,
+        ...GenerateExtraEp,
+      ];
+      const FilteredEpsData = (
+        SortOrder === "ascending" ? [...EpsData].reverse() : EpsData
+      ).slice(0, LoadAll ? EpsData.length : 20);
+
       const ProgressToObj =
         (Progress &&
           Progress.reduce((a, GrName) => ({ ...a, [GrName]: GrName }), {})) ||
         null;
-      const OrderedEpsData =
-        SortOrder === "ascending" ? [...EpisodesData].reverse() : EpisodesData;
-
-      const JSXElems = OrderedEpsData.map((epData, i) => {
+      const JSXElems = FilteredEpsData.map((epData, i) => {
         let watched = true;
         if (
           !Progress ||
@@ -61,10 +109,25 @@ const EpsPoster: FC<EpsPosterProps> = ({
       setNewRender(JSXElems);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [EpisodesData, Progress, WatchType, SortOrder]
+    [EpisodesData, Progress, WatchType, SortOrder, LoadAll]
   );
 
   /* FUNC */
+  const GenerateExtraEp = useMemo(
+    (): UserExtraEpisodesShape[] =>
+      Array.apply(null, Array(ExtraEpisodes || 0)).map((_: null, i) => ({
+        mal_id: i + 1 + EpisodesData.length,
+        isExtra: true,
+      })),
+    [EpisodesData.length, ExtraEpisodes]
+  );
+
+  const GetAnimeRef = useMemo(
+    () =>
+      doc(doc(db, "users", auth.currentUser.uid), "animes", AnimeId.toString()),
+    [AnimeId]
+  );
+
   const UpdateUserAnimeProgress = useCallback(
     (epId: number, remove: boolean) => {
       try {
@@ -82,12 +145,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
           NewProgress = ProgressCopy;
         }
 
-        const AnimeRef = doc(
-          doc(db, "users", auth.currentUser.uid),
-          "animes",
-          AnimeId.toString()
-        );
-        updateDoc(AnimeRef, {
+        updateDoc(GetAnimeRef, {
           Progress: removeDuplicates(NewProgress),
         });
 
@@ -96,17 +154,12 @@ const EpsPoster: FC<EpsPosterProps> = ({
         toast.error("Error, cannot execute this action.");
       }
     },
-    [AnimeId, Progress]
+    [GetAnimeRef, Progress]
   );
 
   const MarkAllEpWatched = () => {
     try {
-      const AnimeRef = doc(
-        doc(db, "users", auth.currentUser.uid),
-        "animes",
-        AnimeId.toString()
-      );
-      updateDoc(AnimeRef, {
+      updateDoc(GetAnimeRef, {
         Progress: [-2811],
       });
       toast.success("All Marked as watched !");
@@ -115,18 +168,32 @@ const EpsPoster: FC<EpsPosterProps> = ({
     }
   };
 
+  const AddExtraEpisode = () => {
+    if (NoOfEpsToAdd <= 0) return;
+    try {
+      updateDoc(GetAnimeRef, {
+        ExtraEpisodes: increment(NoOfEpsToAdd),
+      });
+
+      toast.success(`${NoOfEpsToAdd} eps added!`);
+      setNoOfEpsToAdd(0);
+    } catch (err) {
+      toast.error("Error, cannot execute this action.");
+    }
+  };
+
   return (
     <div className="w-full relative">
       <h1 className="text-center text-4xl text-headline font-bold mb-3">
-        Episodes ({EpisodesData.length})
+        Episodes ({EpisodesLength})
       </h1>
-      <div className="flex flex-wrap gap-x-2 mb-3">
+      <div className="flex flex-wrap md:justify-start justify-center gap-2 mb-3">
         {!isNaN(Duration) && (
           <div className="font-bold text-primary-main text-xl tracking-wide mr-auto">
-            {((Duration * EpisodesData.length) / 60).toFixed()} Hr{" "}
-            {parseInt((Duration * EpisodesData.length).toFixed(0).slice(2))} min{" "}
+            {((Duration * EpisodesLength) / 60).toFixed()} Hr{" "}
+            {parseInt((Duration * EpisodesLength).toFixed(0).slice(2))} min{" "}
             <span className="text-description font-semibold text-lg">
-              ({EpisodesData.length} eps x {Duration} min)
+              ({EpisodesLength} eps x {Duration} min)
             </span>
           </div>
         )}
@@ -148,9 +215,40 @@ const EpsPoster: FC<EpsPosterProps> = ({
         >
           Mark as &quot;Watched&quot;
         </div>
+        <button
+          onClick={({ target }) => {
+            if (target.id === "DigitAddEpsInput") return;
+            AddExtraEpisode();
+          }}
+          className="text-center text-headline bg-primary-darker rounded-md font-bold w-40 py-1 outline-none focus:ring-2
+             focus:ring-primary-whiter transition"
+        >
+          <FaPlus className="icon" /> Add{" "}
+          <input
+            id="DigitAddEpsInput"
+            type="number"
+            value={NoOfEpsToAdd || ""}
+            onChange={({ target: { value, valueAsNumber } }) =>
+              value.length <= 2 && setNoOfEpsToAdd(valueAsNumber)
+            }
+            className="w-6 h-5 rounded-lg bg-primary-main text-center font-bold outline-none"
+          />{" "}
+          Ep{NoOfEpsToAdd > 1 && "s"}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 mb-5">{RenderedEps}</div>
+      <div className="grid grid-cols-1 gap-2 mb-2">{RenderedEps}</div>
+      <div className="flex justify-center mb-4">
+        {!LoadAll && (
+          <button
+            onClick={() => setLoadAll(true)}
+            className="text-center text-headline bg-primary-darker py-2 px-2 rounded-lg font-bold w-56 outline-none focus:ring-2
+             focus:ring-primary-whiter transition"
+          >
+            <FaEye className="icon" /> Load All
+          </button>
+        )}
+      </div>
     </div>
   );
 };
@@ -160,11 +258,14 @@ function EpsPosterItem({
   watched,
   UpdateUserAnimeProgress,
 }: EpsPosterItemProps) {
-  const { title, mal_id, filler, recap, aired } = EpisodeData || {};
+  const { title, mal_id, filler, recap, aired, isExtra } = EpisodeData || {};
 
   return (
     <div
-      onClick={() => UpdateUserAnimeProgress(mal_id, watched)}
+      onClick={({ target: { classList } }) => {
+        if (classList[0] === "DeleteExtraEp" || classList[0] === "M32") return;
+        UpdateUserAnimeProgress(mal_id, watched);
+      }}
       className={`grid grid-cols-24 w-full bg-bgi-whitest py-0.5 px-4 items-center rounded-md relative${
         watched || filler || recap ? "" : " border-l-4 border-primary-main"
       }${
@@ -177,6 +278,14 @@ function EpsPosterItem({
           : ""
       }${watched ? " scale-95" : ""}`}
     >
+      {isExtra && (
+        <div
+          onClick={DecrementExtraEpisode}
+          className="absolute right-4 cursor-pointer"
+        >
+          <FaTrashAlt className="DeleteExtraEp text-red-500" />
+        </div>
+      )}
       <div className="cursor-pointer">
         {watched ? (
           <AiOutlineEyeInvisible className="text-description mr-4 text-xl -translate-x-3" />

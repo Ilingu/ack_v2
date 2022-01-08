@@ -62,8 +62,9 @@ export interface UserAnimeShape {
   AnimeId: number;
   WatchType: AnimeWatchType;
   Fav: boolean;
-  Progress: number[] | null;
-  TimestampDate: UserAnimeTimestampDate | null;
+  Progress?: number[];
+  TimestampDate?: UserAnimeTimestampDate;
+  ExtraEpisodes?: number;
 }
 export interface UserAnimeTimestampDate {
   BeganData: number; // Timestamp
@@ -84,6 +85,9 @@ export interface UserAnimePosterShape {
 export interface UserGroupPosterShape {
   GroupName: string;
   Animes: UserAnimePosterShape[];
+}
+export interface UserExtraEpisodesShape extends JikanApiResEpisodes {
+  isExtra?: true;
 }
 /* AnimeDB */
 export interface AnimeShape {
@@ -219,14 +223,14 @@ export interface JikanApiResEpisodesRoot {
 
 export interface JikanApiResEpisodes {
   mal_id: number;
-  url: string;
-  title: string;
+  url?: string;
+  title?: string;
   title_japanese?: string;
   title_romanji?: string;
   aired?: string;
-  filler: boolean;
-  recap: boolean;
-  forum_url: string;
+  filler?: boolean;
+  recap?: boolean;
+  forum_url?: string;
 }
 
 /* JikanRes on /anime/recommendations */

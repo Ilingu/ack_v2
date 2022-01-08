@@ -39,7 +39,7 @@ export default async function AddNewAnimeToFB(
     }
 
     if (animeEpsRes.length <= 0)
-      animeEpsRes = Array.apply(null, Array(12)).map((_: null, i: number) => ({
+      animeEpsRes = Array.apply(null, Array(12)).map((_: null, i) => ({
         mal_id: i + 1,
       }));
 
