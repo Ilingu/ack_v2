@@ -39,6 +39,7 @@ export function useUserData() {
         setUser(user);
       } else {
         setUser(null);
+        setUsername(null);
         setFinished(true);
       }
     });
@@ -66,7 +67,10 @@ export function useGlobalAnimeData(userUid: string) {
   }, []);
 
   useEffect(() => {
-    if (!userUid) return null;
+    if (!userUid) {
+      setUserAnimesData(undefined);
+      return null;
+    }
 
     const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
     let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
@@ -80,7 +84,10 @@ export function useGlobalAnimeData(userUid: string) {
   }, [userUid]);
 
   useEffect(() => {
-    if (!userUid) return null;
+    if (!userUid) {
+      setUserGroupsData(undefined);
+      return null;
+    }
 
     const UserGroupsRef = collection(doc(db, "users", userUid), "groups");
     let unsub = onSnapshot(UserGroupsRef, (Snapdocs) => {
