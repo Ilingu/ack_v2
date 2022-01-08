@@ -1,6 +1,8 @@
 import React, {
+  Dispatch,
   FC,
   Fragment,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -26,6 +28,7 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { AnimeWatchType } from "../../lib/types/enums";
 
 /* INTERFACES */
 interface EpsPosterProps {
@@ -97,7 +100,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
       // Required For Render
       const ProgressToObj =
         (Progress &&
-          Progress.reduce((a, GrName) => ({ ...a, [GrName]: GrName }), {})) ||
+          Progress.reduce((a, Ep_ID) => ({ ...a, [Ep_ID]: Ep_ID }), {})) ||
         null;
       let NextEp = null;
       let NoWatched = 0;
@@ -155,7 +158,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
       try {
         let NewProgress = Progress
           ? Progress[0] === -2811
-            ? []
+            ? [...Progress.slice(1)]
             : [...Progress, epId]
           : [epId];
 
@@ -167,17 +170,19 @@ const EpsPoster: FC<EpsPosterProps> = ({
           NewProgress = ProgressCopy;
         }
 
+        const IsFinished = NewProgress.length === EpisodesLength;
+
         const NewTimestampDate: UserAnimeTimestampDate = {
           BeganDate: !!TimestampDate?.BeganDate
             ? TimestampDate.BeganDate
             : new Date().toLocaleDateString(),
           EndedDate: !!TimestampDate?.EndedDate
             ? TimestampDate?.EndedDate
-            : NewProgress.length === EpisodesLength &&
-              new Date().toLocaleDateString(),
+            : IsFinished && new Date().toLocaleDateString(),
         };
 
         updateDoc(GetAnimeRef, {
+          WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
           Progress: removeDuplicates(NewProgress),
           TimestampDate: NewTimestampDate || null,
         });
@@ -188,13 +193,21 @@ const EpsPoster: FC<EpsPosterProps> = ({
         toast.error("Error, cannot execute this action.");
       }
     },
-    [EpisodesLength, GetAnimeRef, Progress, TimestampDate]
+    [
+      EpisodesLength,
+      GetAnimeRef,
+      Progress,
+      TimestampDate?.BeganDate,
+      TimestampDate?.EndedDate,
+      WatchType,
+    ]
   );
 
   const MarkAllEpWatched = () => {
     try {
       updateDoc(GetAnimeRef, {
-        Progress: [-2811],
+        WatchType: AnimeWatchType.WATCHED,
+        Progress: Progress ? [-2811, ...Progress] : [-2811],
       });
       toast.success("All Marked as watched !");
     } catch (err) {
@@ -216,6 +229,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
     }
   };
 
+  /* JSX */
   return (
     <div className="w-full relative">
       <h1 className="flex flex-col text-center text-4xl text-headline font-bold mb-3">

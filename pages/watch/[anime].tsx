@@ -18,6 +18,7 @@ import Link from "next/link";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaBell, FaPlay } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
+import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -25,6 +26,8 @@ const WatchPage: NextPage = () => {
   const { GlobalAnime, UserAnimes } = useContext(GlobalAppContext);
   const [CurrentAnimeData, setCurrentAnimeData] = useState<AnimeShape>(null);
   const [UserAnimeData, setUserAnimeData] = useState<UserAnimeShape>(null);
+
+  const [FocusMode, setFocusMode] = useState(false);
 
   const {
     title,
@@ -88,7 +91,10 @@ const WatchPage: NextPage = () => {
               </div>
               {/* Title */}
               <div className="gta-title lg:block lg:justify-start flex justify-center">
-                <h1 className="xs:text-6xl text-5xl text-headline font-extrabold tracking-wider h-full">
+                <h1
+                  id="WatchBigTitle"
+                  className="xs:text-6xl text-5xl text-headline font-extrabold tracking-wider h-full"
+                >
                   {title.slice(0, 20)}
                   <br />
                   {title.slice(20)}
@@ -96,7 +102,10 @@ const WatchPage: NextPage = () => {
               </div>
               {/* Buttons */}
               <div className="gta-buttons flex flex-wrap gap-x-4 gap-y-2 2xl:ml-16 lg:ml-52 justify-center lg:-mt-20">
-                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
+                <button
+                  onClick={() => setFocusMode(true)}
+                  className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none"
+                >
                   <FaPlay className="icon" />
                 </button>
                 {Airing && broadcast && (
@@ -122,7 +131,8 @@ const WatchPage: NextPage = () => {
                   classNameProps="h-14 w-72"
                 />
               </div>
-              {/* Anime Content (Progress...) */}
+              {/* Anime Content/Focus Mode */}
+
               <div className="gta-content">
                 {type === "Movie" || type === "Music" ? (
                   <MovieList
@@ -139,6 +149,13 @@ const WatchPage: NextPage = () => {
               </div>
             </div>
           </div>
+          {FocusMode && (
+            <FocusModeComponent
+              EpisodesData={EpisodesData}
+              UserAnimeData={UserAnimeData}
+              CancelModeFocus={() => setFocusMode(false)}
+            />
+          )}
         </main>
       )}
     </AuthCheck>

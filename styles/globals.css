@@ -109,4 +109,8 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
+#WatchBigTitle {
+  text-shadow: 1px 1px 1px #222222;
+}
 /*# sourceMappingURL=globals.css.map */
