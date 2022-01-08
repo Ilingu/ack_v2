@@ -86,6 +86,7 @@ export default async function AddNewAnimeToFB(
       .status(404)
       .json({ message: `Anime with id: ${animeId} not found.`, err: true });
   } catch (err) {
+    console.error(err);
     return res
       .status(404)
       .json({ message: `Anime with id: ${animeId} not found.`, err: true });

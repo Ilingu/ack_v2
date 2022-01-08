@@ -1,5 +1,6 @@
 import React, {
   FC,
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -15,10 +16,15 @@ import toast from "react-hot-toast";
 import {
   JikanApiResEpisodes,
   UserAnimeShape,
+  UserAnimeTimestampDate,
   UserExtraEpisodesShape,
 } from "../../lib/types/interface";
 // UI
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import {
+  AiFillPlaySquare,
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+} from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
 
 /* INTERFACES */
@@ -58,9 +64,11 @@ const DecrementExtraEpisode = () => {
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
   Duration,
-  UserAnimeData: { Progress, WatchType, AnimeId, ExtraEpisodes },
+  UserAnimeData: { Progress, WatchType, AnimeId, ExtraEpisodes, TimestampDate },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
+  const [NextEP, setNextEp] = useState<number>(null);
+  const [NoWatchedEp, setNoWatchedEp] = useState(0);
 
   const [LoadAll, setLoadAll] = useState(false);
   const [SortOrder, setSortOrder] = useState<SortOrderType>("descending");
@@ -77,25 +85,34 @@ const EpsPoster: FC<EpsPosterProps> = ({
 
   useEffect(
     () => {
+      // Data
       const EpsData: UserExtraEpisodesShape[] = [
         ...EpisodesData,
         ...GenerateExtraEp,
       ];
       const FilteredEpsData = (
         SortOrder === "ascending" ? [...EpsData].reverse() : EpsData
-      ).slice(0, LoadAll ? EpsData.length : 20);
+      ).slice(0, LoadAll ? EpsData.length : 30);
 
+      // Required For Render
       const ProgressToObj =
         (Progress &&
           Progress.reduce((a, GrName) => ({ ...a, [GrName]: GrName }), {})) ||
         null;
+      let NextEp = null;
+      let NoWatched = 0;
+
+      // Render
       const JSXElems = FilteredEpsData.map((epData, i) => {
         let watched = true;
         if (
           !Progress ||
           (Progress && Progress[0] !== -2811 && !ProgressToObj[epData.mal_id])
-        )
+        ) {
           watched = false;
+          !NextEp && (NextEp = epData.mal_id);
+        }
+        watched && NoWatched++;
 
         return (
           <EpsPosterItem
@@ -106,6 +123,11 @@ const EpsPoster: FC<EpsPosterProps> = ({
           />
         );
       });
+      if (Progress && Progress[0] === -2811) NoWatched = EpisodesLength;
+
+      setNextEp(NextEp);
+      setNoWatchedEp(NoWatched);
+
       setNewRender(JSXElems);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,16 +167,28 @@ const EpsPoster: FC<EpsPosterProps> = ({
           NewProgress = ProgressCopy;
         }
 
+        const NewTimestampDate: UserAnimeTimestampDate = {
+          BeganDate: !!TimestampDate?.BeganDate
+            ? TimestampDate.BeganDate
+            : new Date().toLocaleDateString(),
+          EndedDate: !!TimestampDate?.EndedDate
+            ? TimestampDate?.EndedDate
+            : NewProgress.length === EpisodesLength &&
+              new Date().toLocaleDateString(),
+        };
+
         updateDoc(GetAnimeRef, {
           Progress: removeDuplicates(NewProgress),
+          TimestampDate: NewTimestampDate || null,
         });
 
-        toast.success("Marked as watched !");
+        toast.success(`Marked as ${remove ? "un" : ""}watched !`);
       } catch (err) {
+        console.error(err);
         toast.error("Error, cannot execute this action.");
       }
     },
-    [GetAnimeRef, Progress]
+    [EpisodesLength, GetAnimeRef, Progress, TimestampDate]
   );
 
   const MarkAllEpWatched = () => {
@@ -184,20 +218,55 @@ const EpsPoster: FC<EpsPosterProps> = ({
 
   return (
     <div className="w-full relative">
-      <h1 className="text-center text-4xl text-headline font-bold mb-3">
-        Episodes ({EpisodesLength})
+      <h1 className="flex flex-col text-center text-4xl text-headline font-bold mb-3">
+        Episodes{" "}
+        <span className="text-description italic font-semibold text-lg">
+          Total: {EpisodesLength} {"//"} Remaining:{" "}
+          {EpisodesLength - NoWatchedEp} eps x {Duration} min
+        </span>
       </h1>
-      <div className="flex flex-wrap md:justify-start justify-center gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-1">
         {!isNaN(Duration) && (
-          <div className="font-bold text-primary-main text-xl tracking-wide mr-auto">
-            {((Duration * EpisodesLength) / 60).toFixed()} Hr{" "}
-            {parseInt((Duration * EpisodesLength).toFixed(0).slice(2))} min{" "}
-            <span className="text-description font-semibold text-lg">
-              ({EpisodesLength} eps x {Duration} min)
+          <div className="font-bold text-primary-whiter text-xl tracking-wide">
+            {((Duration * (EpisodesLength - NoWatchedEp)) / 60).toFixed()} Hr{" "}
+            {(Duration * (EpisodesLength - NoWatchedEp)) % 60} min{" "}
+            <span className="text-description italic font-semibold text-lg">
+              Remaining
             </span>
           </div>
         )}
 
+        <div className="font-bold text-headline text-xl mr-auto">
+          {NextEP && (
+            <Fragment>
+              <AiFillPlaySquare className="icon text-primary-main" /> Ep.{" "}
+              <span className="text-primary-whiter">{NextEP}</span> -{" "}
+            </Fragment>
+          )}
+          <span className="text-yellow-100">
+            {((NoWatchedEp / EpisodesLength) * 100).toFixed(2)}%
+          </span>
+        </div>
+
+        {TimestampDate && (
+          <div className="text-headline font-semibold cursor-default">
+            {TimestampDate.BeganDate && (
+              <span className="hover:text-primary-whiter transition-all">
+                <span className="text-description italic">[Began]</span>{" "}
+                {TimestampDate.BeganDate}
+              </span>
+            )}
+            {TimestampDate.EndedDate && (
+              <span className="hover:text-primary-whiter transition-all">
+                {" "}
+                <span className="text-description italic">/ [Ended]</span>{" "}
+                {TimestampDate.EndedDate}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap md:justify-start justify-center gap-2 mb-3">
         <div
           onClick={() =>
             setSortOrder(
@@ -211,7 +280,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
 
         <div
           onClick={MarkAllEpWatched}
-          className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer"
+          className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer mr-auto"
         >
           Mark as &quot;Watched&quot;
         </div>
@@ -236,10 +305,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
           Ep{NoOfEpsToAdd > 1 && "s"}
         </button>
       </div>
-
       <div className="grid grid-cols-1 gap-2 mb-2">{RenderedEps}</div>
       <div className="flex justify-center mb-4">
-        {!LoadAll && (
+        {!LoadAll && RenderedEps?.length !== EpisodesLength && (
           <button
             onClick={() => setLoadAll(true)}
             className="text-center text-headline bg-primary-darker py-2 px-2 rounded-lg font-bold w-56 outline-none focus:ring-2
@@ -266,7 +334,7 @@ function EpsPosterItem({
         if (classList[0] === "DeleteExtraEp" || classList[0] === "M32") return;
         UpdateUserAnimeProgress(mal_id, watched);
       }}
-      className={`grid grid-cols-24 w-full bg-bgi-whitest py-0.5 px-4 items-center rounded-md relative${
+      className={`grid grid-cols-24 w-full bg-bgi-whitest cursor-pointer py-0.5 px-4 items-center rounded-md relative${
         watched || filler || recap ? "" : " border-l-4 border-primary-main"
       }${
         filler
@@ -279,14 +347,11 @@ function EpsPosterItem({
       }${watched ? " scale-95" : ""}`}
     >
       {isExtra && (
-        <div
-          onClick={DecrementExtraEpisode}
-          className="absolute right-4 cursor-pointer"
-        >
+        <div onClick={DecrementExtraEpisode} className="absolute right-4">
           <FaTrashAlt className="DeleteExtraEp text-red-500" />
         </div>
       )}
-      <div className="cursor-pointer">
+      <div>
         {watched ? (
           <AiOutlineEyeInvisible className="text-description mr-4 text-xl -translate-x-3" />
         ) : (

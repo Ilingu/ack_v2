@@ -67,10 +67,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Check on FB
   const animeFBRef = doc(db, "animes", animeId);
   const animeFB = await getDoc(animeFBRef);
-  if (
-    animeFB.exists() &&
-    Date.now() - postToJSON(animeFB).LastRefresh < 2592000000
-  ) {
+  if (animeFB.exists() && postToJSON(animeFB).LastRefresh > Date.now()) {
     return {
       props: { animeData: postToJSON(animeFB) }, // Exists on FB
     };

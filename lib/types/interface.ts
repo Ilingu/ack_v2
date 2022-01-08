@@ -67,8 +67,8 @@ export interface UserAnimeShape {
   ExtraEpisodes?: number;
 }
 export interface UserAnimeTimestampDate {
-  BeganData: number; // Timestamp
-  EndedDate: number; // Timestamp
+  BeganDate: string; // Timestamp
+  EndedDate: string; // Timestamp
 }
 export interface UserGroupShape {
   GroupAnimesId: string[];

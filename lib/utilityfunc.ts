@@ -153,8 +153,11 @@ export function JikanApiToAnimeShape(
         image_url: removeParamsFromPhotoUrl(recom.entry.images.jpg.image_url),
       })) || [],
     EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
-    LastRefresh: Date.now(),
     broadcast: JikanObj[0].broadcast.string,
+    LastRefresh:
+      (JikanObj[0].status as AnimeStatusType) === "Not yet aired"
+        ? Date.now() + 86400000
+        : Date.now() + 2592000000,
   };
 }
 

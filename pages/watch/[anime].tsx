@@ -35,6 +35,8 @@ const WatchPage: NextPage = () => {
     EpisodesData,
     duration,
     type,
+    broadcast,
+    Airing,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
@@ -97,9 +99,11 @@ const WatchPage: NextPage = () => {
                 <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
                   <FaPlay className="icon" />
                 </button>
-                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
-                  <FaBell className="icon" />
-                </button>
+                {Airing && broadcast && (
+                  <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
+                    <FaBell className="icon" />
+                  </button>
+                )}
                 <button
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
