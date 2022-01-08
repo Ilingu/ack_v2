@@ -14,10 +14,11 @@ import { ToggleFav } from "../../lib/utilityfunc";
 import { AnimeShape, UserAnimeShape } from "../../lib/types/interface";
 // UI
 import AnimesWatchType from "../../components/Common/AnimesWatchType";
-import EpsPoster from "../../components/Lists/EpisodesWatchList";
+import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
 import Link from "next/link";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaPlay } from "react-icons/fa";
+import MovieList from "../../components/WatchComponents/MovieList";
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -26,8 +27,16 @@ const WatchPage: NextPage = () => {
   const [CurrentAnimeData, setCurrentAnimeData] = useState<AnimeShape>(null);
   const [UserAnimeData, setUserAnimeData] = useState<UserAnimeShape>(null);
 
-  const { title, photoPath, malId, WatchType, Fav, EpisodesData, duration } =
-    { ...CurrentAnimeData, ...UserAnimeData } || {};
+  const {
+    title,
+    photoPath,
+    malId,
+    WatchType,
+    Fav,
+    EpisodesData,
+    duration,
+    type,
+  } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes) return;
@@ -84,7 +93,10 @@ const WatchPage: NextPage = () => {
                 </h1>
               </div>
               {/* Buttons */}
-              <div className="gta-buttons flex flex-wrap justify-center lg:-mt-20">
+              <div className="gta-buttons flex flex-wrap 2xl:ml-0 lg:ml-36 justify-center lg:-mt-20">
+                <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none">
+                  <FaPlay className="icon" />
+                </button>
                 <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md mr-4 text-headline text-xl outline-none">
                   <FaBell className="icon" />
                 </button>
@@ -108,11 +120,18 @@ const WatchPage: NextPage = () => {
               </div>
               {/* Anime Content (Progress...) */}
               <div className="gta-content">
-                <EpsPoster
-                  EpisodesData={EpisodesData}
-                  UserAnimeData={UserAnimeData}
-                  Duration={parseInt(duration.split(" ")[0])}
-                />
+                {type === "Movie" || type === "Music" ? (
+                  <MovieList
+                    Duration={duration.replace("hr", "Hr")}
+                    UserAnimeData={UserAnimeData}
+                  />
+                ) : (
+                  <EpsPoster
+                    EpisodesData={EpisodesData}
+                    UserAnimeData={UserAnimeData}
+                    Duration={parseInt(duration.split(" ")[0])}
+                  />
+                )}
               </div>
             </div>
           </div>

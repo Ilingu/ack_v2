@@ -10,7 +10,7 @@ import debounce from "lodash.debounce";
 // UI
 import MetaTags from "../../components/Common/Metatags";
 import Divider from "../../components/Design/Divider";
-import AnimePoster from "../../components/Poster/SearchPoster";
+import AnimePoster from "../../components/Search/SearchPoster";
 // Utility Func
 import {
   callApi,

@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState } from "react";
 // Types
 import { JikanApiResEpisodes, UserAnimeShape } from "../../lib/types/interface";
+import { AnimeWatchType } from "../../lib/types/enums";
 // UI
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { AnimeWatchType } from "../../lib/types/enums";
 
 /* INTERFACES */
 interface EpsPosterProps {
@@ -53,10 +53,10 @@ const EpsPoster: FC<EpsPosterProps> = ({
 
   return (
     <div className="w-full relative">
-      <h1 className="text-center text-4xl text-headline font-bold mb-4">
+      <h1 className="text-center text-4xl text-headline font-bold mb-3">
         Episodes ({EpisodesData.length})
       </h1>
-      <div className="flex mb-4">
+      <div className="flex flex-wrap justify-around mb-3">
         <div
           onClick={() =>
             setSortOrder(
@@ -67,19 +67,21 @@ const EpsPoster: FC<EpsPosterProps> = ({
         >
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </div>
-        <div className="font-bold text-headline text-xl tracking-wide">
-          Ep 1-{EpisodesData.length}
-        </div>
+
         {!isNaN(Duration) && (
-          <div className="font-bold text-headline text-xl tracking-wide">
-            {((Duration * EpisodesData.length) / 60).toFixed()}H{" "}
-            {parseInt((Duration * EpisodesData.length).toFixed(0).slice(2))}
-            Min
+          <div className="font-bold text-primary-main text-xl tracking-wide">
+            {((Duration * EpisodesData.length) / 60).toFixed()} Hr{" "}
+            {parseInt((Duration * EpisodesData.length).toFixed(0).slice(2))} min{" "}
+            <span className="text-description font-semibold text-lg">
+              ({EpisodesData.length} eps x {Duration} min)
+            </span>
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-2 mb-5">{RenderedEps}</div>
+      <div className="grid grid-cols-1 gap-2 mb-5 shadow-md shadow-bgi-whiter">
+        {RenderedEps}
+      </div>
     </div>
   );
 };

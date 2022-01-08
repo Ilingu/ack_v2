@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import AuthCheck from "../components/Common/AuthCheck";
 // UI
 import MetaTags from "../components/Common/Metatags";
-import HomePoster from "../components/Poster/HomePoster";
+import HomePoster from "../components/Home/HomePoster";
 
 /* Components */
 const Home: NextPage = () => {
