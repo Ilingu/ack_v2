@@ -12,6 +12,6 @@ module.exports = withPWA({
   reactStrictMode: true,
   fallbacks: {
     image: "/favicon.ico",
-    // document: "/pages/...",
+    video: "/NoInternet.gif",
   },
 });

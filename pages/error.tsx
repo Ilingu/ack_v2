@@ -10,7 +10,7 @@ export default function Custom404() {
       <h1 className="text-6xl mb-2 font-mono text-red-500 font-bold">
         <BiErrorAlt className="icon" /> ERROR
       </h1>
-      <h2 className="text-3xl mb-2 font-semibold text-center">
+      <h2 className="text-3xl mb-4 font-semibold text-center">
         ⚡ ACK have crashed ! <br /> 🛡For security purpose we redirect you into
         this page.
       </h2>

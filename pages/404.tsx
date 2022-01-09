@@ -6,7 +6,7 @@ export default function Custom404() {
     <main className="flex flex-col justify-center items-center text-headline h-screen">
       <Metatags title="404 Page Not Found!" description="404 Page" />
       <h1 className="text-6xl mb-2 font-mono text-red-500 font-bold">404</h1>
-      <h2 className="text-3xl mb-2 font-semibold">
+      <h2 className="text-3xl mb-4 font-semibold">
         That page does not seem to exist...
       </h2>
       <iframe

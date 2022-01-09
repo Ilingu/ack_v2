@@ -27,16 +27,21 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
     const CheckConn = (ConnInfo: NetworkInformationShape) => {
       if (
-        ConnInfo &&
-        (ConnInfo.effectiveType === "slow-2g" ||
-          ConnInfo.effectiveType === "2g")
+        ConnInfo?.effectiveType === "slow-2g" ||
+        ConnInfo?.effectiveType === "2g"
       ) {
         toast.error(
-          `Connexion internet faible/instable (${ConnInfo.effectiveType})`,
+          `Unstable internet connection (${ConnInfo?.effectiveType})`,
           {
             position: "bottom-right",
           }
         );
+      }
+
+      if (ConnInfo?.downlink === 0) {
+        toast.error(`You are offline`, {
+          position: "bottom-right",
+        });
       }
     };
     const connectionInfo =

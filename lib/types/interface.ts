@@ -65,6 +65,7 @@ export interface UserAnimeShape {
   Progress?: number[];
   TimestampDate?: UserAnimeTimestampDate;
   ExtraEpisodes?: number;
+  NewEpisodeAvailable?: boolean;
 }
 export interface UserAnimeTimestampDate {
   BeganDate: string; // Timestamp

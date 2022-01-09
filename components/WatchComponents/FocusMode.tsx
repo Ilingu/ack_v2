@@ -33,8 +33,9 @@ const FocusMode: FC<FocusModeProps> = ({
   const { EpId, EpTitle, Filler, Recap } = FocusEpisodeData || {};
 
   const { current: EpisodesLength } = useRef(
-    EpisodesData.length + ExtraEpisodes
+    EpisodesData.length + (ExtraEpisodes || 0)
   );
+  console.log(ExtraEpisodes);
 
   /* FUNC */
   const GenerateEp = useMemo(
