@@ -16,10 +16,12 @@ import {
   Studio as StudioShape,
   GenreTag,
   AlternativeTitleShape,
+  InternalApiResError,
 } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
+// Func
 import {
-  callApi,
+  AddNewGlobalAnime,
   ConvertBroadcastTimeZone,
   postToJSON,
   Return404,
@@ -79,14 +81,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // No Anime -> Api Req
-  const animeData = await callApi(
-    `http://${
-      process.env.NODE_ENV === "development"
-        ? "localhost:3000"
-        : "ack.vercel.app"
-    }/api/${animeId}`
-  );
-  if (!animeData || animeData.err) return Return404();
+  const animeData = await AddNewGlobalAnime(animeId);
+  if (!animeData || (animeData as InternalApiResError).err) return Return404();
 
   return {
     props: { animeData },

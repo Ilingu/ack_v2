@@ -195,7 +195,7 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
           {animeFound?.length > 0 || (
             <p
               onClick={() => Submit(reqTitle, true)}
-              className="text-lg text-center text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
+              className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
             >
               Chercher Globalement <FaGlobe className="icon text-thirdly" />
             </p>

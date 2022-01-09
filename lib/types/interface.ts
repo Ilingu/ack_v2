@@ -18,6 +18,10 @@ export interface NetworkInformationShape {
   saveData: boolean;
   type: NetworkType;
 }
+export interface InternalApiResError {
+  message: string;
+  err: boolean;
+}
 /* User */
 export interface UserShape {
   displayName: string;

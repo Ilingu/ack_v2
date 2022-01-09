@@ -1,12 +1,16 @@
-import { DocumentSnapshot } from "@firebase/firestore";
+// Types
 import {
+  AnimeConfigPathsIdShape,
   AnimeShape,
   EpisodesShape,
+  InternalApiResError,
   JikanApiERROR,
   JikanApiResAnime,
+  JikanApiResAnimeRoot,
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
   JikanApiResRecommandations,
+  JikanApiResRecommandationsRoot,
   JikanApiResSeason,
   RecommendationsShape,
   SeasonAnimesShape,
@@ -17,9 +21,103 @@ import {
   DayOfWeek,
   TheFourSeason,
 } from "./types/types";
-import { doc, updateDoc } from "@firebase/firestore";
+// DB
+import {
+  doc,
+  updateDoc,
+  writeBatch,
+  DocumentSnapshot,
+  getDoc,
+} from "@firebase/firestore";
 import { auth, db } from "./firebase";
+// Toast
 import toast from "react-hot-toast";
+
+/* FUNC */
+
+/**
+ * Fetch Anime Data and add it to FB
+ * @param {string} animeId
+ */
+export const AddNewGlobalAnime = async (
+  animeId: string
+): Promise<AnimeShape | InternalApiResError> => {
+  let animeData: AnimeShape;
+  try {
+    const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
+    // Req
+    const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
+    let animeEpsRes = await getAllTheEpisodes(animeId);
+    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
+      await callApi(endpoint + "/recommendations");
+
+    if (
+      IsError(animeRes as unknown as JikanApiERROR) ||
+      IsError(animeRecommendationsRes as unknown as JikanApiERROR)
+    ) {
+      return { message: `Error when fetching: ${animeId}.`, err: true };
+    }
+
+    if (animeEpsRes.length <= 0)
+      animeEpsRes = Array.apply(null, Array(12)).map((_: null, i) => ({
+        mal_id: i + 1,
+      }));
+
+    const AllAnimeData = await Promise.all([
+      animeRes,
+      animeEpsRes,
+      animeRecommendationsRes,
+    ]);
+
+    let IsGood = true;
+    AllAnimeData || (IsGood = false);
+    AllAnimeData.forEach((oneData) => {
+      if (!oneData) IsGood = false;
+    });
+
+    if (IsGood) {
+      animeData = JikanApiToAnimeShape(AllAnimeData);
+
+      const batch = writeBatch(db);
+
+      const newAnimesRef = doc(db, "animes", animeId);
+      batch.set(newAnimesRef, animeData);
+
+      const animesConfigPathsRef = doc(db, "animes", "animes-config");
+      const animesConfigPaths = (
+        await getDoc(animesConfigPathsRef)
+      ).data() as AnimeConfigPathsIdShape;
+
+      const ArrayPathsToObjPaths = animesConfigPaths.AllAnimeId.reduce(
+        (a, id) => ({ ...a, [id]: id }),
+        {}
+      );
+      if (!ArrayPathsToObjPaths[animeId]) {
+        const newAnimeConfigPaths = {
+          AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
+        };
+        batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+      }
+
+      await batch.commit();
+      return animeData;
+    }
+    return { message: `Anime with id: ${animeId} not found.`, err: true };
+  } catch (err) {
+    console.error(err);
+    return { message: `Anime with id: ${animeId} not found.`, err: true };
+  }
+};
+
+/**
+ * Fetch Data From Api
+ * @param {URL} url
+ */
+export async function callApi(url: string) {
+  if (!isValidUrl(url)) return;
+  const req = await fetch(url);
+  return await req.json();
+}
 
 /**
  * Is the string a valid url (https://www.example.com)
@@ -33,16 +131,6 @@ export function isValidUrl(url: string) {
   } catch (_) {
     return false;
   }
-}
-
-/**
- * Fetch Data From Api
- * @param {URL} url
- */
-export async function callApi(url: string) {
-  if (!isValidUrl(url)) return;
-  const req = await fetch(url);
-  return await req.json();
 }
 
 /**

@@ -5,13 +5,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Init
 const firebaseConfig = {
-  apiKey: "AIzaSyDihE5yYCzxD2sJRy1FS4Y47Lkp7kiZPQ8",
-  authDomain: "ackv2-652fc.firebaseapp.com",
-  projectId: "ackv2-652fc",
-  storageBucket: "ackv2-652fc.appspot.com",
-  messagingSenderId: "277886610954",
-  appId: "1:277886610954:web:d82d787211cd5c583fb9f3",
-  measurementId: "G-CMVYL0SD32",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 if (!getApps().length) {
