@@ -77,6 +77,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists() && postToJSON(animeFB).LastRefresh > Date.now()) {
     return {
       props: { animeData: postToJSON(animeFB) }, // Exists on FB
+      revalidate: 3600,
     };
   }
 
@@ -86,6 +87,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { animeData },
+    revalidate: 3600,
   };
 };
 
