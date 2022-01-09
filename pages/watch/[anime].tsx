@@ -19,6 +19,7 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaBell, FaPlay } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
 import FocusModeComponent from "../../components/WatchComponents/FocusMode";
+import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -135,10 +136,7 @@ const WatchPage: NextPage = () => {
 
               <div className="gta-content">
                 {type === "Movie" || type === "Music" ? (
-                  <MovieList
-                    Duration={duration.replace("hr", "Hr")}
-                    UserAnimeData={UserAnimeData}
-                  />
+                  <MovieList Duration={duration.replace("hr", "Hr")} />
                 ) : (
                   <EpsPoster
                     EpisodesData={EpisodesData}
@@ -149,10 +147,18 @@ const WatchPage: NextPage = () => {
               </div>
             </div>
           </div>
-          {FocusMode && (
+          {FocusMode && type !== "Movie" && (
             <FocusModeComponent
               EpisodesData={EpisodesData}
               UserAnimeData={UserAnimeData}
+              CancelModeFocus={() => setFocusMode(false)}
+            />
+          )}
+          {FocusMode && type === "Movie" && (
+            <MovieFocusMode
+              AnimeId={UserAnimeData?.AnimeId.toString()}
+              title={title}
+              duration={duration.replace("hr", "Hr")}
               CancelModeFocus={() => setFocusMode(false)}
             />
           )}

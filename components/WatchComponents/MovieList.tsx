@@ -1,21 +1,16 @@
 import React, { FC } from "react";
-import { UserAnimeShape } from "../../lib/types/interface";
 
+/* INTERFACES */
 interface MovieListProps {
-  UserAnimeData: UserAnimeShape;
   Duration: string;
 }
 
-const MovieList: FC<MovieListProps> = ({
-  Duration,
-  UserAnimeData: { WatchType },
-}) => {
+/* COMPONENT */
+const MovieList: FC<MovieListProps> = ({ Duration }) => {
   const DurationDataNum = Duration.split(" Hr ");
   const DurationToMin =
     parseInt(DurationDataNum[0]) * 60 +
     parseInt(DurationDataNum[1].split(" min")[0]);
-
-  console.log(DurationToMin);
 
   return (
     <div className="w-full relative">
