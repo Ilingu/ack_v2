@@ -36,10 +36,12 @@ const RecommandationsList: FC<RecommandationsListProps> = ({
 
   return (
     <Fragment>
-      <h1 className="text-4xl font-bold tracking-wider text-headline mb-8 text-center">
+      <h1 className="xs:text-4xl text-3xl font-bold tracking-wider text-headline mb-8 text-center">
         Recommendations
       </h1>
-      <div className="grid grid-cols-7 gap-2">{RenderElements}</div>
+      <div className="grid 2xl:grid-cols-7 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
+        {RenderElements}
+      </div>
     </Fragment>
   );
 };

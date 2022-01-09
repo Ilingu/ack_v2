@@ -123,7 +123,7 @@ const SearchPage: NextPage = () => {
   );
 
   return (
-    <main className="h-screen py-2 px-2 grid grid-rows-12">
+    <main className="h-screen py-2 px-2">
       <MetaTags
         title="🪐 World Anime"
         description="Find the data anime that you wanted"
@@ -157,18 +157,15 @@ function FormInput({ Submit }: FormInputProps) {
   );
 
   return (
-    <form
-      onSubmit={(e) => e.preventDefault()}
-      className="flex flex-col justify-evenly items-center row-span-3"
-    >
-      <h1 className="tracking-wider text-5xl font-bold text-headline">
+    <form onSubmit={(e) => e.preventDefault()} className="text-center">
+      <h1 className="tracking-wider sm:text-5xl text-4xl mb-2 font-bold text-headline">
         <FaSearch className="icon" /> Find your{" "}
         <span className="text-primary-darker">anime</span>
       </h1>
       <input
         type="text"
         placeholder="Bungo Stray Dogs"
-        className="w-2/3 bg-bgi-darker h-16 rounded-md text-center text-2xl text-headline font-semibold px-2 outline-none 
+        className="xl:w-2/3 w-11/12 bg-bgi-darker h-16 rounded-md text-center text-2xl text-headline font-semibold px-2 outline-none 
         focus:ring-2 focus:ring-primary-whiter transition"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -189,16 +186,16 @@ function FormInput({ Submit }: FormInputProps) {
 
 function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
   return (
-    <div className="row-span-9">
+    <div>
       {reqTitle && (
-        <h1 className="text-2xl font-semibold text-headline">
+        <h1 className="text-2xl font-semibold text-headline mt-4">
           Résultats pour{" "}
           <span className="text-primary-main">&quot;{reqTitle}&quot;</span> (
           {animeFound?.length})
           {animeFound?.length > 0 || (
             <p
               onClick={() => Submit(reqTitle, true)}
-              className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
+              className="text-lg text-center text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
             >
               Chercher Globalement <FaGlobe className="icon text-thirdly" />
             </p>
@@ -206,7 +203,7 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
         </h1>
       )}
       {animeFound && (
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid 2xl:grid-cols-7 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
           <SearchPosterContext.Provider value={{ reqTitle }}>
             <AnimePoster AnimeToTransform={animeFound} />
           </SearchPosterContext.Provider>

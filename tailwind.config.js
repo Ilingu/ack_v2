@@ -47,6 +47,11 @@ module.exports = {
         "span-16": "span 16 / span 16",
         "span-17": "span 17 / span 17",
       },
+      spacing: {
+        "iframe-h": "315px",
+        "iframe-w": "560px",
+        "info-bubble": "calc(50% - 136.5px)",
+      },
       // Animation
       animation: {
         fadeIn: "fadeIn 0.1s ease-in 0s 1 forwards",

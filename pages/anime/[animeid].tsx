@@ -160,13 +160,13 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
         image={photoPath}
       />
       {/* Overall Info */}
-      <section className="relative w-5/6">
-        <h1 className="text-4xl font-bold text-primary-main underline">
+      <section className="relative lg:w-5/6">
+        <h1 className="text-4xl lg:text-left text-center font-bold text-primary-main underline">
           {title}
         </h1>
         <div className="mt-6 flex flex-col items-center">
-          <div className="w-5/6">
-            <div className="grid grid-cols-4 text-headline font-bold mb-6 text-2xl justify-items-center">
+          <div className="xl:w-5/6">
+            <div className="grid md:grid-cols-4 grid-cols-2 gap-2 text-headline font-bold mb-6 text-2xl justify-items-center">
               <div>
                 <FaTv className="icon" />{" "}
                 <span className="text-primary-whiter">{type}</span>{" "}
@@ -219,8 +219,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-6">
-              <div className="relative col-span-1">
+            <div className="lg:grid lg:grid-cols-6">
+              <div className="relative lg:col-span-1 lg:block flex justify-center">
                 <img
                   src={photoPath}
                   alt={`${title}'s cover`}
@@ -229,12 +229,12 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 <a href={MalPage} target="_blank" rel="noreferrer">
                   <FaInfo
                     onClick={() => router.push(MalPage)}
-                    className="absolute -top-3 -left-3 text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
+                    className="absolute -top-3 lg:-left-3 left-info-bubble text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
                 hover:scale-110 transition cursor-pointer"
                   />
                 </a>
               </div>
-              <p className="col-span-5 px-8 text-justify text-headline font-semibold text-lg">
+              <p className="lg:col-span-5 lg:px-8 md:px-4 px-2 text-justify text-headline font-semibold xs:text-lg text-base">
                 <SynopsisComponent
                   Synopsis={Synopsis?.replace("[Written by MAL Rewrite]", "")}
                 />
@@ -258,14 +258,12 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
         </div>
       </section>
       {/* Trailer */}
-      <section className="bg-bgi-whiter w-5/6 flex flex-col items-center rounded-xl py-4">
+      <section className="bg-bgi-whiter lg:w-5/6 w-11/12 flex flex-col items-center rounded-xl py-4">
         <h1 className="text-4xl font-bold tracking-wider text-headline mb-8">
           Trailer:
         </h1>
         <iframe
-          width="560"
-          height="315"
-          className="rounded-xl ring-primary-main ring-4"
+          className="rounded-xl ring-primary-main ring-4 sm:w-iframe-w sm:h-iframe-h"
           src={trailer_url}
           title="YouTube video player"
           frameBorder="0"
