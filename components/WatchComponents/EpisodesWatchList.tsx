@@ -40,6 +40,9 @@ interface EpsPosterItemProps {
   UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
 }
 type SortOrderType = "descending" | "ascending";
+type HTMLElementEvent<T extends HTMLElement> = Event & {
+  target: T;
+};
 
 /* FUNC */
 let GlobalAnimeId: string;
@@ -331,7 +334,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
         >
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </div>
-
         <div
           onClick={MarkAllEpWatched}
           className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer mr-auto"
@@ -339,8 +341,12 @@ const EpsPoster: FC<EpsPosterProps> = ({
           Mark as &quot;Watched&quot;
         </div>
         <button
-          onClick={({ target }) => {
-            if (target.id === "DigitAddEpsInput") return;
+          onClick={(event) => {
+            if (
+              (event as unknown as HTMLElementEvent<HTMLButtonElement>).target
+                .id === "DigitAddEpsInput"
+            )
+              return;
             AddExtraEpisode();
           }}
           className="text-center text-headline bg-primary-darker rounded-md font-bold w-40 py-1 outline-none focus:ring-2
@@ -384,8 +390,14 @@ function EpsPosterItem({
 
   return (
     <div
-      onClick={({ target: { classList } }) => {
-        if (classList[0] === "DeleteExtraEp" || classList[0] === "M32") return;
+      onClick={(event) => {
+        const target = (event as unknown as HTMLElementEvent<HTMLButtonElement>)
+          .target;
+        if (
+          target.classList[0] === "DeleteExtraEp" ||
+          target.classList[0] === "M32"
+        )
+          return;
         UpdateUserAnimeProgress(mal_id, watched);
       }}
       className={`grid grid-cols-24 w-full bg-bgi-whitest cursor-pointer py-0.5 px-4 items-center rounded-md relative${

@@ -111,7 +111,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         SkipFirstCallbackInstance.current = false;
         return;
       }
-      // GetSeason(y, season);
+      GetSeason(y, season);
     }, 2000),
     []
   );
