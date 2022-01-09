@@ -549,7 +549,7 @@ function AnimePosterComponent({
 }: AnimePosterComponentProps) {
   return (
     <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
-      {AnimeRenderedElements.length <= 0 ? (
+      {AnimeRenderedElements?.length <= 0 ? (
         <span className="font-bold text-2xl text-red-300">💢 No Anime</span>
       ) : (
         AnimeRenderedElements

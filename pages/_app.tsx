@@ -43,6 +43,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       navigator.connection as unknown as NetworkInformationShape;
     connectionInfo.onchange = onChangeNetwork;
     CheckConn(connectionInfo);
+    /* ERROR DETECTION */
+    window.onerror = async () => {
+      if (process?.env?.NODE_ENV === "development") return;
+      history.pushState("", "", "/error");
+      window.location.reload();
+    };
   }, []);
 
   return (
