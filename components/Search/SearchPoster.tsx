@@ -42,7 +42,7 @@ function AnimeItem({ animeData }: AnimeItemProps) {
 
   return (
     <div className="cursor-pointer relative">
-      <Link href={`/anime/${animeData.malId}`}>
+      <Link href={`/anime/${animeData.malId}`} prefetch={false}>
         <a>
           <div className="relative group">
             <Image
