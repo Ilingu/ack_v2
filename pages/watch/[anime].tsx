@@ -8,7 +8,7 @@ import { GlobalAppContext } from "../../lib/context";
 import AuthCheck from "../../components/Common/AuthCheck";
 import MetaTags from "../../components/Common/Metatags";
 // Func
-import { ToggleFav } from "../../lib/utilityfunc";
+import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utilityfunc";
 // Types
 import { AnimeShape, UserAnimeShape } from "../../lib/types/interface";
 // UI
@@ -20,6 +20,37 @@ import { FaBell, FaPlay } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
 import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
+
+/* Func */
+let GlobalAnimeId: string;
+const AddNextEpisodeReleaseDate = (NextReleaseDate: number) => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      GlobalAnimeId
+    );
+
+    updateDoc(AnimeRef, {
+      NextEpisodeReleaseDate: NextReleaseDate,
+    });
+  } catch (err) {}
+};
+const NewEpReleased = () => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      GlobalAnimeId
+    );
+
+    updateDoc(AnimeRef, {
+      NewEpisodeAvailable: true,
+    });
+  } catch (err) {}
+};
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -41,19 +72,44 @@ const WatchPage: NextPage = () => {
     type,
     broadcast,
     Airing,
+    NextEpisodeReleaseDate,
+    NewEpisodeAvailable,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes) return;
+
     const UserAnimeData = UserAnimes.find(
       ({ AnimeId }) => AnimeId.toString() === query.anime
     );
     const CurrentAnimeData = GlobalAnime.find(
       ({ malId }) => malId.toString() === query.anime
     );
+    GlobalAnimeId = CurrentAnimeData.malId.toString();
+
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
   }, [GlobalAnime, UserAnimes, query]);
+
+  useEffect(() => {
+    /* NOTIF */
+    if (!NextEpisodeReleaseDate) AddNextEpisodeReleaseDateToFB();
+    if (NextEpisodeReleaseDate && Date.now() >= NextEpisodeReleaseDate) {
+      NewEpReleased();
+      AddNextEpisodeReleaseDateToFB();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [NextEpisodeReleaseDate]);
+
+  const AddNextEpisodeReleaseDateToFB = () => {
+    if (!broadcast || !Airing) return;
+
+    const BroadcastTime = ConvertBroadcastTimeZone(
+      broadcast,
+      "NextBroadcastNumber"
+    ) as number;
+    AddNextEpisodeReleaseDate(BroadcastTime);
+  };
 
   return (
     <AuthCheck
@@ -77,7 +133,7 @@ const WatchPage: NextPage = () => {
           <div className="flex justify-center">
             <div className="watch-container sm:w-10/12 sm:px-0 px-2 mt-24">
               {/* Img */}
-              <div className="gta-img lg:block lg:justify-end flex justify-center">
+              <div className="gta-img lg:block lg:justify-end flex justify-center relative">
                 <Link href={`/anime/${malId}`} passHref>
                   <a>
                     <Image
@@ -87,6 +143,11 @@ const WatchPage: NextPage = () => {
                       height={283}
                       className="object-cover rounded-lg"
                     />
+                    {!!NewEpisodeAvailable && (
+                      <div className="absolute top-0  tracking-wide text-lg font-bold text-headline bg-primary-darker px-3 py-1 rounded-md">
+                        NEW
+                      </div>
+                    )}
                   </a>
                 </Link>
               </div>
@@ -94,7 +155,9 @@ const WatchPage: NextPage = () => {
               <div className="gta-title lg:block lg:justify-start flex justify-center">
                 <h1
                   id="WatchBigTitle"
-                  className="xs:text-6xl text-5xl text-headline font-extrabold tracking-wider h-full"
+                  className={`xs:text-6xl text-5xl ${
+                    !!NewEpisodeAvailable ? "text-indigo-50" : "text-headline"
+                  } font-extrabold tracking-wider h-full`}
                 >
                   {title.slice(0, 20)}
                   <br />

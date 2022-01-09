@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import MetaTags from "../components/Common/Metatags";
 
 export default function offlinePage() {
@@ -21,6 +22,11 @@ export default function offlinePage() {
         height="270"
         className="rounded-md"
       />
+      <Link href="/" passHref>
+        <button className="py-2 px-2 bg-primary mt-2 rounded-lg text-headline font-bold hover:text-primary-whiter transition-all outline-none focus:ring-2">
+          I&apos;m Online
+        </button>
+      </Link>
     </main>
   );
 }

@@ -1,8 +1,6 @@
 import React, {
-  Dispatch,
   FC,
   Fragment,
-  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -10,7 +8,7 @@ import React, {
   useState,
 } from "react";
 // DB
-import { doc, increment, updateDoc } from "firebase/firestore";
+import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { removeDuplicates } from "../../lib/utilityfunc";
 import toast from "react-hot-toast";
@@ -67,7 +65,15 @@ const DecrementExtraEpisode = () => {
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
   Duration,
-  UserAnimeData: { Progress, WatchType, AnimeId, ExtraEpisodes, TimestampDate },
+  UserAnimeData: {
+    Progress,
+    WatchType,
+    AnimeId,
+    ExtraEpisodes,
+    TimestampDate,
+    NewEpisodeAvailable,
+    NextEpisodeReleaseDate,
+  },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
   const [NextEP, setNextEp] = useState<number>(null);
@@ -181,10 +187,16 @@ const EpsPoster: FC<EpsPosterProps> = ({
             : IsFinished && new Date().toLocaleDateString(),
         };
 
+        NewProgress = removeDuplicates(NewProgress);
         updateDoc(GetAnimeRef, {
           WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
-          Progress: removeDuplicates(NewProgress),
-          TimestampDate: NewTimestampDate || null,
+          Progress: NewProgress.length <= 0 ? deleteField() : NewProgress,
+          TimestampDate: NewTimestampDate || deleteField(),
+          NewEpisodeAvailable: remove
+            ? NewEpisodeAvailable
+              ? NewEpisodeAvailable
+              : deleteField()
+            : deleteField(),
         });
 
         toast.success(`Marked as ${remove ? "un" : ""}watched !`);
@@ -200,6 +212,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
       TimestampDate?.BeganDate,
       TimestampDate?.EndedDate,
       WatchType,
+      NewEpisodeAvailable,
     ]
   );
 
@@ -249,7 +262,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
             </span>
           </div>
         )}
-
         <div className="font-bold text-headline text-xl mr-auto">
           {NextEP && (
             <Fragment>
@@ -261,7 +273,35 @@ const EpsPoster: FC<EpsPosterProps> = ({
             {((NoWatchedEp / EpisodesLength) * 100).toFixed(2)}%
           </span>
         </div>
-
+        {NextEpisodeReleaseDate && (
+          <div
+            className="capitalize text-headline font-semibold cursor-default"
+            title={new Date(NextEpisodeReleaseDate).toLocaleString("fr-FR", {
+              weekday: "long",
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+            })}
+          >
+            <span className="text-description italic">[NEXT EPISODE]</span>{" "}
+            {Math.round(
+              (NextEpisodeReleaseDate - Date.now()) / 1000 / 60 / 60 / 24
+            )}{" "}
+            Days{" "}
+            {Math.round(
+              (parseInt(
+                ((NextEpisodeReleaseDate - Date.now()) / 1000 / 60 / 60)
+                  .toFixed(2)
+                  .split(".")[1]
+              ) *
+                60) /
+                100
+            )}{" "}
+            H left
+          </div>
+        )}
         {TimestampDate && (
           <div className="text-headline font-semibold cursor-default">
             {TimestampDate.BeganDate && (

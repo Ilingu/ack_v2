@@ -18,7 +18,12 @@ import {
   AlternativeTitleShape,
 } from "../../lib/types/interface";
 import { AnimeWatchType } from "../../lib/types/enums";
-import { callApi, postToJSON, Return404 } from "../../lib/utilityfunc";
+import {
+  callApi,
+  ConvertBroadcastTimeZone,
+  postToJSON,
+  Return404,
+} from "../../lib/utilityfunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
 import { doc, getDoc } from "@firebase/firestore";
@@ -200,7 +205,10 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 {Airing && broadcast ? (
                   <Fragment>
                     <FaClock className="icon" />{" "}
-                    <span className="text-primary-whiter">{broadcast}</span>
+                    <span className="text-primary-whiter capitalize">
+                      {ConvertBroadcastTimeZone(broadcast, "BroadcastFormated")}{" "}
+                      UTC+1
+                    </span>
                   </Fragment>
                 ) : type === "TV" ? (
                   <Fragment>

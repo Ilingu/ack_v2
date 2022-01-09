@@ -11,7 +11,12 @@ import {
   RecommendationsShape,
   SeasonAnimesShape,
 } from "./types/interface";
-import { AnimeStatusType, TheFourSeason } from "./types/types";
+import {
+  AnimeStatusType,
+  DateOfWeek,
+  DayOfWeek,
+  TheFourSeason,
+} from "./types/types";
 import { doc, updateDoc } from "@firebase/firestore";
 import { auth, db } from "./firebase";
 import toast from "react-hot-toast";
@@ -257,6 +262,92 @@ export const WhitchSeason = () => {
       break;
   }
   return season;
+};
+
+/**
+ * @returns The current Date From Day: 0 | 1 | 2 | 3 | 4 | 5 | 6
+ */
+export const WhitchDate = (day: DayOfWeek): DateOfWeek => {
+  if (day === "sundays") return 0;
+  if (day === "mondays") return 1;
+  if (day === "tuesdays") return 2;
+  if (day === "wednesdays") return 3;
+  if (day === "thursdays") return 4;
+  if (day === "fridays") return 5;
+  if (day === "saturdays") return 6;
+  return 0;
+};
+/**
+ * @returns The current Date From Day: 0 | 1 | 2 | 3 | 4 | 5 | 6
+ */
+export const WhitchDay = (date: DateOfWeek): DayOfWeek => {
+  if (date === 0) return "sundays";
+  if (date === 1) return "mondays";
+  if (date === 2) return "tuesdays";
+  if (date === 3) return "wednesdays";
+  if (date === 4) return "thursdays";
+  if (date === 5) return "fridays";
+  if (date === 6) return "saturdays";
+  return "sundays";
+};
+
+/**
+ * @param {string} JST_Broadcast
+ * @returns The Converted To UTC+1 Timezone Broadcast
+ */
+export const ConvertBroadcastTimeZone = (
+  broadcast: string,
+  ReturnType:
+    | "NextBroadcastNumber"
+    | "NextBroadcastString"
+    | "BroadcastFormated"
+): number | string => {
+  // Convert String Time to JST Date
+  const [NextDay, _, NextTime] = broadcast.toLowerCase().split(" ");
+  const NextBroadcastJST = new Date();
+  NextBroadcastJST.setDate(
+    NextBroadcastJST.getDate() +
+      ((WhitchDate(NextDay as DayOfWeek) + 7 - NextBroadcastJST.getDay()) % 7 ||
+        7)
+  );
+  const [NextHour, NextMinute] = NextTime.split(":").map((time) =>
+    parseInt(time)
+  );
+  NextBroadcastJST.setHours(NextHour, NextMinute, 0, 0);
+
+  // Convert to UTC
+  const JSTtoUTC1Offset = 8;
+  const NextBroadcastJTCTime = NextBroadcastJST.getTime();
+  const localOffset = NextBroadcastJST.getTimezoneOffset() * 60000;
+
+  const UTCOffset = NextBroadcastJTCTime + localOffset;
+  const UTC1Time = UTCOffset - 3600000 * JSTtoUTC1Offset;
+
+  // Exctract Data From Broadcast UTC+1, but based on JST
+  const BroadcastUTC1DateInstance = new Date(UTC1Time);
+  const [BroadcastUTC1Hours, BroadcastUTC1Min] = [
+    BroadcastUTC1DateInstance.getHours(),
+    BroadcastUTC1DateInstance.getMinutes(),
+  ];
+  const BroadcastUTC1Date = BroadcastUTC1DateInstance.getDay();
+
+  // Convert "UTC+1 based JST" to "UTC+1"
+  const NextBroadcastUTC1 = new Date();
+  NextBroadcastUTC1.setDate(
+    NextBroadcastUTC1.getDate() +
+      ((BroadcastUTC1Date + 7 - NextBroadcastUTC1.getDay()) % 7 || 7)
+  );
+  NextBroadcastUTC1.setHours(BroadcastUTC1Hours, BroadcastUTC1Min, 0, 0);
+
+  const NextUTC1Time = NextBroadcastUTC1.getTime(); // NextEp in UTC timestamp
+  const NextBroadcastUTC1Str = NextBroadcastUTC1.toLocaleString(); // NextEp in UTC Date
+
+  if (ReturnType === "NextBroadcastNumber") return NextUTC1Time;
+  if (ReturnType === "NextBroadcastString") return NextBroadcastUTC1Str;
+
+  const SplitedUTC1Date = NextBroadcastUTC1Str.split(",");
+  const ToDay = WhitchDay(new Date(SplitedUTC1Date[0]).getDay() as DateOfWeek);
+  return `${ToDay} ${SplitedUTC1Date[1].trim().replace(":00", "")}`;
 };
 
 /**

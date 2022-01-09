@@ -146,7 +146,7 @@ const HomePoster: FC = () => {
       );
 
     const AnimesHomePostersData: UserAnimePosterShape[] = filterUserAnime()
-      .map(({ AnimeId, Fav, WatchType }) => {
+      .map(({ AnimeId, Fav, WatchType, NewEpisodeAvailable }) => {
         const AnimeData = GlobalAnime.find(({ malId }) => malId === AnimeId);
         if (!AnimeData) return null;
 
@@ -157,7 +157,8 @@ const HomePoster: FC = () => {
           title: AnimeData.title,
           photoURL: AnimeData.photoPath,
           type: AnimeData.type,
-        };
+          NewEpisodeAvailable,
+        } as UserAnimePosterShape;
       })
       .filter((UAP) => UAP);
 
@@ -605,7 +606,7 @@ function GroupComponent({
 
 // [DYNAMIC-COMPONENTS]
 function AnimeItemPoster({
-  AnimeData: { AnimeId, Fav, WatchType, photoURL, title },
+  AnimeData: { AnimeId, Fav, WatchType, photoURL, title, NewEpisodeAvailable },
   RenderType,
   IsAnimeToAdd,
   ToggleGroup,
@@ -649,7 +650,9 @@ function AnimeItemPoster({
     <div className="group xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
       <div>
         <div
-          className="absolute top-1 left-1 font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+          className={`absolute top-1 ${
+            !!NewEpisodeAvailable ? "right-10" : "left-1"
+          } font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg`}
           onClick={() => ToggleFav(AnimeId.toString(), Fav)}
         >
           {Fav ? (
@@ -676,6 +679,11 @@ function AnimeItemPoster({
         >
           {CopyClicked ? <FcOk /> : <FaCopy className="icon" />}
         </div>
+        {!!NewEpisodeAvailable && (
+          <div className="absolute top-1 z-10 tracking-wide font-bold text-headline bg-primary-darker px-3 py-1 rounded-md">
+            NEW
+          </div>
+        )}
       </div>
 
       <Link href={`/watch/${AnimeId}`}>
