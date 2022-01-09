@@ -7,10 +7,16 @@ import React, {
   useRef,
   useState,
 } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import kebabCase from "lodash.kebabcase";
 // Types
 import { GlobalAppContext } from "../../lib/context";
-import { AnimeWatchType, HomeDisplayTypeEnum } from "../../lib/types/enums";
+import {
+  AnimeWatchType,
+  AnimeWatchTypeDisplayable,
+  HomeDisplayTypeEnum,
+} from "../../lib/types/enums";
 import {
   UserAnimePosterShape,
   UserGroupPosterShape,
@@ -26,13 +32,12 @@ import {
   shuffleArray,
   ToggleFav,
 } from "../../lib/utilityfunc";
-import Image from "next/image";
-// Icon
+// UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
-import Link from "next/link";
 import { FaCheck, FaCopy, FaMinus, FaPlus } from "react-icons/fa";
-import toast from "react-hot-toast";
 import { FcOk } from "react-icons/fc";
+import toast from "react-hot-toast";
+import VerticalDivider from "../Design/VerticalDivider";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
@@ -47,9 +52,15 @@ interface HomeAnimeItemPosterProp {
   NameOfGroup?: string;
 }
 interface HomeHeaderProps {
-  IsModeGroup: boolean;
   HomeDisplayType: HomeDisplayTypeEnum;
   setHomeDisplayType: React.Dispatch<React.SetStateAction<HomeDisplayTypeEnum>>;
+}
+interface SortByWatchTypeProps {
+  IsModeGroup: boolean;
+  ActiveWatchType: AnimeWatchTypeDisplayable;
+  setActiveWatchType: React.Dispatch<
+    React.SetStateAction<AnimeWatchTypeDisplayable>
+  >;
 }
 interface GroupFormInputProps {
   IsModeGroup: boolean;
@@ -96,6 +107,9 @@ const HomePoster: FC = () => {
     useState<JSX.Element[]>();
   const [GroupRenderedElements, setNewRenderForGroups] =
     useState<JSX.Element[]>();
+  const [ActiveWatchType, setActiveWatchType] = useState(
+    AnimeWatchTypeDisplayable.WATCHING
+  );
 
   const [AnimesToAdd, setAnimeToAdd] = useState<string[]>([]);
 
@@ -128,7 +142,6 @@ const HomePoster: FC = () => {
       UserAnimes.filter(
         ({ WatchType }) =>
           WatchType !== AnimeWatchType.WONT_WATCH &&
-          WatchType !== AnimeWatchType.WANT_TO_WATCH &&
           WatchType !== AnimeWatchType.UNWATCHED
       );
 
@@ -268,26 +281,44 @@ const HomePoster: FC = () => {
         {}
       );
 
-    const AnimesPosterJSX = AnimesElementsOrder.current.map((animeId, i) => {
-      const AnimeData = AnimesHomePostersData.find(
-        ({ AnimeId }) => AnimeId.toString() === animeId
-      );
-      if (!AnimeData) return null;
+    const AnimesPosterJSX = AnimesElementsOrder.current
+      .map((animeId, i) => {
+        const AnimeData = AnimesHomePostersData.find(
+          ({ AnimeId }) => AnimeId.toString() === animeId
+        );
+        if (!AnimeData) return null;
 
-      return (
-        <AnimeItemPoster
-          key={animeId || i}
-          AnimeData={AnimeData}
-          RenderType="animeList"
-          IsAnimeToAdd={AnimesToAddToObj && !!AnimesToAddToObj[animeId]}
-          ToggleGroup={ToggleGroup}
-        />
-      );
-    });
+        // Sort By ActiveWatchType
+        if (
+          ActiveWatchType !== AnimeWatchTypeDisplayable.ALL &&
+          (AnimeData.WatchType as unknown as AnimeWatchTypeDisplayable) !==
+            ActiveWatchType
+        )
+          return null;
+
+        // JSX
+        return (
+          <AnimeItemPoster
+            key={animeId || i}
+            AnimeData={AnimeData}
+            RenderType="animeList"
+            IsAnimeToAdd={AnimesToAddToObj && !!AnimesToAddToObj[animeId]}
+            ToggleGroup={ToggleGroup}
+          />
+        );
+      })
+      .filter((Poster) => !!Poster);
 
     setNewRenderForAnimes(AnimesPosterJSX);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [GlobalAnime, HomeDisplayType, UserAnimes, UserGroups, AnimesToAdd]);
+  }, [
+    GlobalAnime,
+    HomeDisplayType,
+    UserAnimes,
+    UserGroups,
+    AnimesToAdd,
+    ActiveWatchType,
+  ]);
 
   const ToggleGroup = useCallback(
     (id: string, method: "ADD" | "DELETE" | "DELETE_DB", GrName?: string) => {
@@ -351,10 +382,17 @@ const HomePoster: FC = () => {
   return (
     <div className="mt-5 flex flex-col items-center">
       <HomeHeader
-        IsModeGroup={!!(AnimesToAdd.length > 0)}
         HomeDisplayType={HomeDisplayType}
         setHomeDisplayType={setHomeDisplayType}
       />
+      {HomeDisplayType !== HomeDisplayTypeEnum.GROUP && (
+        <SortByWatchType
+          IsModeGroup={!!(AnimesToAdd.length > 0)}
+          ActiveWatchType={ActiveWatchType}
+          setActiveWatchType={setActiveWatchType}
+        />
+      )}
+
       <GroupFormInput
         IsModeGroup={!!(AnimesToAdd.length > 0)}
         AddGroup={AddGroup}
@@ -377,13 +415,9 @@ const HomePoster: FC = () => {
 };
 
 // [SUB-COMPONENTS]
-function HomeHeader({
-  IsModeGroup,
-  HomeDisplayType,
-  setHomeDisplayType,
-}: HomeHeaderProps) {
+function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
   return (
-    <header className={`${IsModeGroup ? "mb-2" : "mb-4"} flex`}>
+    <header className="mb-3 flex">
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
@@ -407,7 +441,7 @@ function HomeHeader({
         </span>{" "}
         Folder
       </h1>
-      <div className="h-full w-2 rounded-sm cursor-default translate-y-1 py-3 text-headline overflow-hidden bg-headline"></div>
+      <VerticalDivider />
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
@@ -432,6 +466,44 @@ function HomeHeader({
         Folder
       </h1>
     </header>
+  );
+}
+
+function SortByWatchType({
+  IsModeGroup,
+  ActiveWatchType,
+  setActiveWatchType,
+}: SortByWatchTypeProps) {
+  const { WATCHED, WATCHING, WANT_TO_WATCH, DROPPED, ALL } =
+    AnimeWatchTypeDisplayable;
+
+  return (
+    <div
+      className={`flex flex-wrap justify-center gap-4 text-headline text-lg font-semibold cursor-pointer capitalize ${
+        IsModeGroup ? "mb-2" : "mb-4"
+      }`}
+    >
+      {[WATCHING, WATCHED, WANT_TO_WATCH, DROPPED, ALL].map(
+        (CurrentActiveWatch, i) => (
+          <Fragment key={i}>
+            <span
+              onClick={() =>
+                ActiveWatchType !== CurrentActiveWatch &&
+                setActiveWatchType(CurrentActiveWatch)
+              }
+              className={`hover:text-primary-main transition-all${
+                ActiveWatchType === CurrentActiveWatch
+                  ? " text-primary-whiter"
+                  : ""
+              }`}
+            >
+              {CurrentActiveWatch.replaceAll("_", " ")}
+            </span>
+            {i !== 4 && <VerticalDivider />}
+          </Fragment>
+        )
+      )}
+    </div>
   );
 }
 
@@ -477,7 +549,11 @@ function AnimePosterComponent({
 }: AnimePosterComponentProps) {
   return (
     <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
-      {AnimeRenderedElements}
+      {AnimeRenderedElements.length <= 0 ? (
+        <span className="font-bold text-2xl text-red-300">💢 No Anime</span>
+      ) : (
+        AnimeRenderedElements
+      )}
     </div>
   );
 }
@@ -536,13 +612,15 @@ function AnimeItemPoster({
   NameOfGroup,
 }: HomeAnimeItemPosterProp) {
   const [CopyClicked, setCopyClicked] = useState(false);
-  const { WATCHED, WATCHING } = AnimeWatchType;
+  const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
   const Color =
     WatchType === WATCHING
       ? "text-primary-whiter"
       : WatchType === WATCHED
       ? "text-green-500"
-      : "text-red-500";
+      : WatchType === DROPPED
+      ? "text-red-500"
+      : "text-primary-whitest";
 
   const AddToGroup = RenderType === "animeList" && (
     <div
