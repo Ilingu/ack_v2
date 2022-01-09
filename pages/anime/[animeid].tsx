@@ -95,13 +95,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
     await getDoc(doc(db, "animes", "animes-config"))
   ).data() as AnimeConfigPathsIdShape;
 
-  const paths = animesPaths.AllAnimeId.map((doc) => ({
+  const paths = (animesPaths?.AllAnimeId || ["31478"]).map((doc) => ({
     params: { animeid: doc },
   }));
 
   return {
     paths,
-    fallback: true, // If anime isn't cache in DB yet
+    fallback: "blocking",
   };
 };
 

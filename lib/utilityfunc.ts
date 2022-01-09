@@ -88,7 +88,7 @@ export const AddNewGlobalAnime = async (
         await getDoc(animesConfigPathsRef)
       ).data() as AnimeConfigPathsIdShape;
 
-      const ArrayPathsToObjPaths = animesConfigPaths.AllAnimeId.reduce(
+      const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
         (a, id) => ({ ...a, [id]: id }),
         {}
       );
