@@ -50,7 +50,7 @@ function RecommendationItem({ RecomData }: RecommandationItemProps) {
   const { malId, photoUrl, recommendationCount, title } = RecomData || {};
   return (
     <div className="px-4 py-2 rounded-md relative">
-      <Link href={`/anime/${malId}`} passHref>
+      <Link href={`/anime/${malId}`} passHref prefetch={false}>
         <a>
           <Image
             src={photoUrl}

@@ -189,7 +189,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
 
   return (
     <div className="px-4 py-2 rounded-md text-center">
-      <Link href={`/anime/${MalId}`} passHref>
+      <Link href={`/anime/${MalId}`} passHref prefetch={false}>
         <a>
           <div className="flex justify-center">
             <div className="group relative w-56">
