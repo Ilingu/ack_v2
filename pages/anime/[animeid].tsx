@@ -79,7 +79,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // No Anime -> Api Req
-  const animeData = await callApi(`http://localhost:3000/api/${animeId}`);
+  const animeData = await callApi(
+    `http://${
+      process.env.NODE_ENV === "development"
+        ? "localhost:3000"
+        : "ack.vercel.app"
+    }/api/${animeId}`
+  );
   if (!animeData || animeData.err) return Return404();
 
   return {
