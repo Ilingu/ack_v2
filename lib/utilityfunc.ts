@@ -39,7 +39,7 @@ import toast from "react-hot-toast";
  * Fetch Anime Data and add it to FB
  * @param {string} animeId
  */
-export const AddNewGlobalAnime = async (
+export const GetAnimeData = async (
   animeId: string
 ): Promise<AnimeShape | InternalApiResError> => {
   let animeData: AnimeShape;
@@ -77,34 +77,45 @@ export const AddNewGlobalAnime = async (
 
     if (IsGood) {
       animeData = JikanApiToAnimeShape(AllAnimeData);
+      AddNewGlobalAnime(animeId, animeData);
 
-      const batch = writeBatch(db);
-
-      const newAnimesRef = doc(db, "animes", animeId);
-      batch.set(newAnimesRef, animeData);
-
-      const animesConfigPathsRef = doc(db, "animes", "animes-config");
-      const animesConfigPaths = (
-        await getDoc(animesConfigPathsRef)
-      ).data() as AnimeConfigPathsIdShape;
-
-      const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
-        (a, id) => ({ ...a, [id]: id }),
-        {}
-      );
-      if (!ArrayPathsToObjPaths[animeId]) {
-        const newAnimeConfigPaths = {
-          AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
-        };
-        batch.update(animesConfigPathsRef, newAnimeConfigPaths);
-      }
-
-      batch.commit();
       return animeData;
     }
     return { message: `Anime with id: ${animeId} not found.`, err: true };
   } catch (err) {
     return { message: `Anime with id: ${animeId} not found.`, err: true };
+  }
+};
+export const AddNewGlobalAnime = async (
+  animeId: string,
+  animeData: AnimeShape
+) => {
+  try {
+    const batch = writeBatch(db);
+
+    const newAnimesRef = doc(db, "animes", animeId);
+    batch.set(newAnimesRef, animeData);
+
+    const animesConfigPathsRef = doc(db, "animes", "animes-config");
+    const animesConfigPaths = (
+      await getDoc(animesConfigPathsRef)
+    ).data() as AnimeConfigPathsIdShape;
+
+    const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
+      (a, id) => ({ ...a, [id]: id }),
+      {}
+    );
+    if (!ArrayPathsToObjPaths[animeId]) {
+      const newAnimeConfigPaths = {
+        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
+      };
+      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+    }
+
+    batch.commit();
+    return true;
+  } catch (err) {
+    return false;
   }
 };
 

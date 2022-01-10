@@ -23,6 +23,7 @@ import { AnimeWatchType } from "../../lib/types/enums";
 import {
   AddNewGlobalAnime,
   ConvertBroadcastTimeZone,
+  GetAnimeData,
   postToJSON,
   Return404,
 } from "../../lib/utilityfunc";
@@ -82,7 +83,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // No Anime -> Api Req
-  const animeData = await AddNewGlobalAnime(animeId);
+  const animeData = await GetAnimeData(animeId);
 
   if ((animeData as InternalApiResError).err === true) return Return404();
 
@@ -114,7 +115,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const [CurrentAnimeWatchType, setAnimeWatchType] = useState<AnimeWatchType>(
     () => AnimeWatchType.UNWATCHED
   );
-  const { UserAnimes } = useContext(GlobalAppContext);
+  const { UserAnimes, GlobalAnime } = useContext(GlobalAppContext);
 
   const {
     title,
@@ -150,10 +151,21 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   useEffect(() => {
     if (UserAnimes) {
       const CurrentAnime =
-        UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
+        UserAnimes.find(({ AnimeId }) => AnimeId === animeData?.malId) || null;
+
       setAnimeWatchType(CurrentAnime?.WatchType || null);
     }
-  }, [UserAnimes, malId]);
+
+    if (GlobalAnime) {
+      const CurrentGlobalAnime =
+        GlobalAnime.find(
+          ({ malId: GlMalId }) => GlMalId === animeData?.malId
+        ) || null;
+
+      if (!CurrentGlobalAnime)
+        AddNewGlobalAnime(animeData?.malId.toString(), animeData);
+    }
+  }, [UserAnimes, animeData, GlobalAnime]);
 
   if (router.isFallback)
     return (

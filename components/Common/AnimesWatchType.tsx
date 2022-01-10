@@ -59,7 +59,7 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
   return (
     <form onSubmit={(e) => e.preventDefault()} className="flex justify-center">
       <select
-        value={SelectValue}
+        value={SelectValue || UNWATCHED}
         onChange={(e) => setSelectValue(e.target.value as AnimeWatchType)}
         className={`w-full bg-bgi-black text-headline text-center text-2xl outline-none focus:ring-2 focus:ring-primary-main
              rounded-lg px-1 transition${
