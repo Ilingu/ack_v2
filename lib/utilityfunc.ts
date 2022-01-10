@@ -99,7 +99,7 @@ export const AddNewGlobalAnime = async (
         batch.update(animesConfigPathsRef, newAnimeConfigPaths);
       }
 
-      await batch.commit();
+      batch.commit();
       return animeData;
     }
     return { message: `Anime with id: ${animeId} not found.`, err: true };
