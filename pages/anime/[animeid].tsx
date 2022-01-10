@@ -83,7 +83,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // No Anime -> Api Req
   const animeData = await AddNewGlobalAnime(animeId);
-  console.log(animeData);
   if (!animeData || (animeData as InternalApiResError).err) return Return404();
 
   return {
@@ -104,7 +103,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths,
-    fallback: true,
+    fallback: "blocking",
   };
 };
 
