@@ -42,6 +42,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         toast.error(`You are offline`, {
           position: "bottom-right",
         });
+        history.pushState("", "", "/_offline");
+        window.location.reload();
       }
     };
     const connectionInfo =
