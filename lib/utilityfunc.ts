@@ -255,7 +255,10 @@ export function JikanApiToAnimeShape(
         image_url: removeParamsFromPhotoUrl(recom.entry.images.jpg.image_url),
       })) || [],
     EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
-    broadcast: JikanObj[0].broadcast.string,
+    broadcast:
+      JikanObj[0].broadcast.string && JikanObj[0].broadcast.string !== "Unknown"
+        ? JikanObj[0].broadcast.string
+        : null,
     LastRefresh:
       (JikanObj[0].status as AnimeStatusType) === "Not yet aired"
         ? Date.now() + 86400000
@@ -317,10 +320,14 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
 /**
  * @returns 404's Page
  */
-export const Return404 = (): {
+export const Return404 = (
+  revalidate = 0
+): {
   notFound: true;
+  revalidate?: number;
 } => ({
   notFound: true,
+  revalidate: revalidate !== 0 ? revalidate : undefined,
 });
 
 /**
@@ -399,52 +406,58 @@ export const ConvertBroadcastTimeZone = (
     | "NextBroadcastString"
     | "BroadcastFormated"
 ): number | string => {
-  // Convert String Time to JST Date
-  const [NextDay, _, NextTime] = broadcast.toLowerCase().split(" ");
-  const NextBroadcastJST = new Date();
-  NextBroadcastJST.setDate(
-    NextBroadcastJST.getDate() +
-      ((WhitchDate(NextDay as DayOfWeek) + 7 - NextBroadcastJST.getDay()) % 7 ||
-        7)
-  );
-  const [NextHour, NextMinute] = NextTime.split(":").map((time) =>
-    parseInt(time)
-  );
-  NextBroadcastJST.setHours(NextHour, NextMinute, 0, 0);
+  try {
+    // Convert String Time to JST Date
+    const [NextDay, _, NextTime] = broadcast.toLowerCase().split(" ");
+    const NextBroadcastJST = new Date();
+    NextBroadcastJST.setDate(
+      NextBroadcastJST.getDate() +
+        ((WhitchDate(NextDay as DayOfWeek) + 7 - NextBroadcastJST.getDay()) %
+          7 || 7)
+    );
+    const [NextHour, NextMinute] = NextTime.split(":").map((time) =>
+      parseInt(time)
+    );
+    NextBroadcastJST.setHours(NextHour, NextMinute, 0, 0);
 
-  // Convert to UTC
-  const JSTtoUTC1Offset = 8;
-  const NextBroadcastJTCTime = NextBroadcastJST.getTime();
-  const localOffset = NextBroadcastJST.getTimezoneOffset() * 60000;
+    // Convert to UTC
+    const JSTtoUTC1Offset = 8;
+    const NextBroadcastJTCTime = NextBroadcastJST.getTime();
+    const localOffset = NextBroadcastJST.getTimezoneOffset() * 60000;
 
-  const UTCOffset = NextBroadcastJTCTime + localOffset;
-  const UTC1Time = UTCOffset - 3600000 * JSTtoUTC1Offset;
+    const UTCOffset = NextBroadcastJTCTime + localOffset;
+    const UTC1Time = UTCOffset - 3600000 * JSTtoUTC1Offset;
 
-  // Exctract Data From Broadcast UTC+1, but based on JST
-  const BroadcastUTC1DateInstance = new Date(UTC1Time);
-  const [BroadcastUTC1Hours, BroadcastUTC1Min] = [
-    BroadcastUTC1DateInstance.getHours(),
-    BroadcastUTC1DateInstance.getMinutes(),
-  ];
-  const BroadcastUTC1Date = BroadcastUTC1DateInstance.getDay();
+    // Exctract Data From Broadcast UTC+1, but based on JST
+    const BroadcastUTC1DateInstance = new Date(UTC1Time);
+    const [BroadcastUTC1Hours, BroadcastUTC1Min] = [
+      BroadcastUTC1DateInstance.getHours(),
+      BroadcastUTC1DateInstance.getMinutes(),
+    ];
+    const BroadcastUTC1Date = BroadcastUTC1DateInstance.getDay();
 
-  // Convert "UTC+1 based JST" to "UTC+1"
-  const NextBroadcastUTC1 = new Date();
-  NextBroadcastUTC1.setDate(
-    NextBroadcastUTC1.getDate() +
-      ((BroadcastUTC1Date + 7 - NextBroadcastUTC1.getDay()) % 7 || 7)
-  );
-  NextBroadcastUTC1.setHours(BroadcastUTC1Hours, BroadcastUTC1Min, 0, 0);
+    // Convert "UTC+1 based JST" to "UTC+1"
+    const NextBroadcastUTC1 = new Date();
+    NextBroadcastUTC1.setDate(
+      NextBroadcastUTC1.getDate() +
+        ((BroadcastUTC1Date + 7 - NextBroadcastUTC1.getDay()) % 7 || 7)
+    );
+    NextBroadcastUTC1.setHours(BroadcastUTC1Hours, BroadcastUTC1Min, 0, 0);
 
-  const NextUTC1Time = NextBroadcastUTC1.getTime(); // NextEp in UTC timestamp
-  const NextBroadcastUTC1Str = NextBroadcastUTC1.toLocaleString(); // NextEp in UTC Date
+    const NextUTC1Time = NextBroadcastUTC1.getTime(); // NextEp in UTC timestamp
+    const NextBroadcastUTC1Str = NextBroadcastUTC1.toLocaleString(); // NextEp in UTC Date
 
-  if (ReturnType === "NextBroadcastNumber") return NextUTC1Time;
-  if (ReturnType === "NextBroadcastString") return NextBroadcastUTC1Str;
+    if (ReturnType === "NextBroadcastNumber") return NextUTC1Time;
+    if (ReturnType === "NextBroadcastString") return NextBroadcastUTC1Str;
 
-  const SplitedUTC1Date = NextBroadcastUTC1Str.split(",");
-  const ToDay = WhitchDay(new Date(SplitedUTC1Date[0]).getDay() as DateOfWeek);
-  return `${ToDay} ${SplitedUTC1Date[1].trim().replace(":00", "")}`;
+    const SplitedUTC1Date = NextBroadcastUTC1Str.split(",");
+    const ToDay = WhitchDay(
+      new Date(SplitedUTC1Date[0]).getDay() as DateOfWeek
+    );
+    return `${ToDay} ${SplitedUTC1Date[1].trim().replace(":00", "")}`;
+  } catch (err) {
+    return "None";
+  }
 };
 
 /**

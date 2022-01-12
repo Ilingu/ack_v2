@@ -78,18 +78,18 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists() && postToJSON(animeFB).LastRefresh > Date.now()) {
     return {
       props: { animeData: postToJSON(animeFB) }, // Exists on FB
-      revalidate: 60,
+      revalidate: 3600,
     };
   }
 
   // No Anime -> Api Req
   const animeData = await GetAnimeData(animeId);
 
-  // if ((animeData as InternalApiResError).err === true) return Return404();
+  if ((animeData as InternalApiResError).err === true) return Return404(60);
 
   return {
     props: { animeData },
-    revalidate: 60,
+    revalidate: 3600,
   };
 };
 
