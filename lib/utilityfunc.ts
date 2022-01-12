@@ -112,10 +112,9 @@ export const AddNewGlobalAnime = async (
       batch.update(animesConfigPathsRef, newAnimeConfigPaths);
     }
 
-    batch.commit();
-    return true;
+    await batch.commit();
   } catch (err) {
-    return false;
+    console.error(err);
   }
 };
 
