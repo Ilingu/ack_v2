@@ -58,10 +58,16 @@ export const GetAnimeData = async (
       return { message: `Error when fetching: ${animeId}.`, err: true };
     }
 
-    if (animeEpsRes.length <= 0)
-      animeEpsRes = Array.apply(null, Array(12)).map((_: null, i) => ({
-        mal_id: i + 1,
-      }));
+    if (animeEpsRes.length <= 0) {
+      for (let i = 0; i < 12; i++) {
+        animeEpsRes = [
+          ...animeEpsRes,
+          {
+            mal_id: i + 1,
+          },
+        ];
+      }
+    }
 
     const AllAnimeData = await Promise.all([
       animeRes,

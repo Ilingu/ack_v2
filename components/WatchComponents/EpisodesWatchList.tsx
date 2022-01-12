@@ -99,8 +99,8 @@ const EpsPoster: FC<EpsPosterProps> = ({
     () => {
       // Data
       const EpsData: UserExtraEpisodesShape[] = [
-        ...EpisodesData,
-        ...GenerateExtraEp,
+        ...(EpisodesData || []),
+        ...(GenerateExtraEp || []),
       ];
       const FilteredEpsData = (
         SortOrder === "ascending" ? [...EpsData].reverse() : EpsData

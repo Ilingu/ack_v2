@@ -42,6 +42,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         toast.error(`You are offline`, {
           position: "bottom-right",
         });
+        if (window.location.pathname === "/_offline") return;
         history.pushState("", "", "/_offline");
         window.location.reload();
       }
@@ -53,7 +54,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     /* ERROR DETECTION */
     window.onerror = async () => {
       if (process?.env?.NODE_ENV === "development") return;
-      history.pushState("", "", "/error");
+      history.pushState("", "", "/_error");
       window.location.reload();
     };
   }, []);
