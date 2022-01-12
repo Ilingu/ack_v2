@@ -81,10 +81,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       revalidate: 3600,
     };
   }
-
   // No Anime -> Api Req
   const animeData = await GetAnimeData(animeId);
-
+  console.log(animeData);
   if ((animeData as InternalApiResError).err === true) return Return404(60);
 
   return {
@@ -265,7 +264,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 />
               </p>
             </div>
-            <TagsAnime Genres={Genre} Themes={Theme} />
+            <TagsAnime Genres={Genre || []} Themes={Theme || []} />
             <SpecialInfo
               AgeRating={AgeRating}
               AlternativeTitle={AlternativeTitle}
