@@ -12,6 +12,7 @@ export enum AnimeWatchTypeDisplayable {
   WANT_TO_WATCH = "want_to_watch",
   DROPPED = "dropped",
   ALL = "all",
+  FAV = "favorite",
 }
 
 export enum TheFourSeasonEnum {

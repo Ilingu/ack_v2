@@ -7,10 +7,13 @@ interface MovieListProps {
 
 /* COMPONENT */
 const MovieList: FC<MovieListProps> = ({ Duration }) => {
-  const DurationDataNum = Duration.split(" Hr ");
+  const DurationDataNum = Duration.split("Hr").map((str) => str.trim());
+  const HoursToMin = parseInt(DurationDataNum[0]) * 60;
+  const MinutesRemaining = parseInt(DurationDataNum[1]?.split(" min")[0]);
   const DurationToMin =
-    parseInt(DurationDataNum[0]) * 60 +
-    parseInt(DurationDataNum[1].split(" min")[0]);
+    HoursToMin + (!isNaN(MinutesRemaining) ? MinutesRemaining : 0);
+
+  console.log(DurationToMin);
 
   return (
     <div className="w-full relative">

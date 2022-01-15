@@ -34,8 +34,11 @@ const Settings: NextPage = () => {
       <main className="h-screen flex flex-col justify-center items-center">
         <MetaTags title="User's Settings" description="Settings of ACK User" />
         <h1 className="text-headline font-bold text-5xl text-center">
-          🦺 Under construction
+          🦺 Page Under construction
         </h1>
+        <h2 className="text-description-whiter font-semibold text-2xl text-center">
+          (Release Version: Open Beta)
+        </h2>
         <div className="flex justify-center flex-wrap">
           <button
             onClick={() => auth.signOut()}

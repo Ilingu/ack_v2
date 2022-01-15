@@ -108,7 +108,9 @@ const HomePoster: FC = () => {
   const [GroupRenderedElements, setNewRenderForGroups] =
     useState<JSX.Element[]>();
   const [ActiveWatchType, setActiveWatchType] = useState(
-    AnimeWatchTypeDisplayable.WATCHING
+    () =>
+      (localStorage.getItem("WatchTypeFilter") as AnimeWatchTypeDisplayable) ||
+      AnimeWatchTypeDisplayable.WATCHING
   );
 
   const [AnimesToAdd, setAnimeToAdd] = useState<string[]>([]);
@@ -117,9 +119,10 @@ const HomePoster: FC = () => {
   const GroupsElementsOrder = useRef<string[]>();
 
   const [HomeDisplayType, setHomeDisplayType] = useState<HomeDisplayTypeEnum>(
-    JSON.parse(localStorage.getItem("HomeDisplayType")) !== 0
-      ? HomeDisplayTypeEnum.ANIMES
-      : HomeDisplayTypeEnum.GROUP
+    () =>
+      JSON.parse(localStorage.getItem("HomeDisplayType")) !== 0
+        ? HomeDisplayTypeEnum.ANIMES
+        : HomeDisplayTypeEnum.GROUP
   );
 
   // Group
@@ -134,6 +137,9 @@ const HomePoster: FC = () => {
   useEffect(() => {
     localStorage.setItem("HomeDisplayType", JSON.stringify(HomeDisplayType));
   }, [HomeDisplayType]);
+  useEffect(() => {
+    localStorage.setItem("WatchTypeFilter", ActiveWatchType);
+  }, [ActiveWatchType]);
 
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
@@ -292,9 +298,12 @@ const HomePoster: FC = () => {
         // Sort By ActiveWatchType
         if (
           ActiveWatchType !== AnimeWatchTypeDisplayable.ALL &&
+          ActiveWatchType !== AnimeWatchTypeDisplayable.FAV &&
           (AnimeData.WatchType as unknown as AnimeWatchTypeDisplayable) !==
             ActiveWatchType
         )
+          return null;
+        if (ActiveWatchType === AnimeWatchTypeDisplayable.FAV && !AnimeData.Fav)
           return null;
 
         // JSX
@@ -475,7 +484,7 @@ function SortByWatchType({
   ActiveWatchType,
   setActiveWatchType,
 }: SortByWatchTypeProps) {
-  const { WATCHED, WATCHING, WANT_TO_WATCH, DROPPED, ALL } =
+  const { WATCHED, WATCHING, WANT_TO_WATCH, DROPPED, ALL, FAV } =
     AnimeWatchTypeDisplayable;
 
   return (
@@ -484,7 +493,7 @@ function SortByWatchType({
         IsModeGroup ? "mb-2" : "mb-4"
       }`}
     >
-      {[WATCHING, WATCHED, WANT_TO_WATCH, DROPPED, ALL].map(
+      {[WATCHING, WATCHED, WANT_TO_WATCH, FAV, DROPPED, ALL].map(
         (CurrentActiveWatch, i) => (
           <Fragment key={i}>
             <span
@@ -500,7 +509,7 @@ function SortByWatchType({
             >
               {CurrentActiveWatch.replaceAll("_", " ")}
             </span>
-            {i !== 4 && <VerticalDivider />}
+            {i !== 5 && <VerticalDivider />}
           </Fragment>
         )
       )}
