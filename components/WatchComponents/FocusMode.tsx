@@ -1,10 +1,15 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 // DB
-import { doc, updateDoc } from "firebase/firestore";
+import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import { removeDuplicates } from "../../lib/utilityfunc";
 // Types
-import { JikanApiResEpisodes, UserAnimeShape } from "../../lib/types/interface";
+import {
+  JikanApiResEpisodes,
+  UserAnimeShape,
+  UserAnimeTimestampDate,
+} from "../../lib/types/interface";
+import { AnimeWatchType } from "../../lib/types/enums";
 // UI
 import { AiOutlineCloseSquare, AiOutlineRightCircle } from "react-icons/ai";
 import toast from "react-hot-toast";
@@ -24,7 +29,7 @@ interface FocusEpisodeShape {
 
 const FocusMode: FC<FocusModeProps> = ({
   EpisodesData,
-  UserAnimeData: { Progress, ExtraEpisodes, AnimeId },
+  UserAnimeData: { Progress, ExtraEpisodes, AnimeId, TimestampDate, WatchType },
   CancelModeFocus,
 }) => {
   const [FocusEpisodeData, setFocusEpisodeShape] =
@@ -35,7 +40,6 @@ const FocusMode: FC<FocusModeProps> = ({
   const { current: EpisodesLength } = useRef(
     EpisodesData.length + (ExtraEpisodes || 0)
   );
-  console.log(ExtraEpisodes);
 
   /* FUNC */
   const GenerateEp = useMemo(
@@ -98,8 +102,21 @@ const FocusMode: FC<FocusModeProps> = ({
           AnimeId.toString()
         );
 
+      const IsFinished = NewProgress.length === EpisodesLength;
+
+      const NewTimestampDate: UserAnimeTimestampDate = {
+        BeganDate: !!TimestampDate?.BeganDate
+          ? TimestampDate.BeganDate
+          : new Date().toLocaleDateString(),
+        EndedDate: !!TimestampDate?.EndedDate
+          ? TimestampDate?.EndedDate
+          : IsFinished && new Date().toLocaleDateString(),
+      };
+
       updateDoc(AnimeRef(), {
+        WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
         Progress: removeDuplicates(NewProgress),
+        TimestampDate: NewTimestampDate || deleteField(),
       });
       toast.success(`Marked as watched !`);
     } catch (err) {

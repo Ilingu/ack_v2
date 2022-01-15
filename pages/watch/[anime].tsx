@@ -122,14 +122,12 @@ const WatchPage: NextPage = () => {
         <main>
           <MetaTags title={`Watch ${title}`} description="User Watch Page" />{" "}
           {/* Banner */}
-          <div className="w-full h-80 absolute -z-10 bg-gradient-to-t from-bgi-darker">
-            <Image
-              src={photoPath.split(".jpg")[0] + "l.jpg"}
-              alt={`${title}'s Banner`}
-              layout="fill"
-              className="object-cover -z-10 blur-sm bg-fixed bg-center bg-cover min-h-72 bg-no-repeat opacity-80"
-            />
-          </div>
+          <div
+            className="w-full h-80 absolute -z-10 bg-fixed bg-center bg-cover bg-no-repeat bg-gradient-to-t from-bgi-darker object-cover blur-sm opacity-80"
+            style={{
+              backgroundImage: `url("${photoPath.split(".jpg")[0] + "l.jpg"}")`,
+            }}
+          ></div>
           <div className="flex justify-center">
             <div className="watch-container sm:w-10/12 sm:px-0 px-2 mt-24">
               {/* Img */}
