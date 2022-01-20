@@ -22,6 +22,14 @@ export interface InternalApiResError {
   message: string;
   err: boolean;
 }
+/* LastEpReleased */
+export interface AdkamiLastReleasedEpisodeShape {
+  title: string; // Black Clover
+  episodeId: string; // Episode 28 vostfr
+  TimeReleased: string; // 28min ago
+  Img: string;
+  Team: string; // Wakanim
+}
 /* User */
 export interface UserShape {
   displayName: string;
@@ -128,7 +136,11 @@ export interface AlternativeTitleShape {
   title_japanese: string;
   title_synonyms: string[];
 }
-
+/* adkami-api Error */
+export interface ADKamiScrapperApiERROR {
+  statusCode: number;
+  message: string;
+}
 /* JikanRes Error */
 export interface JikanApiERROR {
   status: number;

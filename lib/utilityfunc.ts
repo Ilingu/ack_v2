@@ -1,5 +1,7 @@
 // Types
 import {
+  AdkamiLastReleasedEpisodeShape,
+  ADKamiScrapperApiERROR,
   AnimeConfigPathsIdShape,
   AnimeShape,
   EpisodesShape,
@@ -504,4 +506,55 @@ export const ToggleFav = (AnimeId: string, currentVal: boolean) => {
   } catch (err) {
     toast.error("Cannot add this anime to your favorite");
   }
+};
+
+/**
+ * Toggle User Anime Fav Field
+ * @returns {AdkamiLastReleasedEpisodeShape[]} Array of last released anime episodes in the world
+ */
+export const GetLastReleasedAnimeEp = (): Promise<
+  AdkamiLastReleasedEpisodeShape[]
+> => {
+  console.log("Brute Force 'GetLastReleasedAnimeEp' Called");
+  const fetchData = async (): Promise<
+    AdkamiLastReleasedEpisodeShape[] | false
+  > => {
+    try {
+      const LastAnimeEp:
+        | AdkamiLastReleasedEpisodeShape[]
+        | ADKamiScrapperApiERROR = await callApi(
+        `https://adkami-scapping-api.herokuapp.com/last`
+      );
+
+      if (!LastAnimeEp || (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode)
+        return false;
+
+      return LastAnimeEp as AdkamiLastReleasedEpisodeShape[];
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    let i = 0;
+
+    try {
+      const repeatFetching = async () => {
+        const LastEpData = await fetchData();
+        if (i > 15) return reject("Error: Cannot fetch Last Released Ep");
+
+        if (!LastEpData) {
+          i++;
+          setTimeout(repeatFetching, 3000);
+          return;
+        }
+
+        resolve(LastEpData as AdkamiLastReleasedEpisodeShape[]);
+      };
+      repeatFetching();
+    } catch (err) {
+      reject("Error: Cannot fetch Last Released Ep");
+    }
+  });
 };

@@ -16,19 +16,19 @@ import {
   JikanApiToSeasonAnimeShape,
   Return404,
   WhitchSeason,
-} from "../../lib/utilityfunc";
+} from "../../../lib/utilityfunc";
 import {
   JikanApiERROR,
   JikanApiResSeason,
   JikanApiResSeasonRoot,
   SeasonAnimesShape,
-} from "../../lib/types/interface";
-import { TheFourSeason } from "../../lib/types/types";
-import { TheFourSeasonEnum } from "../../lib/types/enums";
+} from "../../../lib/types/interface";
+import { TheFourSeason } from "../../../lib/types/types";
+import { TheFourSeasonEnum } from "../../../lib/types/enums";
 // UI
 import { FaCalendarAlt, FaStar } from "react-icons/fa";
-import Divider from "../../components/Design/Divider";
-import MetaTags from "../../components/Common/Metatags";
+import Divider from "../../../components/Design/Divider";
+import MetaTags from "../../../components/Common/Metatags";
 
 /* Interface */
 interface SeasonAnimesProps {
