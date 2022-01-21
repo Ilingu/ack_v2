@@ -1,21 +1,21 @@
 # [ACK] MyAnimList :: List your anime
 
-- ACK is a [MAL](https://myanimelist.net/) data based app to track your Animes with a fancy Design
+#### **ACK is a [MAL](https://myanimelist.net/) data based app to track your Animes with a fancy Design**
 
 [![SITE](https://forthebadge.com/images/badges/check-it-out.svg)](https://ack.vercel.app)
 
 ## Site Info
 
-[![SITE](https://img.shields.io/maintenance/yes/2021?style=for-the-badge)](https://ack.vercel.app)
+[![SITE](https://img.shields.io/maintenance/yes/2022?style=for-the-badge)](https://ack.vercel.app)
 
 ### Up ⬆ Or Down ⬇
 
 [![SITE](https://img.shields.io/website-up-down-green-red/https/myanimchecker.netlify.app.svg?style=for-the-badge)](https://ack.vercel.app/)  
-[![SITE](https://img.shields.io/netlify/034816b9-c9d3-4fd5-800f-2b4ba804bcfc?style=for-the-badge)](https://www.netlify.com/)
+[![SITE](https://therealsujitk-vercel-badge.vercel.app/?app=ack)](https://vercel.com/)
 
 ### Release
 
-[![SITE](https://img.shields.io/badge/ACK%20release-Beta%201-blue?style=for-the-badge)](https://ack.vercel.app/)
+[![SITE](https://img.shields.io/badge/ACK%20release-Beta%203-blue?style=for-the-badge)](https://ack.vercel.app/)
 
 ## Technologies
 
