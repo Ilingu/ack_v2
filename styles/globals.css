@@ -45,12 +45,12 @@
 
 /* HoverHoverit */
 ::-moz-selection {
-  background-color: #161616;
-  color: #b3b4ff;
+  background-color: #ececff;
+  color: #0a0a0a;
 }
 ::selection {
-  background-color: #161616;
-  color: #b3b4ff;
+  background-color: #ececff;
+  color: #0a0a0a;
 }
 
 /* GENERAL */

@@ -26,7 +26,7 @@ import {
 import { TheFourSeason } from "../../../lib/types/types";
 import { TheFourSeasonEnum } from "../../../lib/types/enums";
 // UI
-import { FaCalendarAlt, FaStar } from "react-icons/fa";
+import { FaCalendarAlt, FaExternalLinkAlt, FaStar } from "react-icons/fa";
 import Divider from "../../../components/Design/Divider";
 import MetaTags from "../../../components/Common/Metatags";
 
@@ -122,7 +122,18 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         title="Season Animes"
         description="All the animes of the moment !"
       />
-      <header>
+      <header className="relative">
+        <Link href="/anime/season/last-released-episodes">
+          <a>
+            <button
+              className="lg:absolute text-xl text-center bg-primary-main text-headline 
+        text-semibold p-2 rounded-lg"
+            >
+              <FaExternalLinkAlt className="icon" /> Last Released Episodes
+            </button>
+          </a>
+        </Link>
+
         <h1 className="text-center text-headline font-semibold text-5xl tracking-wide">
           {UpComingAnime.current ? (
             <Fragment>
@@ -131,8 +142,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
           ) : (
             <Fragment>
               <span className="text-primary-main capitalize">{Season}</span>
-              &apos;s
-              <span className="text-primary-main"> {Year}</span> animes
+              &apos;s <span className="text-primary-main"> {Year}</span> animes
             </Fragment>
           )}
         </h1>

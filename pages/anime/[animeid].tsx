@@ -245,11 +245,23 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
             </div>
             <div className="lg:grid lg:grid-cols-6">
               <div className="relative lg:col-span-1 lg:block flex justify-center">
-                <img
-                  src={photoPath}
-                  alt={`${title}'s cover`}
-                  className="rounded-md ring-2 ring-primary-whiter shadow-md"
-                />
+                {CurrentAnimeWatchType ? (
+                  <Link href={`/watch/${malId}`} passHref>
+                    <a>
+                      <img
+                        src={photoPath}
+                        alt={`${title}'s cover`}
+                        className="rounded-md ring-2 ring-primary-whiter shadow-md"
+                      />
+                    </a>
+                  </Link>
+                ) : (
+                  <img
+                    src={photoPath}
+                    alt={`${title}'s cover`}
+                    className="rounded-md ring-2 ring-primary-whiter shadow-md"
+                  />
+                )}{" "}
                 <a href={MalPage} target="_blank" rel="noreferrer">
                   <FaInfo
                     onClick={() => router.push(MalPage)}

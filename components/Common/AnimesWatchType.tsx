@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 // DB
 import { auth, db } from "../../lib/firebase";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
@@ -19,6 +20,7 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
 }) => {
   const { WATCHING, WATCHED, UNWATCHED, WANT_TO_WATCH, WONT_WATCH, DROPPED } =
     AnimeWatchType;
+  const { push } = useRouter();
   const [SelectValue, setSelectValue] = useState(AnimeType);
   const FirstEffectSkipped = useRef(false);
 
@@ -46,8 +48,10 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
       malId.toString()
     );
 
-    if (newType === AnimeWatchType.UNWATCHED)
+    if (newType === AnimeWatchType.UNWATCHED) {
+      push(`/anime/${malId}`);
       return await deleteDoc(UserAnimeRef);
+    }
 
     await setDoc(UserAnimeRef, {
       AnimeId: malId,

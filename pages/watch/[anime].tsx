@@ -16,7 +16,7 @@ import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
 import Link from "next/link";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaBell, FaPlay } from "react-icons/fa";
+import { FaBell, FaPlay, FaSpinner } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
 import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
@@ -24,13 +24,15 @@ import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 
 /* Func */
-let GlobalAnimeId: string;
-const AddNextEpisodeReleaseDate = (NextReleaseDate: number) => {
+const AddNextEpisodeReleaseDate = (
+  NextReleaseDate: number,
+  AnimeId: string
+) => {
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
       "animes",
-      GlobalAnimeId
+      AnimeId
     );
 
     updateDoc(AnimeRef, {
@@ -38,12 +40,12 @@ const AddNextEpisodeReleaseDate = (NextReleaseDate: number) => {
     });
   } catch (err) {}
 };
-const NewEpReleased = () => {
+const NewEpReleased = (AnimeId: string) => {
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
       "animes",
-      GlobalAnimeId
+      AnimeId
     );
 
     updateDoc(AnimeRef, {
@@ -54,7 +56,7 @@ const NewEpReleased = () => {
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const { GlobalAnime, UserAnimes } = useContext(GlobalAppContext);
   const [CurrentAnimeData, setCurrentAnimeData] = useState<AnimeShape>(null);
   const [UserAnimeData, setUserAnimeData] = useState<UserAnimeShape>(null);
@@ -85,17 +87,19 @@ const WatchPage: NextPage = () => {
     const CurrentAnimeData = GlobalAnime.find(
       ({ malId }) => malId.toString() === query.anime
     );
-    GlobalAnimeId = CurrentAnimeData.malId.toString();
+
+    if (!UserAnimeData) push("/404");
 
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnime, UserAnimes, query]);
 
   useEffect(() => {
     /* NOTIF */
     if (!NextEpisodeReleaseDate) AddNextEpisodeReleaseDateToFB();
     if (NextEpisodeReleaseDate && Date.now() >= NextEpisodeReleaseDate) {
-      NewEpReleased();
+      NewEpReleased(CurrentAnimeData.malId.toString());
       AddNextEpisodeReleaseDateToFB();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,8 +112,17 @@ const WatchPage: NextPage = () => {
       broadcast,
       "NextBroadcastNumber"
     ) as number;
-    AddNextEpisodeReleaseDate(BroadcastTime);
+    AddNextEpisodeReleaseDate(BroadcastTime, CurrentAnimeData.malId.toString());
   };
+
+  if (!UserAnimeData)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <h1 className="text-headline text-4xl text-semibold">
+          <FaSpinner className="icon" /> Redirect...
+        </h1>
+      </div>
+    );
 
   return (
     <AuthCheck

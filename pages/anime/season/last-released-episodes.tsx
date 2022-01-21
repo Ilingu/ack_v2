@@ -1,8 +1,10 @@
 import { GetStaticProps, NextPage } from "next";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import MetaTags from "../../../components/Common/Metatags";
 import Divider from "../../../components/Design/Divider";
+import Loader from "../../../components/Design/Loader";
+import VerticalDivider from "../../../components/Design/VerticalDivider";
 import {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
@@ -18,8 +20,12 @@ interface LastEpPageProps {
   LastAnimeEpISR: AdkamiLastReleasedEpisodeShape[];
 }
 interface LastEpItemProps {
-  EpisodeData: AdkamiLastReleasedEpisodeShape;
+  EpisodeData: PosterLastReleasedEpisodeShape;
 }
+type PosterLastReleasedEpisodeShape = Omit<
+  AdkamiLastReleasedEpisodeShape,
+  "Img"
+>;
 
 /* ISR */
 export const getStaticProps: GetStaticProps = async () => {
@@ -99,43 +105,82 @@ const LastEpPage: NextPage<LastEpPageProps> = ({ LastAnimeEpISR }) => {
         </h1>
         <Divider />
       </header>
-      <div className="grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2 text-headline">
-        {RenderedEpisodes || "Nothing To Display :("}
+      <div className="grid grid-cols-1 justify-items-center gap-2 text-headline py-5">
+        {RenderedEpisodes || (
+          <div className="text-xl text-headline text-bold text-center">
+            <Loader show /> Loading...
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
-  const { title, Img, episodeId, TimeReleased, Team } = EpisodeData || {};
-  return (
-    <div>
-      <div className="px-4 py-2 rounded-md text-center">
-        <div className="flex justify-center">
-          <div className="group relative w-[210px] h-[300px]">
-            {/* <Image
-              src={Img.split("?")[0]}
-              alt="cover"
-              width={210}
-              height={300}
-              className="opacity-95 hover:opacity-50 transition cursor-pointer rounded-lg"
-            /> */}
-            <div className="absolute top-0 left-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
-              {Team}
-            </div>
-            <div
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 font-semibold text-headline bg-bgi-darker 
-            bg-opacity-80 px-1 py-2 rounded-lg"
-            >
-              {TimeReleased}
-            </div>
-          </div>
-        </div>
+  const { title, episodeId, TimeReleased, Team } = EpisodeData || {};
+  const TransformEpId = () => {
+    const EpisodesType = episodeId.includes("Episode");
+    const OAVType = episodeId.includes("OAV");
+    const SpecialType = episodeId.includes("Spécial");
+    const MoovieType = episodeId.includes("Film");
 
-        <h1 className="text-headline font-semibold cursor-pointer text-lg hover:text-gray-200 transition truncate">
-          {title}
+    let result = episodeId;
+    let WordToInject = "";
+    let NumberToInject = "";
+
+    if (EpisodesType) {
+      const EpId = result.split("Episode ")[1].split(" ")[0];
+      WordToInject = "Episode";
+      NumberToInject = `N°${EpId}`;
+      result = result.split("Episode ")[1].split(" ").slice(1).join(" ");
+    }
+
+    if (OAVType || SpecialType || MoovieType) {
+      const SeparateVal = result.split(" ");
+
+      WordToInject = SeparateVal[0];
+      NumberToInject = `N°${SeparateVal[1]}`;
+      result = result
+        .split(`${OAVType ? "OAV" : SpecialType ? "Spécial" : "Film"}`)[1]
+        .split(" ")
+        .slice(2)
+        .join(" ");
+    }
+
+    result = result.replaceAll("vostfr", "").replaceAll("vf", "");
+    result = result.split(" ")[0].trim();
+
+    return (
+      <Fragment>
+        <span className="font-semibold text-headline">{WordToInject}</span>{" "}
+        <span className="font-bold text-primary-whiter underline">
+          {NumberToInject}
+        </span>{" "}
+        {result}
+      </Fragment>
+    );
+  };
+
+  return (
+    <div
+      className="md:w-4/5 w-full flex flex-col justify-center items-center gap-2 bg-bgi-darker py-2 rounded-lg shadow-md
+     shadow-bgi-black hover:shadow-inner transition-all"
+    >
+      <div className="flex justify-center items-center gap-3">
+        <h1
+          className="text-primary-whiter font-semibold cursor-pointer text-xl hover:text-gray-200 transition truncate"
+          title={title}
+        >
+          {title.slice(0, 30)}
         </h1>
-        <h2>{episodeId}</h2>
+        <VerticalDivider Styling="just-boilerplate" />
+        <h2 className="text-lg text-description">{TransformEpId()}</h2>
+      </div>
+      <div className="flex justify-center items-center gap-3">
+        <p>{Team}</p>
+        <p className="text-description-whiter">
+          {TimeReleased.replaceAll("-", "/").split(" ")[0]}
+        </p>
       </div>
     </div>
   );
