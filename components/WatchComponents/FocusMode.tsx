@@ -126,7 +126,7 @@ const FocusMode: FC<FocusModeProps> = ({
 
   /* JSX */
   return (
-    <div className="absolute top-0 left-0 h-screen w-screen z-20 bg-bgi-darker bg-opacity-40 flex flex-col justify-center items-center">
+    <div className="absolute top-0 left-0 h-screen w-screen z-20 bg-bgi-darker bg-opacity-60 flex flex-col justify-center items-center">
       <h1
         className="relative font-bold text-2xl sm:w-72 sm:min-w-max w-10/12 p-4 bg-bgi-black bg-opacity-80 hover:bg-opacity-90 transition-all rounded-lg
        text-headline mb-5 scale-110 text-center"

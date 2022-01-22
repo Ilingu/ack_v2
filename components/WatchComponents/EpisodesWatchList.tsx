@@ -292,17 +292,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
             {Math.round(
               (NextEpisodeReleaseDate - Date.now()) / 1000 / 60 / 60 / 24
             )}{" "}
-            Days{" "}
-            {Math.round(
-              (parseInt(
-                ((NextEpisodeReleaseDate - Date.now()) / 1000 / 60 / 60)
-                  .toFixed(2)
-                  .split(".")[1]
-              ) *
-                60) /
-                100
-            )}{" "}
-            H left
+            Days Left
           </div>
         )}
         {TimestampDate && (
