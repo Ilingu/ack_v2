@@ -1,10 +1,6 @@
-import { GetStaticProps, NextPage } from "next";
-import Image from "next/image";
+import { GetServerSideProps, NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
-import MetaTags from "../../../components/Common/Metatags";
-import Divider from "../../../components/Design/Divider";
-import Loader from "../../../components/Design/Loader";
-import VerticalDivider from "../../../components/Design/VerticalDivider";
+// Types/Func
 import {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
@@ -14,6 +10,11 @@ import {
   GetLastReleasedAnimeEp,
   Return404,
 } from "../../../lib/utilityfunc";
+// UI
+import MetaTags from "../../../components/Common/Metatags";
+import Divider from "../../../components/Design/Divider";
+import Loader from "../../../components/Design/Loader";
+import VerticalDivider from "../../../components/Design/VerticalDivider";
 
 /* INTERFACES */
 interface LastEpPageProps {
@@ -27,8 +28,8 @@ type PosterLastReleasedEpisodeShape = Omit<
   "Img"
 >;
 
-/* ISR */
-export const getStaticProps: GetStaticProps = async () => {
+/* SSR */
+export const getServerSideProps: GetServerSideProps = async () => {
   try {
     const LastAnimeEp:
       | AdkamiLastReleasedEpisodeShape[]
@@ -50,7 +51,6 @@ export const getStaticProps: GetStaticProps = async () => {
           60
         ),
       },
-      revalidate: 3600,
     };
   } catch (err) {
     console.error(err);
