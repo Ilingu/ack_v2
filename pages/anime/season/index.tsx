@@ -125,11 +125,8 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
       <header className="relative">
         <Link href="/anime/season/last-released-episodes">
           <a>
-            <button
-              className="lg:absolute text-xl text-center bg-primary-main text-headline 
-        text-semibold p-2 rounded-lg"
-            >
-              <FaExternalLinkAlt className="icon" /> Last Released Episodes
+            <button className="lg:absolute text-lg text-center bg-primary-main text-headline font-semibold p-2 rounded-lg">
+              <FaExternalLinkAlt className="icon" /> Last Release
             </button>
           </a>
         </Link>

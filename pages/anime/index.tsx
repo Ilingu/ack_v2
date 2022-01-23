@@ -173,7 +173,7 @@ function FormInput({ Submit }: FormInputProps) {
       <p className="text-description font-semibold tracking-wide">
         <span className="text-base">Aucun résultats pertinent ?</span>{" "}
         <span
-          onClick={() => Submit(title, true)}
+          onClick={() => Submit(title.trim().toLowerCase(), true)}
           className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
         >
           Chercher Globalement <FaGlobe className="icon text-thirdly" />
@@ -194,7 +194,7 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
           {animeFound?.length})
           {animeFound?.length > 0 || (
             <p
-              onClick={() => Submit(reqTitle, true)}
+              onClick={() => Submit(reqTitle.trim().toLowerCase(), true)}
               className="text-lg text-primary-whiter hover:underline hover:text-primary-main cursor-pointer transition"
             >
               Chercher Globalement <FaGlobe className="icon text-thirdly" />

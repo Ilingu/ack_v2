@@ -176,18 +176,13 @@ const WatchPage: NextPage = () => {
                 </h1>
               </div>
               {/* Buttons */}
-              <div className="gta-buttons flex flex-wrap gap-x-4 gap-y-2 2xl:ml-16 lg:ml-52 justify-center lg:-mt-20">
+              <div className="gta-buttons flex flex-wrap gap-x-4 gap-y-2 2xl:-ml-20 lg:ml-20 justify-center lg:-mt-20">
                 <button
                   onClick={() => setFocusMode(true)}
                   className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none"
                 >
                   <FaPlay className="icon" />
                 </button>
-                {Airing && broadcast && (
-                  <button className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none">
-                    <FaBell className="icon" />
-                  </button>
-                )}
                 <button
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
