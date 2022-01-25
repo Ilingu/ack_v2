@@ -117,6 +117,7 @@ const FocusMode: FC<FocusModeProps> = ({
         WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
         Progress: removeDuplicates(NewProgress),
         TimestampDate: NewTimestampDate || deleteField(),
+        NewEpisodeAvailable: deleteField(),
       });
       toast.success(`Marked as watched !`);
     } catch (err) {

@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -34,10 +35,11 @@ import {
 } from "../../lib/utilityfunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaCheck, FaCopy, FaMinus, FaPlus } from "react-icons/fa";
+import { FaCopy, FaMinus, FaPlus } from "react-icons/fa";
 import { FcOk } from "react-icons/fc";
 import toast from "react-hot-toast";
 import VerticalDivider from "../Design/VerticalDivider";
+import HandleInput from "./HandleInput";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
@@ -66,6 +68,7 @@ interface GroupFormInputProps {
   IsModeGroup: boolean;
   HomeDisplayType: HomeDisplayTypeEnum;
   AddGroup: (GrName: string) => void;
+  SearchGroup: (GrName: string) => string[];
 }
 interface HomeGroupItemPosterProp {
   GroupData: UserGroupPosterShape;
@@ -144,105 +147,127 @@ const HomePoster: FC = () => {
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
 
-    const filterUserAnime = () =>
-      UserAnimes.filter(
+    if (HomeDisplayType === HomeDisplayTypeEnum.GROUP) {
+      return GroupRender();
+    }
+    AnimeRender();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    GlobalAnime,
+    HomeDisplayType,
+    UserAnimes,
+    UserGroups,
+    AnimesToAdd,
+    ActiveWatchType,
+  ]);
+
+  /* Filtered Anime Data */
+  const filterUserAnime = useCallback(
+    () =>
+      UserAnimes?.filter(
         ({ WatchType }) =>
           WatchType !== AnimeWatchType.WONT_WATCH &&
           WatchType !== AnimeWatchType.UNWATCHED
-      );
+      ),
+    [UserAnimes]
+  );
 
-    const AnimesHomePostersData: UserAnimePosterShape[] = filterUserAnime()
-      .map(({ AnimeId, Fav, WatchType, NewEpisodeAvailable }) => {
-        const AnimeData = GlobalAnime.find(({ malId }) => malId === AnimeId);
-        if (!AnimeData) return null;
+  const AnimesHomePostersData: UserAnimePosterShape[] = useMemo(
+    () =>
+      filterUserAnime()
+        ?.map(({ AnimeId, Fav, WatchType, NewEpisodeAvailable }) => {
+          const AnimeData = GlobalAnime.find(({ malId }) => malId === AnimeId);
+          if (!AnimeData) return null;
 
-        return {
-          AnimeId,
-          Fav,
-          WatchType,
-          title: AnimeData.title,
-          photoURL: AnimeData.photoPath,
-          type: AnimeData.type,
-          NewEpisodeAvailable,
-        } as UserAnimePosterShape;
-      })
-      .filter((UAP) => UAP);
+          return {
+            AnimeId,
+            Fav,
+            WatchType,
+            title: AnimeData.title,
+            photoURL: AnimeData.photoPath,
+            type: AnimeData.type,
+            NewEpisodeAvailable,
+          } as UserAnimePosterShape;
+        })
+        .filter((UAP) => UAP),
+    [GlobalAnime, filterUserAnime]
+  );
 
+  /* RENDER */
+  const GroupRender = () => {
     // Group Render
-    if (HomeDisplayType === HomeDisplayTypeEnum.GROUP) {
-      if (!GroupsElementsOrder.current) {
-        // Render Order
-        const AnimesGroupId: string[] = UserGroups.map(
-          ({ GroupName }) => GroupName
-        );
-
-        const GroupsOrder = shuffleArray(AnimesGroupId);
-        GroupsElementsOrder.current = GroupsOrder;
-      }
-      if (UserGroups.length !== GroupsElementsOrder.current.length) {
-        const ToObjRA = UserGroups.reduce(
-          (a, { GroupName }) => ({ ...a, [GroupName]: GroupName }),
-          {}
-        );
-        const ToObjCA = GroupsElementsOrder.current.reduce(
-          (a, GrName) => ({ ...a, [GrName]: GrName }),
-          {}
-        );
-
-        // Check If New Group To Add
-        UserGroups.forEach(({ GroupName }) => {
-          if (!ToObjCA[GroupName])
-            GroupsElementsOrder.current.unshift(GroupName);
-        });
-        // Check If Group To Delete
-        GroupsElementsOrder.current.forEach((GrName) => {
-          if (!ToObjRA[GrName]) {
-            const CurrentGroups = GroupsElementsOrder.current;
-            const indexToDel = CurrentGroups.indexOf(GrName);
-            if (indexToDel === -1) return;
-            CurrentGroups.splice(indexToDel, 1);
-          }
-        });
-      }
-
-      const TransformToPosterGroupData = ({
-        GroupAnimesId,
-        GroupName,
-      }: UserGroupShape): UserGroupPosterShape => {
-        const FilteredAnimesForGroup = AnimesHomePostersData.filter(
-          ({ AnimeId }) => {
-            let Pass = false;
-
-            GroupAnimesId.forEach((GroupAnimeId) => {
-              if (AnimeId.toString() === GroupAnimeId) Pass = true;
-            });
-            return Pass;
-          }
-        );
-        return { GroupName, Animes: FilteredAnimesForGroup };
-      };
-
-      const GroupsPosterJSX = GroupsElementsOrder.current.map(
-        (GroupNameId, i) => {
-          const GroupData = UserGroups.find(
-            ({ GroupName }) => GroupName === GroupNameId
-          );
-          const DataAssociatedForGroup = TransformToPosterGroupData(GroupData);
-
-          return (
-            <GroupItemPoster
-              key={i}
-              GroupData={DataAssociatedForGroup}
-              setSelectedGroup={setSelectedGroup}
-            />
-          );
-        }
+    if (!GroupsElementsOrder.current) {
+      // Render Order
+      const AnimesGroupId: string[] = UserGroups.map(
+        ({ GroupName }) => GroupName
       );
 
-      setNewRenderForGroups(GroupsPosterJSX);
-      return;
+      const GroupsOrder = shuffleArray(AnimesGroupId);
+      GroupsElementsOrder.current = GroupsOrder;
+    }
+    if (UserGroups.length !== GroupsElementsOrder.current.length) {
+      const ToObjRA = UserGroups.reduce(
+        (a, { GroupName }) => ({ ...a, [GroupName]: GroupName }),
+        {}
+      );
+      const ToObjCA = GroupsElementsOrder.current.reduce(
+        (a, GrName) => ({ ...a, [GrName]: GrName }),
+        {}
+      );
+
+      // Check If New Group To Add
+      UserGroups.forEach(({ GroupName }) => {
+        if (!ToObjCA[GroupName]) GroupsElementsOrder.current.unshift(GroupName);
+      });
+      // Check If Group To Delete
+      GroupsElementsOrder.current.forEach((GrName) => {
+        if (!ToObjRA[GrName]) {
+          const CurrentGroups = GroupsElementsOrder.current;
+          const indexToDel = CurrentGroups.indexOf(GrName);
+          if (indexToDel === -1) return;
+          CurrentGroups.splice(indexToDel, 1);
+        }
+      });
     }
 
+    const TransformToPosterGroupData = ({
+      GroupAnimesId,
+      GroupName,
+    }: UserGroupShape): UserGroupPosterShape => {
+      const FilteredAnimesForGroup = AnimesHomePostersData.filter(
+        ({ AnimeId }) => {
+          let Pass = false;
+
+          GroupAnimesId.forEach((GroupAnimeId) => {
+            if (AnimeId.toString() === GroupAnimeId) Pass = true;
+          });
+          return Pass;
+        }
+      );
+      return { GroupName, Animes: FilteredAnimesForGroup };
+    };
+
+    const GroupsPosterJSX = GroupsElementsOrder.current.map(
+      (GroupNameId, i) => {
+        const GroupData = UserGroups.find(
+          ({ GroupName }) => GroupName === GroupNameId
+        );
+        const DataAssociatedForGroup = TransformToPosterGroupData(GroupData);
+
+        return (
+          <GroupItemPoster
+            key={i}
+            GroupData={DataAssociatedForGroup}
+            setSelectedGroup={setSelectedGroup}
+          />
+        );
+      }
+    );
+
+    setNewRenderForGroups(GroupsPosterJSX);
+  };
+
+  const AnimeRender = () => {
     // Animes Render
     if (!AnimesElementsOrder.current) {
       // Shuffle Array -> Order
@@ -320,16 +345,9 @@ const HomePoster: FC = () => {
       .filter((Poster) => !!Poster);
 
     setNewRenderForAnimes(AnimesPosterJSX);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    GlobalAnime,
-    HomeDisplayType,
-    UserAnimes,
-    UserGroups,
-    AnimesToAdd,
-    ActiveWatchType,
-  ]);
+  };
 
+  /* FB Func */
   const ToggleGroup = useCallback(
     (id: string, method: "ADD" | "DELETE" | "DELETE_DB", GrName?: string) => {
       if (method === "ADD") setAnimeToAdd((prev) => [...prev, id]);
@@ -389,8 +407,18 @@ const HomePoster: FC = () => {
     [AnimesToAdd, user.uid]
   );
 
+  const SearchGroup = useCallback(
+    (GrName: string) =>
+      UserGroups.filter(({ GroupName }) => {
+        const GrNameToSearch = encodeURI(kebabCase(GrName));
+        return GroupName.includes(GrNameToSearch);
+      }).map(({ GroupName }) => GroupName),
+    [UserGroups]
+  );
+
+  /* COMPONENT JSX */
   return (
-    <div className="mt-5 flex flex-col items-center">
+    <div className="mt-5 flex flex-col items-center relative">
       <HomeHeader
         HomeDisplayType={HomeDisplayType}
         setHomeDisplayType={setHomeDisplayType}
@@ -407,8 +435,9 @@ const HomePoster: FC = () => {
         IsModeGroup={!!(AnimesToAdd.length > 0)}
         AddGroup={AddGroup}
         HomeDisplayType={HomeDisplayType}
+        SearchGroup={SearchGroup}
       />
-      <div className="w-10/12">
+      <div className="w-10/12 relative">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
@@ -521,8 +550,15 @@ function GroupFormInput({
   IsModeGroup,
   HomeDisplayType,
   AddGroup,
+  SearchGroup,
 }: GroupFormInputProps) {
   const [InputGroupName, setInputGroupName] = useState("");
+  const [GroupsMatch, setGroupMatch] = useState<string[]>(null);
+
+  useEffect(() => {
+    if (InputGroupName.trim().length < 3) return setGroupMatch(null);
+    setGroupMatch(SearchGroup(InputGroupName));
+  }, [InputGroupName, SearchGroup]);
 
   const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -535,21 +571,29 @@ function GroupFormInput({
   return (
     IsModeGroup &&
     HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
-      <form className="mb-4 mt-2" onSubmit={HandleSubmit}>
-        <input
-          type="text"
-          value={InputGroupName}
-          onChange={(e) => setInputGroupName(e.target.value)}
-          className="bg-black sm:text-lg rounded-l-md py-2 sm:w-96 w-80 text-center font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
-          placeholder="Name of group (Already existing or not)"
+      <Fragment>
+        <HandleInput
+          Value={InputGroupName}
+          setValue={setInputGroupName}
+          HandleSubmit={HandleSubmit}
         />
-        <button
-          type="submit"
-          className="bg-black h-11 py-2 px-2 rounded-r-md -translate-y-px font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
-        >
-          <FaCheck className="icon" />
-        </button>
-      </form>
+        {GroupsMatch && (
+          <div
+            className="xl:absolute xl:top-8 xl:left-2 z-10 rounded-md p-0.5 sm:w-96 w-80 text-center font-semibold text-primary-whitest 
+          outline-none bg-slate-800 capitalize mb-3 cursor-pointer"
+          >
+            {GroupsMatch.map((text) => (
+              <p
+                key={text}
+                onClick={() => setInputGroupName(text)}
+                className="hover:text-headline transition-all mb-1 border-t border-t-primary-darker"
+              >
+                {text}
+              </p>
+            ))}
+          </div>
+        )}
+      </Fragment>
     )
   );
 }
@@ -580,9 +624,12 @@ function GroupComponent({
         {GroupRenderedElements}
       </div>
 
-      <div className="flex justify-center items-center">
+      <div className="absolute top-0 w-9/12 left-1/2 -translate-x-1/2">
         {selectedGroupName?.name && (
-          <div className="animate-fadeIn md:w-1/2 w-10/12 p-2 absolute bg-bgi-darker bg-opacity-90 cursor-pointer rounded-lg">
+          <div
+            className="flex flex-col animate-fadeIn p-2 bg-bgi-darker 
+          bg-opacity-90 cursor-pointer rounded-lg"
+          >
             <h1 className="text-headline font-bold text-2xl capitalize text-center">
               <span className="text-primary-main">
                 {selectedGroupName.data.GroupName}
@@ -595,7 +642,7 @@ function GroupComponent({
             >
               <AiFillCloseCircle className="icon" />
             </button>
-            <div className="grid 2xl:grid-cols-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center mt-3">
+            <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center mt-3">
               {selectedGroupName.data.Animes.map((AnimeData, i) => (
                 <AnimeItemPoster
                   key={AnimeData?.AnimeId || i}
@@ -734,9 +781,10 @@ function GroupItemPoster({
   return (
     <div
       className="w-52 h-80 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg"
-      onClick={() =>
-        setSelectedGroup({ name: GroupData.GroupName, data: GroupData })
-      }
+      onClick={() => {
+        scrollTo(0, 80);
+        setSelectedGroup({ name: GroupData.GroupName, data: GroupData });
+      }}
     >
       <div className="row-span-5 grid grid-cols-2">
         {GroupData.Animes.slice(0, 2).map(({ photoURL }, i) => (
