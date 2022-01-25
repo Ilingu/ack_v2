@@ -5,12 +5,14 @@ interface HandleInputProps {
   HandleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   Value: string | number;
   setValue: React.Dispatch<React.SetStateAction<string | number>>;
+  placeholder?: string;
 }
 
 const HandleInput: FC<HandleInputProps> = ({
   HandleSubmit,
   Value,
   setValue,
+  placeholder,
 }) => {
   return (
     <form
@@ -22,7 +24,7 @@ const HandleInput: FC<HandleInputProps> = ({
         value={Value}
         onChange={(e) => setValue(e.target.value)}
         className="bg-black sm:text-lg rounded-l-md py-2 sm:w-96 w-80 text-center font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
-        placeholder="Name of group (Already existing or not)"
+        placeholder={placeholder}
       />
       <button
         type="submit"

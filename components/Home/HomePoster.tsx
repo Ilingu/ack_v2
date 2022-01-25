@@ -11,6 +11,7 @@ import React, {
 import Link from "next/link";
 import Image from "next/image";
 import kebabCase from "lodash.kebabcase";
+import debounce from "lodash.debounce";
 // Types
 import { GlobalAppContext } from "../../lib/context";
 import {
@@ -42,7 +43,7 @@ import {
 } from "../../lib/utilityfunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaCopy, FaMinus, FaPlus } from "react-icons/fa";
+import { FaCopy, FaMinus, FaPlus, FaSearch } from "react-icons/fa";
 import { FcOk } from "react-icons/fc";
 import toast from "react-hot-toast";
 import VerticalDivider from "../Design/VerticalDivider";
@@ -63,6 +64,7 @@ interface HomeAnimeItemPosterProp {
 interface HomeHeaderProps {
   HomeDisplayType: HomeDisplayTypeEnum;
   setHomeDisplayType: React.Dispatch<React.SetStateAction<HomeDisplayTypeEnum>>;
+  setAnimeSearchMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface SortByWatchTypeProps {
   IsModeGroup: boolean;
@@ -107,6 +109,9 @@ interface GroupComponentProps {
     GrName?: string
   ) => void;
 }
+interface AnimeSearchFormInputProps {
+  SearchAnime: (AnimeName: string) => void;
+}
 
 /* COMPONENTS */
 const HomePoster: FC = () => {
@@ -123,6 +128,9 @@ const HomePoster: FC = () => {
       (localStorage.getItem("WatchTypeFilter") as AnimeWatchTypeDisplayable) ||
       AnimeWatchTypeDisplayable.WATCHING
   );
+
+  const [AnimeSearchMode, setAnimeSearchMode] = useState(false);
+  const [AnimeSearchScope, setAnimeSearchScope] = useState<string[]>([]);
 
   const [AnimesToAdd, setAnimeToAdd] = useState<string[]>([]);
 
@@ -170,6 +178,7 @@ const HomePoster: FC = () => {
     UserGroups,
     AnimesToAdd,
     ActiveWatchType,
+    AnimeSearchScope,
   ]);
 
   /* Filtered Anime Data */
@@ -368,6 +377,10 @@ const HomePoster: FC = () => {
         if (ActiveWatchType === AnimeWatchTypeDisplayable.FAV && !AnimeData.Fav)
           return null;
 
+        // Check If within the Search Scope
+        if (AnimeSearchScope?.length > 0 && !AnimeSearchScope.includes(animeId))
+          return null;
+
         // JSX
         return (
           <AnimeItemPoster
@@ -458,12 +471,28 @@ const HomePoster: FC = () => {
     [UserGroups]
   );
 
+  /* Other Func */
+  const SearchAnime = useCallback(
+    (AnimeName: string) => {
+      if (!AnimeName) return setAnimeSearchScope([]);
+      const AnimeNameToSearch = AnimeName.trim().toLowerCase();
+      const ResultScope = AnimesHomePostersData.filter(({ title }) => {
+        const AnimeTitle = title.trim().toLowerCase();
+        return AnimeTitle.includes(AnimeNameToSearch);
+      }).map(({ AnimeId }) => AnimeId.toString());
+
+      setAnimeSearchScope(ResultScope);
+    },
+    [AnimesHomePostersData]
+  );
+
   /* COMPONENT JSX */
   return (
     <div className="mt-5 flex flex-col items-center relative">
       <HomeHeader
         HomeDisplayType={HomeDisplayType}
         setHomeDisplayType={setHomeDisplayType}
+        setAnimeSearchMode={setAnimeSearchMode}
       />
       {HomeDisplayType !== HomeDisplayTypeEnum.GROUP && (
         <SortByWatchType
@@ -473,12 +502,16 @@ const HomePoster: FC = () => {
         />
       )}
 
-      <GroupFormInput
-        IsModeGroup={!!(AnimesToAdd.length > 0)}
-        AddGroup={AddGroup}
-        HomeDisplayType={HomeDisplayType}
-        SearchGroup={SearchGroup}
-      />
+      {!AnimeSearchMode ? (
+        <GroupFormInput
+          IsModeGroup={!!(AnimesToAdd.length > 0)}
+          AddGroup={AddGroup}
+          HomeDisplayType={HomeDisplayType}
+          SearchGroup={SearchGroup}
+        />
+      ) : undefined}
+      {AnimeSearchMode && <AnimeSearchFormInput SearchAnime={SearchAnime} />}
+
       <div className="w-10/12 relative">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
@@ -496,13 +529,17 @@ const HomePoster: FC = () => {
 };
 
 // [SUB-COMPONENTS]
-function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
+function HomeHeader({
+  HomeDisplayType,
+  setHomeDisplayType,
+  setAnimeSearchMode,
+}: HomeHeaderProps) {
   return (
     <header className="mb-3 flex">
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
-        } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
+        } group font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
           " underline decoration-primary-darker text-headline"
         }`}
@@ -511,6 +548,16 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
           setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
         }
       >
+        {HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
+          <Fragment>
+            <FaSearch
+              onClick={() => setAnimeSearchMode((prev) => !prev)}
+              className={`icon text-primary-whitest text-xl${
+                window.mobileAndTabletCheck() ? "" : " hidden"
+              } group-hover:inline`}
+            />{" "}
+          </Fragment>
+        )}
         <span
           className={
             HomeDisplayType === HomeDisplayTypeEnum.ANIMES
@@ -618,6 +665,7 @@ function GroupFormInput({
           Value={InputGroupName}
           setValue={setInputGroupName}
           HandleSubmit={HandleSubmit}
+          placeholder="Name of group (Already existing or not)"
         />
         {GroupsMatch && (
           <div
@@ -637,6 +685,38 @@ function GroupFormInput({
         )}
       </Fragment>
     )
+  );
+}
+function AnimeSearchFormInput({ SearchAnime }: AnimeSearchFormInputProps) {
+  const [InputAnimeName, setInputAnimeName] = useState("");
+
+  useEffect(() => {
+    return () => SearchAnime(null);
+  }, [SearchAnime]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => DebounceAndSearch(), [InputAnimeName, SearchAnime]);
+
+  const HandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const DebounceAndSearch = useCallback(
+    debounce(() => {
+      if (InputAnimeName.trim().length < 3) return SearchAnime(null);
+      SearchAnime(InputAnimeName);
+    }, 200),
+    [InputAnimeName, SearchAnime]
+  );
+
+  return (
+    <HandleInput
+      Value={InputAnimeName}
+      setValue={setInputAnimeName}
+      HandleSubmit={HandleSubmit}
+      placeholder="Name of anime 👀"
+    />
   );
 }
 

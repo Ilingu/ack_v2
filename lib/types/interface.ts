@@ -6,6 +6,13 @@ import {
   NetworkType,
 } from "./types";
 
+declare global {
+  interface Window {
+    opera: any;
+    mobileAndTabletCheck: () => boolean;
+  }
+}
+
 // Others
 export interface AnimeConfigPathsIdShape {
   AllAnimeId: string[];

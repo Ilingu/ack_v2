@@ -5,8 +5,6 @@ import AuthCheck from "../components/Common/AuthCheck";
 import MetaTags from "../components/Common/Metatags";
 import HomePoster from "../components/Home/HomePoster";
 
-// V4: Search Mode + Check Notif
-
 /* Components */
 const Home: NextPage = () => {
   return (
