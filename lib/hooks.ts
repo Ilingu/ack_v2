@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 // Auth
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { User } from "@firebase/auth";
+import { Unsubscribe, User } from "@firebase/auth";
 import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
 import {
@@ -20,9 +20,9 @@ export function useUserData() {
   const [reqFinished, setFinished] = useState(false);
 
   useEffect(() => {
-    let unsubscribe;
+    let unsubscribe: Unsubscribe;
 
-    onAuthStateChanged(auth, async (user: User) => {
+    const unSub = onAuthStateChanged(auth, async (user: User) => {
       if (user) {
         const UserRef = doc(db, "users", user.uid);
         unsubscribe = onSnapshot(UserRef, (doc) => {
@@ -44,7 +44,10 @@ export function useUserData() {
       }
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      unSub();
+    };
   }, []);
 
   return { user, username: usernameState, reqFinished };

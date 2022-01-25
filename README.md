@@ -10,7 +10,7 @@
 
 ### Up ⬆ Or Down ⬇
 
-[![SITE](https://img.shields.io/website-up-down-green-red/https/myanimchecker.netlify.app.svg?style=for-the-badge)](https://ack.vercel.app/)  
+[![SITE](https://img.shields.io/website-up-down-green-red/https/ack.vercel.app.svg?style=for-the-badge)](https://ack.vercel.app/)  
 [![SITE](https://therealsujitk-vercel-badge.vercel.app/?app=ack)](https://vercel.com/)
 
 ### Release
@@ -24,7 +24,7 @@
 
 ## Compatibilities
 
-[![SITE](https://img.shields.io/static/v1?label=Compatibility%20With&message=ALL&color=C13B3A&style=for-the-badge)](https://myanimchecker.netlify.app/)
+[![SITE](https://img.shields.io/static/v1?label=Compatibility%20With&message=ALL&color=C13B3A&style=for-the-badge)](https://ack.vercel.app/)
 
 ## Uninteresting stuff
 
@@ -33,3 +33,5 @@
 MIT
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+This App use [ADKami](https://www.adkami.com/) data for [This Page](https://ack.vercel.app/anime/season/last-released-episodes). \*These Data are extracted with a [nestJS](https://nestjs.com/) Scrapping API --> [Github Repo](https://github.com/Ilingu/adkami-scrapping-api)

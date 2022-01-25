@@ -16,11 +16,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     UserAnimesData: UserAnimes,
     UserGroupsData: UserGroups,
   } = useGlobalAnimeData(userData?.user?.uid);
-  const [IsWebVersion, setAppVersion] = useState(false);
+  // const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
     /* AppVersion */
-    setAppVersion(!window.matchMedia("(display-mode: standalone)").matches);
+    // setAppVersion(!window.matchMedia("(display-mode: standalone)").matches);
+
     /* Network Connection */
     const onChangeNetwork = (e: Event) => {
       CheckConn(e.currentTarget as unknown as NetworkInformationShape);
@@ -63,7 +64,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <GlobalAppContext.Provider
       value={{
         ...userData,
-        IsWebVersion,
         UserAnimes,
         GlobalAnime,
         UserGroups,

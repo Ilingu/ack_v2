@@ -91,7 +91,7 @@ const FocusMode: FC<FocusModeProps> = ({
     };
   }, [EpisodesData, GenerateEp, Progress]);
 
-  const UpdateUserAnimeProgress = () => {
+  const UpdateUserAnimeProgress = async () => {
     const NewProgress = Progress ? [...Progress, EpId] : [EpId];
 
     try {
@@ -113,7 +113,7 @@ const FocusMode: FC<FocusModeProps> = ({
           : IsFinished && new Date().toLocaleDateString(),
       };
 
-      updateDoc(AnimeRef(), {
+      await updateDoc(AnimeRef(), {
         WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
         Progress: removeDuplicates(NewProgress),
         TimestampDate: NewTimestampDate || deleteField(),

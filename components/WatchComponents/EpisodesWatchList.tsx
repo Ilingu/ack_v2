@@ -46,7 +46,7 @@ type HTMLElementEvent<T extends HTMLElement> = Event & {
 
 /* FUNC */
 let GlobalAnimeId: string;
-const DecrementExtraEpisode = () => {
+const DecrementExtraEpisode = async () => {
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
@@ -54,7 +54,7 @@ const DecrementExtraEpisode = () => {
       GlobalAnimeId
     );
 
-    updateDoc(AnimeRef, {
+    await updateDoc(AnimeRef, {
       ExtraEpisodes: increment(-1),
     });
 
@@ -163,7 +163,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
   );
 
   const UpdateUserAnimeProgress = useCallback(
-    (epId: number, remove: boolean) => {
+    async (epId: number, remove: boolean) => {
       try {
         let NewProgress = Progress
           ? Progress[0] === -2811
@@ -191,7 +191,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
         };
 
         NewProgress = removeDuplicates(NewProgress);
-        updateDoc(GetAnimeRef, {
+        await updateDoc(GetAnimeRef, {
           WatchType: IsFinished ? AnimeWatchType.WATCHED : WatchType,
           Progress: NewProgress.length <= 0 ? deleteField() : NewProgress,
           TimestampDate: NewTimestampDate || deleteField(),
@@ -219,9 +219,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
     ]
   );
 
-  const MarkAllEpWatched = () => {
+  const MarkAllEpWatched = async () => {
     try {
-      updateDoc(GetAnimeRef, {
+      await updateDoc(GetAnimeRef, {
         WatchType: AnimeWatchType.WATCHED,
         Progress: Progress ? [-2811, ...Progress] : [-2811],
       });
@@ -231,10 +231,10 @@ const EpsPoster: FC<EpsPosterProps> = ({
     }
   };
 
-  const AddExtraEpisode = () => {
+  const AddExtraEpisode = async () => {
     if (NoOfEpsToAdd <= 0) return;
     try {
-      updateDoc(GetAnimeRef, {
+      await updateDoc(GetAnimeRef, {
         ExtraEpisodes: increment(NoOfEpsToAdd),
       });
 

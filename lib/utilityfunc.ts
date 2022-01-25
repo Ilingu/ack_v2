@@ -489,7 +489,7 @@ export const copyToClipboard = (text: string) =>
  * @param {string} AnimeId
  * @param {boolean} currentVal
  */
-export const ToggleFav = (AnimeId: string, currentVal: boolean) => {
+export const ToggleFav = async (AnimeId: string, currentVal: boolean) => {
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
@@ -497,7 +497,7 @@ export const ToggleFav = (AnimeId: string, currentVal: boolean) => {
       AnimeId
     );
 
-    updateDoc(AnimeRef, {
+    await updateDoc(AnimeRef, {
       Fav: !currentVal,
     });
 

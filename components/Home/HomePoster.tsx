@@ -24,7 +24,14 @@ import {
   UserGroupShape,
 } from "../../lib/types/interface";
 // Auth
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  deleteField,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 // Func
 import {
@@ -103,6 +110,7 @@ interface GroupComponentProps {
 
 /* COMPONENTS */
 const HomePoster: FC = () => {
+  /* STATE */
   const { UserAnimes, UserGroups, GlobalAnime, user } =
     useContext(GlobalAppContext);
 
@@ -137,6 +145,8 @@ const HomePoster: FC = () => {
     data: null,
   });
 
+  /* EFFECT */
+  // LocalHost
   useEffect(() => {
     localStorage.setItem("HomeDisplayType", JSON.stringify(HomeDisplayType));
   }, [HomeDisplayType]);
@@ -144,6 +154,7 @@ const HomePoster: FC = () => {
     localStorage.setItem("WatchTypeFilter", ActiveWatchType);
   }, [ActiveWatchType]);
 
+  // Render
   useEffect(() => {
     if (!GlobalAnime || !UserAnimes || !UserGroups) return;
 
@@ -175,20 +186,31 @@ const HomePoster: FC = () => {
   const AnimesHomePostersData: UserAnimePosterShape[] = useMemo(
     () =>
       filterUserAnime()
-        ?.map(({ AnimeId, Fav, WatchType, NewEpisodeAvailable }) => {
-          const AnimeData = GlobalAnime.find(({ malId }) => malId === AnimeId);
-          if (!AnimeData) return null;
-
-          return {
+        ?.map(
+          ({
             AnimeId,
             Fav,
             WatchType,
-            title: AnimeData.title,
-            photoURL: AnimeData.photoPath,
-            type: AnimeData.type,
             NewEpisodeAvailable,
-          } as UserAnimePosterShape;
-        })
+            NextEpisodeReleaseDate,
+          }) => {
+            const AnimeData = GlobalAnime.find(
+              ({ malId }) => malId === AnimeId
+            );
+            if (!AnimeData) return null;
+
+            return {
+              AnimeId,
+              Fav,
+              WatchType,
+              title: AnimeData.title,
+              photoURL: AnimeData.photoPath,
+              type: AnimeData.type,
+              NewEpisodeAvailable,
+              NextEpisodeReleaseDate,
+            } as UserAnimePosterShape;
+          }
+        )
         .filter((UAP) => UAP),
     [GlobalAnime, filterUserAnime]
   );
@@ -269,6 +291,10 @@ const HomePoster: FC = () => {
 
   const AnimeRender = () => {
     // Animes Render
+    const batch = writeBatch(db);
+    const AnimeRef = (AnimeId: string) =>
+      doc(doc(db, "users", user.uid), "animes", AnimeId);
+
     if (!AnimesElementsOrder.current) {
       // Shuffle Array -> Order
       const AllAnimesId = filterUserAnime().map(({ AnimeId }) =>
@@ -320,14 +346,25 @@ const HomePoster: FC = () => {
         );
         if (!AnimeData) return null;
 
-        // Sort By ActiveWatchType
+        // Notif Check
         if (
+          AnimeData?.NextEpisodeReleaseDate &&
+          Date.now() >= AnimeData?.NextEpisodeReleaseDate
+        ) {
+          !AnimeData?.NewEpisodeAvailable &&
+            batch.update(AnimeRef(animeId), {
+              NewEpisodeAvailable: true,
+            });
+        }
+
+        // Sort By ActiveWatchType
+        const ActiveWatchType_CONDITION =
           ActiveWatchType !== AnimeWatchTypeDisplayable.ALL &&
           ActiveWatchType !== AnimeWatchTypeDisplayable.FAV &&
           (AnimeData.WatchType as unknown as AnimeWatchTypeDisplayable) !==
-            ActiveWatchType
-        )
-          return null;
+            ActiveWatchType;
+
+        if (ActiveWatchType_CONDITION) return null;
         if (ActiveWatchType === AnimeWatchTypeDisplayable.FAV && !AnimeData.Fav)
           return null;
 
@@ -344,12 +381,17 @@ const HomePoster: FC = () => {
       })
       .filter((Poster) => !!Poster);
 
+    (async () => await batch.commit())();
     setNewRenderForAnimes(AnimesPosterJSX);
   };
 
   /* FB Func */
   const ToggleGroup = useCallback(
-    (id: string, method: "ADD" | "DELETE" | "DELETE_DB", GrName?: string) => {
+    async (
+      id: string,
+      method: "ADD" | "DELETE" | "DELETE_DB",
+      GrName?: string
+    ) => {
       if (method === "ADD") setAnimeToAdd((prev) => [...prev, id]);
       if (method === "DELETE") {
         const CopyArr = [...AnimesToAdd];
@@ -368,7 +410,7 @@ const HomePoster: FC = () => {
           CurrentGroup.splice(IndexToDel, 1);
 
           const GroupRef = doc(doc(db, "users", user.uid), "groups", GrName);
-          updateDoc(GroupRef, {
+          await updateDoc(GroupRef, {
             GroupAnimesId: CurrentGroup,
           });
           toast.success("Anime removed from this group");
@@ -389,11 +431,11 @@ const HomePoster: FC = () => {
 
         if (GroupData.exists()) {
           const { GroupAnimesId } = GroupData.data();
-          updateDoc(GroupRef, {
+          await updateDoc(GroupRef, {
             GroupAnimesId: removeDuplicates([...GroupAnimesId, ...AnimesToAdd]),
           });
         } else
-          setDoc(GroupRef, {
+          await setDoc(GroupRef, {
             GroupName: SafeGrName,
             GroupAnimesId: AnimesToAdd,
           });

@@ -16,7 +16,7 @@ import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
 import Link from "next/link";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaBell, FaPlay, FaSpinner } from "react-icons/fa";
+import { FaPlay, FaSpinner } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
 import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
@@ -24,7 +24,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 
 /* Func */
-const AddNextEpisodeReleaseDate = (
+const AddNextEpisodeReleaseDate = async (
   NextReleaseDate: number,
   AnimeId: string
 ) => {
@@ -35,12 +35,13 @@ const AddNextEpisodeReleaseDate = (
       AnimeId
     );
 
-    updateDoc(AnimeRef, {
+    await updateDoc(AnimeRef, {
       NextEpisodeReleaseDate: NextReleaseDate,
     });
   } catch (err) {}
 };
-const NewEpReleased = (AnimeId: string) => {
+
+const NewEpReleased = async (AnimeId: string) => {
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
@@ -48,7 +49,7 @@ const NewEpReleased = (AnimeId: string) => {
       AnimeId
     );
 
-    updateDoc(AnimeRef, {
+    await updateDoc(AnimeRef, {
       NewEpisodeAvailable: true,
     });
   } catch (err) {}
@@ -99,7 +100,7 @@ const WatchPage: NextPage = () => {
     /* NOTIF */
     if (!NextEpisodeReleaseDate) AddNextEpisodeReleaseDateToFB();
     if (NextEpisodeReleaseDate && Date.now() >= NextEpisodeReleaseDate) {
-      NewEpReleased(CurrentAnimeData.malId.toString());
+      !NewEpisodeAvailable && NewEpReleased(CurrentAnimeData.malId.toString());
       AddNextEpisodeReleaseDateToFB();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,7 +120,7 @@ const WatchPage: NextPage = () => {
     return (
       <div className="h-screen flex items-center justify-center">
         <h1 className="text-headline text-4xl text-semibold">
-          <FaSpinner className="icon" /> Redirect...
+          <FaSpinner className="icon" /> Load...
         </h1>
       </div>
     );

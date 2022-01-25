@@ -96,6 +96,7 @@ export interface UserAnimePosterShape {
   photoURL: string;
   type: AnimeType;
   NewEpisodeAvailable?: boolean;
+  NextEpisodeReleaseDate?: number;
 }
 export interface UserGroupPosterShape {
   GroupName: string;

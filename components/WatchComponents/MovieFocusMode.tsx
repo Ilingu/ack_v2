@@ -31,7 +31,7 @@ const MovieFocusMode: FC<MovieFocusMode> = ({
     };
   }, []);
 
-  const MarkMovieAsWatched = () => {
+  const MarkMovieAsWatched = async () => {
     try {
       const AnimeRef = () =>
         doc(
@@ -40,7 +40,7 @@ const MovieFocusMode: FC<MovieFocusMode> = ({
           AnimeId.toString()
         );
 
-      updateDoc(AnimeRef(), {
+      await updateDoc(AnimeRef(), {
         WatchType: AnimeWatchType.WATCHED,
       });
 
