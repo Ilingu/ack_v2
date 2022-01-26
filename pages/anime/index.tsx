@@ -37,16 +37,30 @@ interface AnimeFoundListProps {
   reqTitle: string;
   Submit: SubmitShape;
 }
+interface AnimesFoundShape {
+  animesFound: PosterSearchData[];
+  reqTitle: string;
+}
 type SubmitShape = (title: string, api?: boolean) => void;
+
+const SaveToSessionStorage = (ResultObject: AnimesFoundShape) =>
+  sessionStorage.setItem("Search_Anime_Found", JSON.stringify(ResultObject));
 
 /* Components */
 const SearchPage: NextPage = () => {
   const { GlobalAnime } = useContext(GlobalAppContext);
   const animes = useRef<AnimeShape[]>(GlobalAnime);
-  const [{ animesFound, reqTitle }, setResSearch] = useState<{
-    animesFound: PosterSearchData[];
-    reqTitle: string;
-  }>({ animesFound: [], reqTitle: "" });
+  const [{ animesFound, reqTitle }, setResSearch] = useState<AnimesFoundShape>({
+    animesFound: [],
+    reqTitle: "",
+  });
+
+  useEffect(() => {
+    const SessionData = sessionStorage.getItem("Search_Anime_Found");
+
+    if (!SessionData) return;
+    setResSearch(JSON.parse(SessionData));
+  }, []);
 
   useEffect(() => {
     animes.current = GlobalAnime;
@@ -71,8 +85,16 @@ const SearchPage: NextPage = () => {
         const { data: animesRes }: JikanApiResSearchRoot = await callApi(
           `https://api.jikan.moe/v4/anime?q=${title}&limit=16`
         );
+        // Format
         const ToPosterShape = JikanDataToPosterData(animesRes);
-        setResSearch({ animesFound: ToPosterShape, reqTitle: title });
+        const ResultObject: AnimesFoundShape = {
+          animesFound: ToPosterShape,
+          reqTitle: title,
+        };
+
+        // Save
+        SaveToSessionStorage(ResultObject);
+        setResSearch(ResultObject);
         return;
       }
 
@@ -114,10 +136,18 @@ const SearchPage: NextPage = () => {
         });
       };
 
+      // Format
       const resultAnimesFound = AnimeShapeToPosterData(
         removeDuplicates(filterIt(title))
       );
-      setResSearch({ animesFound: resultAnimesFound, reqTitle: title });
+      const ResultObject: AnimesFoundShape = {
+        animesFound: resultAnimesFound,
+        reqTitle: title,
+      };
+
+      // Save
+      SaveToSessionStorage(ResultObject);
+      setResSearch(ResultObject);
     },
     [animes]
   );
