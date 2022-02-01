@@ -37,7 +37,10 @@ const SignUpPage: NextPage = () => {
     <Fragment>
       <MetaTags title="Sign up" description="Sign up Page for ACK" />
       <main className="h-screen flex flex-col justify-center items-center">
-        <div className="bg-bgi-whiter text-primary-main h-4/6 w-1/4 py-4 px-4 rounded-lg shadow-lg flex flex-col justify-center items-center">
+        <div
+          className="bg-bgi-whiter text-primary-main md:w-[500px] md:h-[600px] w-[350px] h-[500px] py-4 px-4 rounded-lg 
+        shadow-lg flex flex-col justify-center items-center"
+        >
           {user ? (
             !username ? (
               <UsernameForm />
@@ -103,7 +106,7 @@ function SignInButton() {
         <h1 className="text-center text-4xl font-bold mb-6">Sign In/Up</h1>
         <Divider />
       </header>
-      <aside className="shadow-2xl bg-bgi-main w-3/4 h-1/3 py-2 rounded-lg flex flex-col justify-evenly items-center">
+      <aside className="shadow-2xl bg-bgi-main md:w-3/4 w-full py-4 rounded-lg flex flex-col justify-evenly items-center">
         <button
           onClick={() => signIn("google")}
           className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4

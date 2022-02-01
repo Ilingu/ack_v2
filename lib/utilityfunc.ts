@@ -37,13 +37,25 @@ import toast from "react-hot-toast";
 
 /* FUNC */
 
+let NextApiCallTimestamp = 0;
 /**
  * Fetch Anime Data and add it to FB
  * @param {string} animeId
  */
 export const GetAnimeData = async (
-  animeId: string
+  animeId: string,
+  TimestampLimit?: boolean
 ): Promise<AnimeShape | InternalApiResError> => {
+  if (TimestampLimit && NextApiCallTimestamp > Date.now())
+    return {
+      message: `Attempt to get anime data denied. Cooldown between 2req hasn't reach is end. Try again in ${(
+        (NextApiCallTimestamp - Date.now()) /
+        1000
+      ).toFixed(1)}s`,
+      err: true,
+    };
+  if (TimestampLimit) NextApiCallTimestamp = Date.now() + 5000;
+
   let animeData: AnimeShape;
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;

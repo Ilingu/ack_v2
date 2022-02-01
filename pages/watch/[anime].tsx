@@ -8,7 +8,11 @@ import { GlobalAppContext } from "../../lib/context";
 import AuthCheck from "../../components/Common/AuthCheck";
 import MetaTags from "../../components/Common/Metatags";
 // Func
-import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utilityfunc";
+import {
+  ConvertBroadcastTimeZone,
+  GetAnimeData,
+  ToggleFav,
+} from "../../lib/utilityfunc";
 // Types
 import { AnimeShape, UserAnimeShape } from "../../lib/types/interface";
 // UI
@@ -154,6 +158,12 @@ const WatchPage: NextPage = () => {
                       width={200}
                       height={283}
                       className="object-cover rounded-lg"
+                      placeholder="blur"
+                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
+                      onError={() => {
+                        console.warn("Img Cannot be load");
+                        GetAnimeData(malId.toString(), true);
+                      }}
                     />
                     {!!NewEpisodeAvailable && (
                       <div className="absolute top-0  tracking-wide text-lg font-bold text-headline bg-primary-darker px-3 py-1 rounded-md">

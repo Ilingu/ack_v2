@@ -78,17 +78,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists() && postToJSON(animeFB).LastRefresh > Date.now()) {
     return {
       props: { animeData: postToJSON(animeFB) }, // Exists on FB
-      revalidate: 3600,
+      revalidate: 900,
     };
   }
   // No Anime -> Api Req
   const animeData = await GetAnimeData(animeId);
-  console.log(animeData);
   if ((animeData as InternalApiResError).err === true) return Return404(60);
 
   return {
     props: { animeData },
-    revalidate: 3600,
+    revalidate: 1800,
   };
 };
 
@@ -265,8 +264,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 <a href={MalPage} target="_blank" rel="noreferrer">
                   <FaInfo
                     onClick={() => router.push(MalPage)}
-                    className="absolute -top-3 lg:-left-3 left-info-bubble text-headline font-bold w-12 h-12 py-2 px-2 bg-primary-main rounded-full 
-                hover:scale-110 transition cursor-pointer"
+                    className="absolute -top-3 lg:-left-3 left-info-bubble text-headline font-bold w-12 h-12 py-2 
+                    px-2 bg-primary-main rounded-full hover:scale-110 transition cursor-pointer"
                   />
                 </a>
               </div>
