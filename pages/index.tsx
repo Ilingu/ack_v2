@@ -12,7 +12,6 @@ import HomePoster from "../components/Home/HomePoster";
     get from the DB --> 
         So add a field that map `title --> malId` OR obj { title, alternativeTitle, malId } in "animes-config"
   - Settings Page
-  
 */
 
 /* Components */

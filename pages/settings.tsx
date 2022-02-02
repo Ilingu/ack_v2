@@ -15,7 +15,6 @@ import { GlobalAppContext } from "../lib/context";
    - Version
    - User Interaction (delete, change username)
    - User stats
-   
 */
 
 /* Components */
