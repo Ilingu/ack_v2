@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import React, { /*useContext,*/ useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 // Auth
 import AuthCheck from "../components/Common/AuthCheck";
 import { auth } from "../lib/firebase";
@@ -9,7 +9,7 @@ import { FaHome, FaSignOutAlt } from "react-icons/fa";
 // Types
 import { BeforeInstallPromptEvent } from "../lib/utils/types/interface";
 import toast from "react-hot-toast";
-// import { GlobalAppContext } from "../lib/context";
+import { GlobalAppContext } from "../lib/context";
 
 /* 
    - Version
@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 
 /* Components */
 const Settings: NextPage = () => {
-  // const { user, username } = useContext(GlobalAppContext);
+  const { user, username } = useContext(GlobalAppContext);
   const deferredPrompt = useRef<BeforeInstallPromptEvent>(null);
 
   useEffect(() => {
@@ -32,6 +32,8 @@ const Settings: NextPage = () => {
       }
     );
   }, []);
+
+  useEffect(() => {}, [user]);
 
   return (
     <AuthCheck
