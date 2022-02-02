@@ -16,15 +16,15 @@ import {
   JikanApiToSeasonAnimeShape,
   Return404,
   WhitchSeason,
-} from "../../../lib/utilityfunc";
+} from "../../../lib/utils/UtilsFunc";
 import {
   JikanApiERROR,
   JikanApiResSeason,
   JikanApiResSeasonRoot,
   SeasonAnimesShape,
-} from "../../../lib/types/interface";
-import { TheFourSeason } from "../../../lib/types/types";
-import { TheFourSeasonEnum } from "../../../lib/types/enums";
+} from "../../../lib/utils/types/interface";
+import { TheFourSeason } from "../../../lib/utils/types/types";
+import { TheFourSeasonEnum } from "../../../lib/utils/types/enums";
 // UI
 import { FaCalendarAlt, FaExternalLinkAlt, FaStar } from "react-icons/fa";
 import Divider from "../../../components/Design/Divider";

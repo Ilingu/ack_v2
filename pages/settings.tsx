@@ -7,9 +7,16 @@ import { auth } from "../lib/firebase";
 import MetaTags from "../components/Common/Metatags";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 // Types
-import { BeforeInstallPromptEvent } from "../lib/types/interface";
+import { BeforeInstallPromptEvent } from "../lib/utils/types/interface";
 import toast from "react-hot-toast";
 // import { GlobalAppContext } from "../lib/context";
+
+/* 
+   - Version
+   - User Interaction (delete, change username)
+   - User stats
+   
+*/
 
 /* Components */
 const Settings: NextPage = () => {

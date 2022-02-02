@@ -31,7 +31,7 @@ import {
   DocumentSnapshot,
   getDoc,
 } from "@firebase/firestore";
-import { auth, db } from "./firebase";
+import { auth, db } from "../firebase";
 // Toast
 import toast from "react-hot-toast";
 

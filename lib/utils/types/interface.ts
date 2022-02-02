@@ -13,6 +13,13 @@ declare global {
   }
 }
 
+// Api routes
+export interface ResApiRoutes {
+  succeed: boolean;
+  code: number;
+  data?: object;
+  message?: string;
+}
 // Others
 export interface AnimeConfigPathsIdShape {
   AllAnimeId: string[];

@@ -5,7 +5,7 @@ import { auth, db } from "../../lib/firebase";
 // UI
 import { AiOutlineCheckSquare, AiOutlineCloseSquare } from "react-icons/ai";
 import toast from "react-hot-toast";
-import { AnimeWatchType } from "../../lib/types/enums";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 
 /* INERFACES */
 interface MovieFocusMode {

@@ -18,12 +18,12 @@ import {
   AnimeWatchType,
   AnimeWatchTypeDisplayable,
   HomeDisplayTypeEnum,
-} from "../../lib/types/enums";
+} from "../../lib/utils/types/enums";
 import {
   UserAnimePosterShape,
   UserGroupPosterShape,
   UserGroupShape,
-} from "../../lib/types/interface";
+} from "../../lib/utils/types/interface";
 // Auth
 import {
   deleteField,
@@ -41,7 +41,7 @@ import {
   removeDuplicates,
   shuffleArray,
   ToggleFav,
-} from "../../lib/utilityfunc";
+} from "../../lib/utils/UtilsFunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaCopy, FaMinus, FaPlus, FaSearch } from "react-icons/fa";

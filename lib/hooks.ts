@@ -10,9 +10,9 @@ import {
   UserAnimeShape,
   UserGroupShape,
   UserShape,
-} from "./types/interface";
+} from "./utils/types/interface";
 // Func
-import { postToJSON } from "./utilityfunc";
+import { postToJSON } from "./utils/UtilsFunc";
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);

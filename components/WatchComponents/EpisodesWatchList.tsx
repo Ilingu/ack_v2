@@ -10,7 +10,7 @@ import React, {
 // DB
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
-import { removeDuplicates } from "../../lib/utilityfunc";
+import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 import toast from "react-hot-toast";
 // Types
 import {
@@ -18,7 +18,7 @@ import {
   UserAnimeShape,
   UserAnimeTimestampDate,
   UserExtraEpisodesShape,
-} from "../../lib/types/interface";
+} from "../../lib/utils/types/interface";
 // UI
 import {
   AiFillPlaySquare,
@@ -26,7 +26,7 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { AnimeWatchType } from "../../lib/types/enums";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 
 /* INTERFACES */
 interface EpsPosterProps {

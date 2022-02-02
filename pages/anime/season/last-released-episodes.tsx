@@ -4,12 +4,12 @@ import { Fragment, useEffect, useState } from "react";
 import {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
-} from "../../../lib/types/interface";
+} from "../../../lib/utils/types/interface";
 import {
   callApi,
   GetLastReleasedAnimeEp,
   Return404,
-} from "../../../lib/utilityfunc";
+} from "../../../lib/utils/UtilsFunc";
 // UI
 import MetaTags from "../../../components/Common/Metatags";
 import Divider from "../../../components/Design/Divider";

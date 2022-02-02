@@ -2,9 +2,9 @@ import React, { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { EpisodesSearchContext } from "../../lib/context";
 // Types
-import { EpisodesShape, JikanApiResEpisodes } from "../../lib/types/interface";
+import { EpisodesShape, JikanApiResEpisodes } from "../../lib/utils/types/interface";
 // Imp
-import { JikanApiToEpisodesShape } from "../../lib/utilityfunc";
+import { JikanApiToEpisodesShape } from "../../lib/utils/UtilsFunc";
 // UI
 import { FaEye } from "react-icons/fa";
 

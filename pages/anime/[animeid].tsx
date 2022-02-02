@@ -17,8 +17,8 @@ import {
   GenreTag,
   AlternativeTitleShape,
   InternalApiResError,
-} from "../../lib/types/interface";
-import { AnimeWatchType } from "../../lib/types/enums";
+} from "../../lib/utils/types/interface";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import {
   AddNewGlobalAnime,
@@ -26,7 +26,7 @@ import {
   GetAnimeData,
   postToJSON,
   Return404,
-} from "../../lib/utilityfunc";
+} from "../../lib/utils/UtilsFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
 import { doc, getDoc } from "@firebase/firestore";

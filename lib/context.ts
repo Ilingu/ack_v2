@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { User } from "@firebase/auth";
-import { AnimeShape, UserAnimeShape, UserGroupShape } from "./types/interface";
+import { AnimeShape, UserAnimeShape, UserGroupShape } from "./utils/types/interface";
 
 interface GlobalAppContext {
   user: User;

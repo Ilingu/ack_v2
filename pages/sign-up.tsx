@@ -22,7 +22,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaTwitter, FaSignOutAlt } from "react-icons/fa";
 import { AiFillGithub } from "react-icons/ai";
 // Types
-import { ConnMethods } from "../lib/types/types";
+import { ConnMethods } from "../lib/utils/types/types";
 
 /* Var */
 const GoogleProvider = new GoogleAuthProvider();

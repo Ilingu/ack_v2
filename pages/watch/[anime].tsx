@@ -12,9 +12,9 @@ import {
   ConvertBroadcastTimeZone,
   GetAnimeData,
   ToggleFav,
-} from "../../lib/utilityfunc";
+} from "../../lib/utils/UtilsFunc";
 // Types
-import { AnimeShape, UserAnimeShape } from "../../lib/types/interface";
+import { AnimeShape, UserAnimeShape } from "../../lib/utils/types/interface";
 // UI
 import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";

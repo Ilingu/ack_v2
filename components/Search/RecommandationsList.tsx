@@ -5,8 +5,8 @@ import React, { FC, Fragment, useEffect, useState } from "react";
 import {
   JikanApiResRecommandations,
   RecommendationsShape,
-} from "../../lib/types/interface";
-import { JikanApiToRecommendationShape } from "../../lib/utilityfunc";
+} from "../../lib/utils/types/interface";
+import { JikanApiToRecommendationShape } from "../../lib/utils/UtilsFunc";
 
 interface RecommandationsListProps {
   RecommandationsData: JikanApiResRecommandations[];

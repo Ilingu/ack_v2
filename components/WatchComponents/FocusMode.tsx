@@ -2,14 +2,14 @@ import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
-import { removeDuplicates } from "../../lib/utilityfunc";
+import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 // Types
 import {
   JikanApiResEpisodes,
   UserAnimeShape,
   UserAnimeTimestampDate,
-} from "../../lib/types/interface";
-import { AnimeWatchType } from "../../lib/types/enums";
+} from "../../lib/utils/types/interface";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 // UI
 import { AiOutlineCloseSquare, AiOutlineRightCircle } from "react-icons/ai";
 import toast from "react-hot-toast";

@@ -16,14 +16,14 @@ import {
   callApi,
   removeDuplicates,
   removeParamsFromPhotoUrl,
-} from "../../lib/utilityfunc";
+} from "../../lib/utils/UtilsFunc";
 // Types
 import {
   AnimeShape,
   JikanApiResSearch,
   JikanApiResSearchRoot,
   PosterSearchData,
-} from "../../lib/types/interface";
+} from "../../lib/utils/types/interface";
 // Icon
 import { FaSearch, FaGlobe } from "react-icons/fa";
 import { GlobalAppContext, SearchPosterContext } from "../../lib/context";

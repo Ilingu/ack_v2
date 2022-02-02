@@ -3,7 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useGlobalAnimeData, useUserData } from "../lib/hooks";
 // TS
 import { AppProps } from "next/app";
-import { NetworkInformationShape } from "../lib/types/interface";
+import { NetworkInformationShape } from "../lib/utils/types/interface";
 // UI
 import "../styles/globals.css";
 import Navbar from "../components/Common/Navbar";

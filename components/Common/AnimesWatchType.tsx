@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { auth, db } from "../../lib/firebase";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
 // Types
-import { AnimeWatchType } from "../../lib/types/enums";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 
 /* INTERFACES */
 interface MyAnimeProps {
