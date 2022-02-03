@@ -40,7 +40,9 @@ const NewAnimeHandler = async (
 
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true)
-      return Respond(ErrorHandling(404, "Anime Not Found")); // ❌
+      return Respond(
+        ErrorHandling(404, (JikanAnimeRes as InternalApiResError).message)
+      ); // ❌
 
     const animeData = JikanAnimeRes as AnimeShape;
     Respond(SuccessHandling(201, animeData));
