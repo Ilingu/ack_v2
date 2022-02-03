@@ -77,12 +77,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    // if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
-    return {
-      props: { animeData }, // Exists on FB
-      revalidate: 900,
-      // };
-    };
+    if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
+      return {
+        props: { animeData }, // Exists on FB
+        revalidate: 900,
+      };
+    }
   }
 
   // No Anime -> Api Req
