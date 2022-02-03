@@ -82,7 +82,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    if (!!animeData?.NextRefresh && animeData?.NextRefresh > Date.now())
+    if (!animeData?.NextRefresh || animeData?.NextRefresh <= Date.now())
       return ReturnProps(animeData);
   }
 
@@ -97,10 +97,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true) {
+      console.error(`Cannot Fetch Anime "${animeId}"`);
       if (animeFB.exists())
         return ReturnProps(postToJSON(animeFB) as AnimeShape);
-
-      console.error(`Cannot Fetch Anime "${animeId}": ERROR_WHEN_FETCHING`);
       return Return404(60);
     }
 
