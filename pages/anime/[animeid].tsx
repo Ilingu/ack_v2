@@ -67,6 +67,11 @@ interface MyAnimeProps {
   malId: number;
 }
 
+const ReturnProps = (animeData: AnimeShape) => ({
+  props: { animeData },
+  revalidate: 600,
+});
+
 /* SSG */
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { animeid: animeId } = params as { animeid: string };
@@ -77,12 +82,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    if (!!animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
-      return {
-        props: { animeData }, // Exists on FB
-        revalidate: 900,
-      };
-    }
+    if (!!animeData?.NextRefresh && animeData?.NextRefresh > Date.now())
+      return ReturnProps(animeData);
   }
 
   // No Anime -> Api Req
@@ -96,18 +97,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true) {
-      console.error(
-        `Cannot Fetch Anime "${animeId}": ERROR_WHEN_FETCHING`,
-        JSON.stringify(JikanAnimeRes as InternalApiResError)
-      );
+      if (animeFB.exists())
+        return ReturnProps(postToJSON(animeFB) as AnimeShape);
+
+      console.error(`Cannot Fetch Anime "${animeId}": ERROR_WHEN_FETCHING`);
       return Return404(60);
     }
 
     const animeData = JikanAnimeRes as AnimeShape;
-    return {
-      props: { animeData },
-      revalidate: 1800,
-    };
+    return ReturnProps(animeData);
   } catch (err) {
     console.error(err);
     return Return404(60); // ❌
