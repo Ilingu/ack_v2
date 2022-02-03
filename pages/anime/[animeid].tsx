@@ -91,8 +91,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const animeData: ResApiRoutes = await callApi(
     `http${DevMode ? "" : "s"}://${
       DevMode ? "localhost:3000" : "ack-git-dev-ilingu.vercel.app" // !TO CHANGE
-    }/api/${animeId}`,
-    { headers: { timestamp: Date.now().toString() } }
+    }/api/${animeId}`
   );
 
   if (!animeData.succeed) {
