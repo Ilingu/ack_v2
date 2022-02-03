@@ -77,12 +77,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    // if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
-    return {
-      props: { animeData }, // Exists on FB
-      revalidate: 900,
-      // };
-    };
+    if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
+      return {
+        props: { animeData }, // Exists on FB
+        revalidate: 900,
+      };
+    }
   }
 
   // No Anime -> Api Req
@@ -90,7 +90,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const animeData: ResApiRoutes = await callApi(
     `http${DevMode ? "" : "s"}://${
-      DevMode ? "localhost:3000" : "ack.vercel.app"
+      DevMode ? "localhost:3000" : "ack-git-dev-ilingu.vercel.app" // !TO CHANGE
     }/api/${animeId}`,
     { headers: { timestamp: Date.now().toString() } }
   );

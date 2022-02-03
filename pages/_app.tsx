@@ -66,7 +66,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
     const connectionInfo =
       navigator.connection as unknown as NetworkInformationShape;
-    connectionInfo.onchange = onChangeNetwork;
+    if (connectionInfo?.onchange) connectionInfo.onchange = onChangeNetwork;
     CheckConn(connectionInfo);
     /* ERROR DETECTION */
     window.onerror = async () => {
