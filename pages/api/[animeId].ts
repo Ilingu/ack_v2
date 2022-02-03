@@ -23,7 +23,6 @@ const NewAnimeHandler = async (
   const {
     query: { animeId },
     method,
-    headers,
   } = req;
 
   if (!animeId || typeof animeId !== "string")
@@ -31,10 +30,6 @@ const NewAnimeHandler = async (
 
   if (method !== "GET")
     return Respond(ErrorHandling(401, "Only accept GET req")); // ❌
-
-  console.log(parseInt(headers.timestamp.toString()) + 100 < Date.now());
-  if (parseInt(headers.timestamp.toString()) + 100 < Date.now())
-    return Respond(ErrorHandling(400, "Your API Access is denied")); // ❌
 
   if (isNaN(parseInt(animeId)))
     return Respond(ErrorHandling(401, "ID must be a number")); // ❌
