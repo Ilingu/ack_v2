@@ -16,12 +16,11 @@ import {
   Studio as StudioShape,
   GenreTag,
   AlternativeTitleShape,
-  ResApiRoutes,
+  InternalApiResError,
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import {
-  callApi,
   ConvertBroadcastTimeZone,
   postToJSON,
   Return404,
@@ -46,6 +45,7 @@ import {
 } from "react-icons/fa";
 // DATA
 import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
+import { GetAnimeData } from "../../lib/utils/ApiFunc";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -77,7 +77,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
+    if (!!animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
       return {
         props: { animeData }, // Exists on FB
         revalidate: 900,
@@ -86,25 +86,32 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // No Anime -> Api Req
-  const DevMode = process.env.NODE_ENV === "development";
-
-  const animeData: ResApiRoutes = await callApi(
-    `http${DevMode ? "" : "s"}://${
-      DevMode ? "localhost:3000" : "ack-git-dev-ilingu.vercel.app" // !TO CHANGE
-    }/api/${animeId}`
-  );
-
-  if (!animeData.succeed) {
-    console.error(
-      `Cannot Fetch Anime: Error ${animeData.code}\nReason: ${animeData.message}`
-    );
-    return Return404(60);
+  if (!animeId || typeof animeId !== "string" || isNaN(parseInt(animeId))) {
+    console.error("Wrong AnimeID Params -> number");
+    return Return404(60); // ❌
   }
 
-  return {
-    props: { animeData: animeData.data },
-    revalidate: 1800,
-  };
+  try {
+    const SecureAnimeID = parseInt(animeId).toString();
+
+    const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
+    if ((JikanAnimeRes as InternalApiResError).err === true) {
+      console.error(
+        `Cannot Fetch Anime "${animeId}": ERROR_WHEN_FETCHING`,
+        JSON.stringify(JikanAnimeRes as InternalApiResError)
+      );
+      return Return404(60);
+    }
+
+    const animeData = JikanAnimeRes as AnimeShape;
+    return {
+      props: { animeData },
+      revalidate: 1800,
+    };
+  } catch (err) {
+    console.error(err);
+    return Return404(60); // ❌
+  }
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

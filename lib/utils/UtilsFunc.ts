@@ -2,17 +2,12 @@
 import {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
-  AnimeConfigPathsIdShape,
   AnimeShape,
   EpisodesShape,
-  InternalApiResError,
   JikanApiERROR,
   JikanApiResAnime,
-  JikanApiResAnimeRoot,
   JikanApiResEpisodes,
-  JikanApiResEpisodesRoot,
   JikanApiResRecommandations,
-  JikanApiResRecommandationsRoot,
   JikanApiResSeason,
   RecommendationsShape,
   SeasonAnimesShape,
@@ -24,13 +19,7 @@ import {
   TheFourSeason,
 } from "./types/types";
 // DB
-import {
-  doc,
-  updateDoc,
-  writeBatch,
-  DocumentSnapshot,
-  getDoc,
-} from "@firebase/firestore";
+import { doc, updateDoc, DocumentSnapshot } from "@firebase/firestore";
 import { auth, db } from "../firebase";
 // Toast
 import toast from "react-hot-toast";
@@ -223,40 +212,6 @@ export const IsError = (api_response: JikanApiERROR): boolean => {
   if (!!api_response?.error) return true;
   return false;
 };
-
-/**
- * Fetch All Ep Of An Anime
- * @param {string} animeId
- * @returns {Promise<JikanApiResEpisodes[]>} Promise Array with all anime eps
- */
-export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
-  return new Promise(async (resolve, reject) => {
-    let Episodes: JikanApiResEpisodes[] = [];
-    let i = 1;
-
-    const fetchOtherEP = async () => {
-      try {
-        let eps: JikanApiResEpisodesRoot = await callApi(
-          `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`
-        );
-        if (
-          IsError(eps as unknown as JikanApiERROR) ||
-          !eps?.data ||
-          eps?.data?.length <= 0 ||
-          i >= 5
-        )
-          return resolve(Episodes);
-        Episodes = [...Episodes, ...eps.data];
-        if (!eps?.pagination.has_next_page) return resolve(Episodes);
-        i++;
-        setTimeout(fetchOtherEP, 4050);
-      } catch (err) {
-        reject(err);
-      }
-    };
-    fetchOtherEP();
-  });
-}
 
 /**
  * @returns 404's Page
