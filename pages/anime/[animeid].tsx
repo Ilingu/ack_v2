@@ -82,7 +82,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists()) {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
-    if (!animeData?.NextRefresh || animeData?.NextRefresh <= Date.now())
+    if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
       return ReturnProps(animeData);
   }
 
