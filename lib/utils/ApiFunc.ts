@@ -1,5 +1,20 @@
 import { randomUUID } from "crypto";
-import { ResApiRoutes } from "./types/interface";
+import { db } from "../firebase-admin";
+import {
+  AnimeConfigPathsIdShape,
+  AnimeShape,
+  InternalApiResError,
+  JikanApiERROR,
+  JikanApiResAnimeRoot,
+  JikanApiResRecommandationsRoot,
+  ResApiRoutes,
+} from "./types/interface";
+import {
+  callApi,
+  getAllTheEpisodes,
+  IsError,
+  JikanApiToAnimeShape,
+} from "./UtilsFunc";
 
 export const ErrorHandling = (code: number, reason?: string): ResApiRoutes => ({
   succeed: false,
@@ -12,34 +27,104 @@ export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
   data,
 });
 
-interface lastTokenShape {
-  token: string;
-  expired: number;
-}
-let lastToken: lastTokenShape = null;
 /**
- * Tokens To Protect Access of api
- * @param {lastToken} TokenToVerify : Verify the given token
- * @returns {boolean} true = accessible || false = access denied
+ * Fetch Anime Data
+ * @param {string} animeId
  */
-export const VerifyApiToken = (TokenToVerify: string): boolean => {
-  if (!TokenToVerify) return false;
-  if (lastToken?.expired < Date.now()) return false;
-  if (TokenToVerify !== lastToken?.token) return false;
-  return true;
+export const GetAnimeData = async (
+  animeId: string
+): Promise<AnimeShape | InternalApiResError> => {
+  let animeData: AnimeShape;
+  try {
+    const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
+    // Req
+    const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
+    let animeEpsRes = await getAllTheEpisodes(animeId);
+    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
+      await callApi(endpoint + "/recommendations");
+
+    if (
+      IsError(animeRes as unknown as JikanApiERROR) ||
+      IsError(animeRecommendationsRes as unknown as JikanApiERROR)
+    ) {
+      return { message: `Error when fetching: ${animeId}.`, err: true };
+    }
+
+    if (animeEpsRes.length <= 0) {
+      for (let i = 0; i < 12; i++) {
+        animeEpsRes = [
+          ...animeEpsRes,
+          {
+            mal_id: i + 1,
+          },
+        ];
+      }
+    }
+
+    const AllAnimeData = await Promise.all([
+      animeRes,
+      animeEpsRes,
+      animeRecommendationsRes,
+    ]);
+
+    let IsGood = true;
+    AllAnimeData || (IsGood = false);
+    AllAnimeData.forEach((oneData) => {
+      if (!oneData) IsGood = false;
+    });
+
+    if (IsGood) {
+      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(AllAnimeData);
+      animeData = AnimeData;
+
+      let IsAddedToDB = false;
+      if (IsAddableToDB)
+        IsAddedToDB = await AddNewGlobalAnime(animeId, animeData);
+
+      return animeData;
+    }
+    return { message: `Anime with id: ${animeId} not found.`, err: true };
+  } catch (err) {
+    console.error(err);
+    return { message: `Anime with id: ${animeId} not found.`, err: true };
+  }
 };
 
 /**
- * Tokens To Protect Access of api
- * @param {lastToken} TokenToVerify : Verify the given token
- * @returns {boolean} true = accessible || false = access denied
+ * Fetch Anime Data
+ * @param {string} animeId
+ * @param {AnimeShape} animeData
  */
-export const GetApiToken = (): string => {
-  if (lastToken !== null) return null;
+export const AddNewGlobalAnime = async (
+  animeId: string,
+  animeData: AnimeShape
+): Promise<boolean> => {
+  try {
+    const batch = db.batch();
 
-  lastToken = {
-    token: randomUUID(),
-    expired: Date.now() + 5000,
-  };
-  return lastToken.token;
+    const newAnimesRef = db.collection("animes").doc(animeId);
+    batch.set(newAnimesRef, animeData);
+
+    const animesConfigPathsRef = db.collection("animes").doc("animes-config");
+    const animesConfigPaths = (
+      await animesConfigPathsRef.get()
+    ).data() as AnimeConfigPathsIdShape;
+
+    const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
+      (a, id) => ({ ...a, [id]: id }),
+      {}
+    );
+    if (!ArrayPathsToObjPaths[animeId]) {
+      const newAnimeConfigPaths = {
+        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
+      };
+      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+    }
+
+    await batch.commit();
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
 };

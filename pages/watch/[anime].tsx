@@ -8,11 +8,7 @@ import { GlobalAppContext } from "../../lib/context";
 import AuthCheck from "../../components/Common/AuthCheck";
 import MetaTags from "../../components/Common/Metatags";
 // Func
-import {
-  ConvertBroadcastTimeZone,
-  GetAnimeData,
-  ToggleFav,
-} from "../../lib/utils/UtilsFunc";
+import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utils/UtilsFunc";
 // Types
 import { AnimeShape, UserAnimeShape } from "../../lib/utils/types/interface";
 // UI
@@ -162,7 +158,7 @@ const WatchPage: NextPage = () => {
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
                       onError={() => {
                         console.warn("Img Cannot be load");
-                        GetAnimeData(malId.toString(), true);
+                        // GetAnimeData(malId.toString(), true);
                       }}
                     />
                     {!!NewEpisodeAvailable && (

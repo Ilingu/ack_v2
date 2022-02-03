@@ -51,3 +51,4 @@ yarn-error.log*
 
 # Others
 /API
+/ackv2_admin_firebase_sdk.json

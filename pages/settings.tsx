@@ -32,7 +32,11 @@ const Settings: NextPage = () => {
     );
   }, []);
 
-  useEffect(() => {}, [user]);
+  useEffect(() => {
+    // (async () => {
+    //   console.log(await user.getIdToken());
+    // })();
+  }, [user]);
 
   return (
     <AuthCheck

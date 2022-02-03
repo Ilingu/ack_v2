@@ -16,14 +16,13 @@ import {
   Studio as StudioShape,
   GenreTag,
   AlternativeTitleShape,
-  InternalApiResError,
+  ResApiRoutes,
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import {
-  AddNewGlobalAnime,
+  callApi,
   ConvertBroadcastTimeZone,
-  GetAnimeData,
   postToJSON,
   Return404,
 } from "../../lib/utils/UtilsFunc";
@@ -75,18 +74,36 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // Check on FB
   const animeFBRef = doc(db, "animes", animeId);
   const animeFB = await getDoc(animeFBRef);
-  if (animeFB.exists() && postToJSON(animeFB).LastRefresh > Date.now()) {
-    return {
-      props: { animeData: postToJSON(animeFB) }, // Exists on FB
-      revalidate: 900,
-    };
+  if (animeFB.exists()) {
+    const animeData = postToJSON(animeFB) as AnimeShape;
+
+    if (animeData?.NextRefresh && animeData?.NextRefresh > Date.now()) {
+      return {
+        props: { animeData: postToJSON(animeFB) }, // Exists on FB
+        revalidate: 900,
+      };
+    }
   }
+
   // No Anime -> Api Req
-  const animeData = await GetAnimeData(animeId);
-  if ((animeData as InternalApiResError).err === true) return Return404(60);
+  const DevMode = process.env.NODE_ENV === "development";
+
+  const animeData: ResApiRoutes = await callApi(
+    `http${DevMode ? "" : "s"}://${
+      DevMode ? "localhost:3000" : "ack.vercel.app"
+    }/api/${animeId}`,
+    { headers: { timestamp: Date.now().toString() } }
+  );
+
+  if (!animeData.succeed) {
+    console.error(
+      `Cannot Fetch Anime: Error ${animeData.code}\nReason: ${animeData.message}`
+    );
+    return Return404(60);
+  }
 
   return {
-    props: { animeData },
+    props: { animeData: animeData.data },
     revalidate: 1800,
   };
 };
@@ -152,16 +169,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
         UserAnimes.find(({ AnimeId }) => AnimeId === animeData?.malId) || null;
 
       setAnimeWatchType(CurrentAnime?.WatchType || null);
-    }
-
-    if (GlobalAnime) {
-      const CurrentGlobalAnime =
-        GlobalAnime.find(
-          ({ malId: GlMalId }) => GlMalId === animeData?.malId
-        ) || null;
-
-      if (!CurrentGlobalAnime)
-        AddNewGlobalAnime(animeData?.malId.toString(), animeData);
     }
   }, [UserAnimes, animeData, GlobalAnime]);
 

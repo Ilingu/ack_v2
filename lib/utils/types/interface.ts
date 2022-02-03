@@ -144,7 +144,7 @@ export interface AnimeShape {
   nbEp: number;
   duration: string;
   malId: number;
-  LastRefresh: number;
+  NextRefresh: number;
 }
 export interface AlternativeTitleShape {
   title_english: string;

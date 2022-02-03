@@ -37,115 +37,13 @@ import toast from "react-hot-toast";
 
 /* FUNC */
 
-let NextApiCallTimestamp = 0;
-/**
- * Fetch Anime Data and add it to FB
- * @param {string} animeId
- */
-export const GetAnimeData = async (
-  animeId: string,
-  TimestampLimit?: boolean
-): Promise<AnimeShape | InternalApiResError> => {
-  if (TimestampLimit && NextApiCallTimestamp > Date.now())
-    return {
-      message: `Attempt to get anime data denied. Cooldown between 2req hasn't reach is end. Try again in ${(
-        (NextApiCallTimestamp - Date.now()) /
-        1000
-      ).toFixed(1)}s`,
-      err: true,
-    };
-  if (TimestampLimit) NextApiCallTimestamp = Date.now() + 5000;
-
-  let animeData: AnimeShape;
-  try {
-    const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
-    // Req
-    const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
-    let animeEpsRes = await getAllTheEpisodes(animeId);
-    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
-      await callApi(endpoint + "/recommendations");
-
-    if (
-      IsError(animeRes as unknown as JikanApiERROR) ||
-      IsError(animeRecommendationsRes as unknown as JikanApiERROR)
-    ) {
-      return { message: `Error when fetching: ${animeId}.`, err: true };
-    }
-
-    if (animeEpsRes.length <= 0) {
-      for (let i = 0; i < 12; i++) {
-        animeEpsRes = [
-          ...animeEpsRes,
-          {
-            mal_id: i + 1,
-          },
-        ];
-      }
-    }
-
-    const AllAnimeData = await Promise.all([
-      animeRes,
-      animeEpsRes,
-      animeRecommendationsRes,
-    ]);
-
-    let IsGood = true;
-    AllAnimeData || (IsGood = false);
-    AllAnimeData.forEach((oneData) => {
-      if (!oneData) IsGood = false;
-    });
-
-    if (IsGood) {
-      animeData = JikanApiToAnimeShape(AllAnimeData);
-      AddNewGlobalAnime(animeId, animeData);
-
-      return animeData;
-    }
-    return { message: `Anime with id: ${animeId} not found.`, err: true };
-  } catch (err) {
-    console.error(err);
-    return { message: `Anime with id: ${animeId} not found.`, err: true };
-  }
-};
-export const AddNewGlobalAnime = async (
-  animeId: string,
-  animeData: AnimeShape
-) => {
-  try {
-    const batch = writeBatch(db);
-
-    const newAnimesRef = doc(db, "animes", animeId);
-    batch.set(newAnimesRef, animeData);
-
-    const animesConfigPathsRef = doc(db, "animes", "animes-config");
-    const animesConfigPaths = (
-      await getDoc(animesConfigPathsRef)
-    ).data() as AnimeConfigPathsIdShape;
-
-    const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
-      (a, id) => ({ ...a, [id]: id }),
-      {}
-    );
-    if (!ArrayPathsToObjPaths[animeId]) {
-      const newAnimeConfigPaths = {
-        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
-      };
-      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
-    }
-
-    await batch.commit();
-  } catch (err) {
-    console.error(err);
-  }
-};
-
 /**
  * Fetch Data From Api
  * @param {URL} url
  */
-export async function callApi(url: string) {
+export async function callApi(url: string, params?: RequestInit) {
   if (!isValidUrl(url)) return;
-  const req = await fetch(url);
+  const req = await fetch(url, params);
   return await req.json();
 }
 
@@ -231,6 +129,10 @@ export function JikanApiToSeasonAnimeShape(
   }));
 }
 
+interface SpecialAnimeShape {
+  AnimeData: AnimeShape;
+  IsAddableToDB: boolean;
+}
 /**
  * Transform JikanApi obj to AnimeShape obj
  * @param {any[]} ary
@@ -241,49 +143,67 @@ export function JikanApiToAnimeShape(
     JikanApiResEpisodes[],
     JikanApiResRecommandations[]
   ]
-): AnimeShape {
+): SpecialAnimeShape {
+  const [AnimeData, EpsData, Recommendations] = JikanObj;
+  let NextRefresh = null;
+  let IsAddableToDB = true;
+
+  const NewSesonAnime =
+    !AnimeData.aired.to &&
+    (AnimeData.airing ||
+      (AnimeData.status as AnimeStatusType) === "Not yet aired");
+
+  if (NewSesonAnime) NextRefresh = Date.now() + 345600000;
+  if (
+    !NewSesonAnime &&
+    AnimeData.score < 6 &&
+    AnimeData.rank >= 1500 &&
+    AnimeData.members < 15000
+  )
+    IsAddableToDB = false;
+
   return {
-    title: JikanObj[0].title,
-    Genre: JikanObj[0].genres,
-    AgeRating: JikanObj[0].rating,
-    Airing: JikanObj[0].airing,
-    AiringDate: new Date(JikanObj[0].aired.from).toLocaleDateString(),
-    AlternativeTitle: {
-      title_english: JikanObj[0].title_english,
-      title_japanese: JikanObj[0].title_japanese,
-      title_synonyms: JikanObj[0].title_synonyms,
+    AnimeData: {
+      title: AnimeData?.title,
+      Genre: AnimeData?.genres,
+      AgeRating: AnimeData?.rating,
+      Airing: AnimeData?.airing,
+      AiringDate: new Date(AnimeData?.aired?.from).toLocaleDateString(),
+      AlternativeTitle: {
+        title_english: AnimeData?.title_english,
+        title_japanese: AnimeData?.title_japanese,
+        title_synonyms: AnimeData?.title_synonyms,
+      },
+      OverallScore: AnimeData?.score,
+      ScoredBy: AnimeData?.scored_by,
+      Status: AnimeData?.status as AnimeStatusType,
+      type: AnimeData?.type,
+      ReleaseDate: `${AnimeData?.season} ${AnimeData?.year}`,
+      Synopsis: AnimeData?.synopsis,
+      Studios: AnimeData?.studios,
+      Theme: AnimeData?.themes,
+      photoPath: removeParamsFromPhotoUrl(AnimeData?.images?.jpg?.image_url),
+      malId: AnimeData?.mal_id,
+      trailer_url: AnimeData?.trailer?.embed_url,
+      nbEp: AnimeData?.episodes || 12,
+      MalPage: AnimeData?.url,
+      duration: AnimeData?.duration,
+      Recommendations:
+        Recommendations?.slice(0, 7).map((recom) => ({
+          ...recom,
+          image_url: removeParamsFromPhotoUrl(
+            recom?.entry?.images?.jpg?.image_url
+          ),
+        })) || [],
+      EpisodesData: AnimeData?.type === "TV" && EpsData,
+      broadcast:
+        AnimeData?.broadcast?.string &&
+        AnimeData?.broadcast?.string !== "Unknown"
+          ? AnimeData.broadcast.string
+          : null,
+      NextRefresh,
     },
-    OverallScore: JikanObj[0].score,
-    ScoredBy: JikanObj[0].scored_by,
-    Status: JikanObj[0].status as AnimeStatusType,
-    type: JikanObj[0].type,
-    ReleaseDate: `${JikanObj[0].season} ${JikanObj[0].year}`,
-    Synopsis: JikanObj[0].synopsis,
-    Studios: JikanObj[0].studios,
-    Theme: JikanObj[0].themes,
-    photoPath: removeParamsFromPhotoUrl(JikanObj[0].images.jpg.image_url),
-    malId: JikanObj[0].mal_id,
-    trailer_url: JikanObj[0].trailer.embed_url,
-    nbEp: JikanObj[0].episodes || 12,
-    MalPage: JikanObj[0].url,
-    duration:
-      JikanObj[0].type === "Movie"
-        ? JikanObj[0].duration
-        : JikanObj[0].duration,
-    Recommendations:
-      JikanObj[2]?.slice(0, 7).map((recom) => ({
-        ...recom,
-        image_url: removeParamsFromPhotoUrl(recom.entry.images.jpg.image_url),
-      })) || [],
-    EpisodesData: JikanObj[0].type === "TV" && JikanObj[1],
-    broadcast:
-      JikanObj[0].broadcast.string && JikanObj[0].broadcast.string !== "Unknown"
-        ? JikanObj[0].broadcast.string
-        : null,
-    LastRefresh:
-      (JikanObj[0].status as AnimeStatusType) === "Not yet aired"
-        ? Date.now() + 86400000
-        : Date.now() + 2592000000,
+    IsAddableToDB,
   };
 }
 

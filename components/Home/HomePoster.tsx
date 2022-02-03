@@ -37,7 +37,6 @@ import { db } from "../../lib/firebase";
 // Func
 import {
   copyToClipboard,
-  GetAnimeData,
   removeDuplicates,
   shuffleArray,
   ToggleFav,
@@ -878,7 +877,7 @@ function AnimeItemPoster({
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
             onError={() => {
               console.warn("Img Cannot be load");
-              GetAnimeData(AnimeId.toString(), true);
+              // GetAnimeData(AnimeId.toString(), true);
             }}
           />
           <h1
