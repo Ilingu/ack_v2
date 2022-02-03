@@ -90,7 +90,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const animeData: ResApiRoutes = await callApi(
     `http${DevMode ? "" : "s"}://${
-      DevMode ? "localhost:3000" : "ack.vercel.app"
+      DevMode
+        ? "localhost:3000"
+        : process.env.NEXT_PUBLIC_VERCEL_URL || "ack.vercel.app"
     }/api/${animeId}`,
     { headers: { timestamp: Date.now().toString() } }
   );
