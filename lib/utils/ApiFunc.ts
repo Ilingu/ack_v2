@@ -4,12 +4,20 @@ import {
   AnimeShape,
   InternalApiResError,
   JikanApiERROR,
+  JikanApiResAnime,
   JikanApiResAnimeRoot,
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
+  JikanApiResRecommandations,
   JikanApiResRecommandationsRoot,
 } from "./types/interface";
 import { callApi, IsError, JikanApiToAnimeShape } from "./UtilsFunc";
+
+type AnimeDatasShape = [
+  JikanApiResAnime,
+  JikanApiResEpisodes[],
+  JikanApiResRecommandations[]
+];
 
 /**
  * Fetch Anime Data
@@ -45,20 +53,18 @@ export const GetAnimeData = async (
       }
     }
 
-    const AllAnimeData = await Promise.all([
+    const AnimeDatas: AnimeDatasShape = [
       animeRes,
       animeEpsRes,
       animeRecommendationsRes,
-    ]);
+    ];
 
     let IsGood = true;
-    AllAnimeData || (IsGood = false);
-    AllAnimeData.forEach((oneData) => {
-      if (!oneData) IsGood = false;
-    });
+    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length !== 3)
+      IsGood = false;
 
     if (IsGood) {
-      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(AllAnimeData);
+      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(AnimeDatas);
       animeData = AnimeData;
 
       if (IsAddableToDB) await AddNewGlobalAnime(animeId, animeData);
