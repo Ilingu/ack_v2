@@ -83,7 +83,7 @@ export const GetAnimeData = async (
 
       return animeData;
     }
-    return { message: `Anime with id: ${animeId} not found.`, err: true };
+    return { message: JSON.stringify(AllAnimeData), err: true };
   } catch (err) {
     console.error(err);
     return { message: err, err: true };
