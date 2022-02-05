@@ -12,6 +12,9 @@ declare global {
     mobileAndTabletCheck: () => boolean;
     appVersion: () => "Web" | "PWA";
   }
+  interface Navigator {
+    userAgentData: any;
+  }
 }
 
 // Api routes

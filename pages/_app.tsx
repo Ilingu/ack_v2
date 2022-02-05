@@ -20,7 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     /* AppVersion */
     window.appVersion = () =>
-      window.matchMedia("(display-mode: standalone)").matches ? "Web" : "PWA";
+      window.matchMedia("(display-mode: standalone)").matches ? "PWA" : "Web";
     /* Browser Version */
     window.mobileAndTabletCheck = () => {
       let check = false;

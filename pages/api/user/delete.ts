@@ -13,7 +13,7 @@ const DeletUserHandler = async (
   };
 
   // Request Verifier
-  const { method, headers } = req;
+  const { method, headers, body } = req;
 
   if (headers.host === "ack-git-dev-ilingu.vercel.app")
     return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
@@ -24,14 +24,17 @@ const DeletUserHandler = async (
   if (method !== "DELETE")
     return Respond(ErrorHandling(400, "Only accept DELETE req")); // ❌
 
+  const Body = JSON.parse(body);
+  if (!Body || !Body["username"])
+    return Respond(ErrorHandling(400, "Missing User New/Old Username Params")); // ❌
+
   // Req Handler
   try {
     const { uid } = await auth.verifyIdToken(headers.authorization);
+    const Username: string = Body["username"].trim();
 
-    const batch = db.batch();
-    batch.delete(db.collection("users").doc(uid)); // 🚮 Delete User Data
-    batch.delete(db.collection("usernames").doc(uid)); // 🚮 Free the username
-    await batch.commit();
+    await db.collection("usernames").doc(Username).delete(); // 🚮 Free the username
+    await db.recursiveDelete(db.collection("users").doc(uid)); // 🚮 Delete User Data
 
     await auth.deleteUser(uid); // 🚮 Delete permanently the user
     Respond(SuccessHandling(200));
