@@ -14,6 +14,11 @@ import {
 // Func
 import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
 
+/*
+ Make List of user dependencies animes (Array of malId number)
+  -> query(animeRef, where("state", "in", [array of malId]));
+*/
+
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
   const [usernameState, setUsername] = useState<string>(null);
@@ -62,11 +67,6 @@ export function useUserData() {
       unsubscribe();
       unSub();
     };
-  }, []);
-
-  useEffect(() => {
-    document.cookie = "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    return auth.onIdTokenChanged(async (user) => {});
   }, []);
 
   return { user, username: usernameState, reqFinished };

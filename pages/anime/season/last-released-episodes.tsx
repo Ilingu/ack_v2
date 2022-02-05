@@ -92,34 +92,34 @@ const LastEpPage: NextPage<LastEpPageProps> = ({ LastAnimeEpISR }) => {
   };
 
   return (
-    <div className="py-2 px-2 relative">
+    <div className="relative py-2 px-2">
       <MetaTags
         title="Last Released Episodes"
         description="All the Last 2days Released Anime Episodes in the world!"
       />
       <header>
-        <p className="md:absolute md:top-2 md:left-2 text-center text-headline font-semibold">
+        <p className="text-headline text-center font-semibold md:absolute md:top-2 md:left-2">
           Data Get From{" "}
           <a
             href="https://www.adkami.com/"
             target="_blank"
             rel="noreferrer"
-            className="font-bold text-[#71a7ff] hover:text-[#3b83f6] transition-all hover:underline hover:decoration-[#3b83f6]"
+            className="font-bold text-[#71a7ff] transition-all hover:text-[#3b83f6] hover:underline hover:decoration-[#3b83f6]"
           >
             <FaExternalLinkAlt className="icon" /> ADKami
           </a>{" "}
         </p>
-        <h1 className="text-center text-primary-whiter font-bold xs:text-5xl text-4xl tracking-wide mb-4">
+        <h1 className="text-primary-whiter xs:text-5xl mb-4 text-center text-4xl font-bold tracking-wide">
           Last Released <br />{" "}
-          <span className="sm:ml-40 font-semibold text-description-whiter">
+          <span className="text-description-whiter font-semibold sm:ml-40">
             Anime Episodes
           </span>
         </h1>
         <Divider />
       </header>
-      <div className="grid grid-cols-1 justify-items-center gap-2 text-headline py-5">
+      <div className="text-headline grid grid-cols-1 justify-items-center gap-2 py-5">
         {RenderedEpisodes || (
-          <div className="text-xl text-headline text-bold text-center">
+          <div className="text-headline text-bold text-center text-xl">
             <Loader show /> Loading...
           </div>
         )}
@@ -164,8 +164,8 @@ function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
 
     return (
       <Fragment>
-        <span className="font-semibold text-headline">{WordToInject}</span>{" "}
-        <span className="font-bold text-primary-whiter underline">
+        <span className="text-headline font-semibold">{WordToInject}</span>{" "}
+        <span className="text-primary-whiter font-bold underline">
           {NumberToInject}
         </span>{" "}
         {result}
@@ -175,23 +175,23 @@ function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
 
   return (
     <div
-      className="md:w-4/5 w-full flex flex-col justify-center items-center gap-2 bg-bgi-darker py-2 rounded-lg shadow-md
-     shadow-bgi-black hover:shadow-inner transition-all"
+      className="bg-bgi-darker shadow-bgi-black flex w-full flex-col items-center justify-center gap-2 rounded-lg py-2 shadow-md
+     transition-all hover:shadow-inner md:w-4/5"
     >
-      <div className="flex sm:flex-row flex-col justify-center items-center gap-x-3">
+      <div className="flex flex-col items-center justify-center gap-x-3 sm:flex-row">
         <h1
-          className="text-primary-whiter font-semibold cursor-pointer text-xl hover:text-gray-200 transition truncate"
+          className="text-primary-whiter cursor-pointer truncate text-xl font-semibold transition hover:text-gray-200"
           title={title}
         >
           {title.slice(0, 30)}
         </h1>
         <VerticalDivider Styling="sm:block hidden" />
-        <h2 className="text-lg text-description sm:block hidden">
+        <h2 className="text-description hidden text-lg sm:block">
           {TransformEpId()}
         </h2>
       </div>
-      <div className="flex justify-center items-center gap-x-3">
-        <h2 className=" text-description sm:hidden block">{TransformEpId()}</h2>
+      <div className="flex items-center justify-center gap-x-3">
+        <h2 className=" text-description block sm:hidden">{TransformEpId()}</h2>
         <p>{Team}</p>
         <p className="text-description-whiter">
           {TimeReleased.replaceAll("-", "/").split(" ")[0]}

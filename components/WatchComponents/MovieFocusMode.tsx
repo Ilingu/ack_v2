@@ -53,29 +53,29 @@ const MovieFocusMode: FC<MovieFocusMode> = ({
 
   /* JSX */
   return (
-    <div className="absolute top-0 left-0 h-screen w-screen z-20 bg-bgi-darker bg-opacity-60 flex flex-col justify-center items-center">
+    <div className="bg-bgi-darker absolute top-0 left-0 z-20 flex h-screen w-screen flex-col items-center justify-center bg-opacity-60">
       <h1
-        className="relative font-bold text-2xl sm:w-72 sm:min-w-max w-10/12 p-4 bg-bgi-black bg-opacity-80 hover:bg-opacity-90 transition-all rounded-lg
-       text-headline mb-5 scale-110 text-center"
+        className="bg-bgi-black text-headline relative mb-5 w-10/12 scale-110 rounded-lg bg-opacity-80 p-4 text-center text-2xl font-bold
+       transition-all hover:bg-opacity-90 sm:w-72 sm:min-w-max"
       >
         <span>{title}</span>
         <br />
-        <span className="text-xl font-semibold underline decoration-primary-whiter">
+        <span className="decoration-primary-whiter text-xl font-semibold underline">
           {duration}
         </span>
       </h1>
       <div className="flex gap-3">
         <button
           onClick={CancelModeFocus}
-          className="text-headline text-5xl p-4 rounded-full bg-bgi-black hover:text-red-400 hover:ring-2 
-        hover:ring-red-500 transition-all"
+          className="text-headline bg-bgi-black rounded-full p-4 text-5xl transition-all hover:text-red-400 
+        hover:ring-2 hover:ring-red-500"
         >
           <AiOutlineCloseSquare />
         </button>
         <button
           onClick={MarkMovieAsWatched}
-          className="text-headline text-5xl p-4 rounded-full bg-bgi-black hover:text-green-400 hover:ring-2 
-        hover:ring-green-500 transition-all"
+          className="text-headline bg-bgi-black rounded-full p-4 text-5xl transition-all hover:text-green-400 
+        hover:ring-2 hover:ring-green-500"
         >
           <AiOutlineCheckSquare />
         </button>

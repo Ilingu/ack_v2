@@ -16,10 +16,10 @@ const MovieList: FC<MovieListProps> = ({ Duration }) => {
   console.log(DurationToMin);
 
   return (
-    <div className="w-full relative">
-      <h1 className="flex flex-col text-center text-4xl text-headline font-bold mb-3">
+    <div className="relative w-full">
+      <h1 className="text-headline mb-3 flex flex-col text-center text-4xl font-bold">
         {Duration}
-        <span className="text-description font-semibold text-lg">
+        <span className="text-description text-lg font-semibold">
           (1 ep x {DurationToMin} min)
         </span>
       </h1>

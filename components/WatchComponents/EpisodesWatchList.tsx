@@ -247,25 +247,25 @@ const EpsPoster: FC<EpsPosterProps> = ({
 
   /* JSX */
   return (
-    <div className="w-full relative">
-      <h1 className="flex flex-col text-center text-4xl text-headline font-bold mb-3">
+    <div className="relative w-full">
+      <h1 className="text-headline mb-3 flex flex-col text-center text-4xl font-bold">
         Episodes{" "}
-        <span className="text-description italic font-semibold text-lg">
+        <span className="text-description text-lg font-semibold italic">
           Total: {EpisodesLength} {"//"} Remaining:{" "}
           {EpisodesLength - NoWatchedEp} eps x {Duration} min
         </span>
       </h1>
-      <div className="flex flex-wrap gap-2 mb-1">
+      <div className="mb-1 flex flex-wrap gap-2">
         {!isNaN(Duration) && (
-          <div className="font-bold text-primary-whiter text-xl tracking-wide">
+          <div className="text-primary-whiter text-xl font-bold tracking-wide">
             {((Duration * (EpisodesLength - NoWatchedEp)) / 60).toFixed()} Hr{" "}
             {(Duration * (EpisodesLength - NoWatchedEp)) % 60} min{" "}
-            <span className="text-description italic font-semibold text-lg">
+            <span className="text-description text-lg font-semibold italic">
               Remaining
             </span>
           </div>
         )}
-        <div className="font-bold text-headline text-xl mr-auto">
+        <div className="text-headline mr-auto text-xl font-bold">
           {NextEP && (
             <Fragment>
               <AiFillPlaySquare className="icon text-primary-main" /> Ep.{" "}
@@ -278,7 +278,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
         </div>
         {NextEpisodeReleaseDate && (
           <div
-            className="capitalize text-headline font-semibold cursor-default"
+            className="text-headline cursor-default font-semibold capitalize"
             title={new Date(NextEpisodeReleaseDate).toLocaleString("fr-FR", {
               weekday: "long",
               year: "numeric",
@@ -296,7 +296,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
           </div>
         )}
         {TimestampDate && (
-          <div className="text-headline font-semibold cursor-default">
+          <div className="text-headline cursor-default font-semibold">
             {TimestampDate.BeganDate && (
               <span className="hover:text-primary-whiter transition-all">
                 <span className="text-description italic">[Began]</span>{" "}
@@ -313,20 +313,20 @@ const EpsPoster: FC<EpsPosterProps> = ({
           </div>
         )}
       </div>
-      <div className="flex flex-wrap md:justify-start justify-center gap-2 mb-3">
+      <div className="mb-3 flex flex-wrap justify-center gap-2 md:justify-start">
         <div
           onClick={() =>
             setSortOrder(
               SortOrder === "descending" ? "ascending" : "descending"
             )
           }
-          className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer"
+          className="text-headline bg-bgi-whitest cursor-pointer rounded-md p-1 font-semibold"
         >
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </div>
         <div
           onClick={MarkAllEpWatched}
-          className="font-semibold text-headline bg-bgi-whitest rounded-md p-1 cursor-pointer mr-auto"
+          className="text-headline bg-bgi-whitest mr-auto cursor-pointer rounded-md p-1 font-semibold"
         >
           Mark as &quot;Watched&quot;
         </div>
@@ -339,8 +339,8 @@ const EpsPoster: FC<EpsPosterProps> = ({
               return;
             AddExtraEpisode();
           }}
-          className="text-center text-headline bg-primary-darker rounded-md font-bold w-40 py-1 outline-none focus:ring-2
-             focus:ring-primary-whiter transition"
+          className="text-headline bg-primary-darker focus:ring-primary-whiter w-40 rounded-md py-1 text-center font-bold outline-none
+             transition focus:ring-2"
         >
           <FaPlus className="icon" /> Add{" "}
           <input
@@ -350,18 +350,18 @@ const EpsPoster: FC<EpsPosterProps> = ({
             onChange={({ target: { value, valueAsNumber } }) =>
               value.length <= 2 && setNoOfEpsToAdd(valueAsNumber)
             }
-            className="w-6 h-5 rounded-lg bg-primary-main text-center font-bold outline-none"
+            className="bg-primary-main h-5 w-6 rounded-lg text-center font-bold outline-none"
           />{" "}
           Ep{NoOfEpsToAdd > 1 && "s"}
         </button>
       </div>
-      <div className="grid grid-cols-1 gap-2 mb-2">{RenderedEps}</div>
-      <div className="flex justify-center mb-4">
+      <div className="mb-2 grid grid-cols-1 gap-2">{RenderedEps}</div>
+      <div className="mb-4 flex justify-center">
         {!LoadAll && RenderedEps?.length !== EpisodesLength && (
           <button
             onClick={() => setLoadAll(true)}
-            className="text-center text-headline bg-primary-darker py-2 px-2 rounded-lg font-bold w-56 outline-none focus:ring-2
-             focus:ring-primary-whiter transition"
+            className="text-headline bg-primary-darker focus:ring-primary-whiter w-56 rounded-lg py-2 px-2 text-center font-bold outline-none
+             transition focus:ring-2"
           >
             <FaEye className="icon" /> Load All
           </button>
@@ -390,15 +390,15 @@ function EpsPosterItem({
           return;
         UpdateUserAnimeProgress(mal_id, watched);
       }}
-      className={`grid grid-cols-24 w-full bg-bgi-whitest cursor-pointer py-0.5 px-4 items-center rounded-md relative${
-        watched || filler || recap ? "" : " border-l-4 border-primary-main"
+      className={`grid-cols-24 bg-bgi-whitest grid w-full cursor-pointer items-center rounded-md py-0.5 px-4 relative${
+        watched || filler || recap ? "" : " border-primary-main border-l-4"
       }${
         filler
           ? " border-l-4 border-red-500"
           : recap
           ? " border-l-4 border-gray-400"
           : watched
-          ? " border-l-4 border-bgi-whitest"
+          ? " border-bgi-whitest border-l-4"
           : ""
       }${watched ? " scale-95" : ""}`}
     >
@@ -409,19 +409,19 @@ function EpsPosterItem({
       )}
       <div>
         {watched ? (
-          <AiOutlineEyeInvisible className="text-description mr-4 text-xl -translate-x-3" />
+          <AiOutlineEyeInvisible className="text-description mr-4 -translate-x-3 text-xl" />
         ) : (
-          <AiOutlineEye className="text-headline mr-4 text-xl -translate-x-3" />
+          <AiOutlineEye className="text-headline mr-4 -translate-x-3 text-xl" />
         )}
       </div>
 
-      <p className="font-semibold text-headline lg:col-span-2 xs:col-span-3 col-span-4">
+      <p className="text-headline xs:col-span-3 col-span-4 font-semibold lg:col-span-2">
         Ep. <span className="text-primary-whiter">{mal_id}</span>
       </p>
-      <p className="font-semibold text-headline lg:col-span-15 xs:col-span-16 col-span-13">
+      <p className="text-headline lg:col-span-15 xs:col-span-16 col-span-13 font-semibold">
         {title}
       </p>
-      <div className="uppercase tracking-wider lg:col-span-3 xs:col-span-4 col-span-6 text-headline font-semibold text-center flex justify-end">
+      <div className="xs:col-span-4 text-headline col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider lg:col-span-3">
         <div
           className={`w-24 rounded-lg ${
             !filler && !recap
@@ -436,7 +436,7 @@ function EpsPosterItem({
           {!filler && !recap && "Canon"}
         </div>
       </div>
-      <p className="lg:grid col-span-3 justify-items-end hidden font-semibold text-headline">
+      <p className="text-headline col-span-3 hidden justify-items-end font-semibold lg:grid">
         {aired && new Date(aired).toLocaleDateString()}
       </p>
     </div>

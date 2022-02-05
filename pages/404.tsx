@@ -3,10 +3,10 @@ import Metatags from "../components/Common/Metatags";
 
 export default function Custom404() {
   return (
-    <main className="flex flex-col justify-center items-center text-headline h-screen">
+    <main className="text-headline flex h-screen flex-col items-center justify-center">
       <Metatags title="404 Page Not Found!" description="404 Page" />
-      <h1 className="text-6xl mb-2 font-mono text-red-500 font-bold">404</h1>
-      <h2 className="text-3xl mb-4 font-semibold">
+      <h1 className="mb-2 font-mono text-6xl font-bold text-red-500">404</h1>
+      <h2 className="mb-4 text-3xl font-semibold">
         That page does not seem to exist...
       </h2>
       <iframe
@@ -18,8 +18,8 @@ export default function Custom404() {
       ></iframe>
       <Link href="/" passHref>
         <button
-          className="py-2 px-2 bg-primary mt-2 w-32 rounded-lg text-headline font-bold hover:bg-secondary
-        hover:text-bgMain transition outline-none focus:ring-2 focus:bg-secondary focus:ring-offset-2"
+          className="bg-primary text-headline hover:bg-secondary hover:text-bgMain focus:bg-secondary mt-2 w-32 rounded-lg py-2
+        px-2 font-bold outline-none transition focus:ring-2 focus:ring-offset-2"
         >
           Go home
         </button>

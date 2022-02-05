@@ -9,7 +9,7 @@ const Loader: FC<Props> = ({ show, big = false }) => {
   return show ? (
     big ? (
       <svg
-        className="animate-spin -ml-1 mr-3 h-14 w-14 text-headline inline"
+        className="text-headline -ml-1 mr-3 inline h-14 w-14 animate-spin"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -18,7 +18,7 @@ const Loader: FC<Props> = ({ show, big = false }) => {
       </svg>
     ) : (
       <svg
-        className="animate-spin -ml-1 mr-3 h-5 w-5 text-headline inline"
+        className="text-headline -ml-1 mr-3 inline h-5 w-5 animate-spin"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

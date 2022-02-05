@@ -25,7 +25,7 @@ const Navbar: FC = () => {
       fallback={
         <Link href="/sign-up" passHref>
           <a>
-            <button className="bg-primary-darker py-2 px-4 text-lg rounded-lg font-bold ml-2">
+            <button className="bg-primary-darker ml-2 rounded-lg py-2 px-4 text-lg font-bold">
               {screen?.width > 768 ? (
                 "Get Started Now"
               ) : (
@@ -49,9 +49,9 @@ const Navbar: FC = () => {
                   className="rounded"
                 />
               ) : (
-                <FiSettings className="-translate-y-0.5 text-secondary" />
+                <FiSettings className="text-secondary -translate-y-0.5" />
               )}
-              <span className="text-description-whiter group-hover:text-headline transition mt-1">
+              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
                 Settings
               </span>
             </button>
@@ -60,7 +60,7 @@ const Navbar: FC = () => {
         <button onClick={() => auth.signOut()} className="btn-navbar group">
           <FaSignOutAlt className="-translate-y-0.5 text-red-500" />
           {screen?.width > 768 && (
-            <span className="text-description-whiter group-hover:text-headline transition mt-1">
+            <span className="text-description-whiter group-hover:text-headline mt-1 transition">
               Sign out
             </span>
           )}
@@ -73,25 +73,25 @@ const Navbar: FC = () => {
 
 function NavItem({ afterHydrated }: NavItemProps) {
   return (
-    <nav className="w-full h-20 bg-bgi-black relative flex rounded-bl-lg rounded-br-lg">
+    <nav className="bg-bgi-black relative flex h-20 w-full rounded-bl-lg rounded-br-lg">
       <Link href="/" replace passHref>
-        <a className="absolute flex items-center h-full ml-2 sm:scale-100 scale-90">
+        <a className="absolute ml-2 flex h-full scale-90 items-center sm:scale-100">
           <Image
             title="Go Home"
             src="/IconAck192.png"
             alt="logo"
             width={60}
             height={60}
-            className="rounded-lg cursor-pointer"
+            className="cursor-pointer rounded-lg"
           />
         </a>
       </Link>
-      <div className="flex sm:justify-end md:justify-center md:mr-0 ml-11 items-center w-full h-full text-headline sm:scale-100 scale-75">
+      <div className="text-headline ml-11 flex h-full w-full scale-75 items-center sm:scale-100 sm:justify-end md:mr-0 md:justify-center">
         <Link href="/anime" passHref>
           <a>
             <button className="btn-navbar group">
-              <FaSearch className="-translate-y-0.5 text-secondary" />{" "}
-              <span className="text-description-whiter group-hover:text-headline transition mt-1">
+              <FaSearch className="text-secondary -translate-y-0.5" />{" "}
+              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
                 Search
               </span>
             </button>
@@ -100,8 +100,8 @@ function NavItem({ afterHydrated }: NavItemProps) {
         <Link href="/anime/season" passHref>
           <a>
             <button className="btn-navbar group">
-              <FaLeaf className="-translate-y-0.5 text-secondary" />{" "}
-              <span className="text-description-whiter group-hover:text-headline transition mt-1">
+              <FaLeaf className="text-secondary -translate-y-0.5" />{" "}
+              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
                 Seasons
               </span>
             </button>

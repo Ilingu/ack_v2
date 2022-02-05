@@ -16,19 +16,19 @@ const HandleInput: FC<HandleInputProps> = ({
 }) => {
   return (
     <form
-      className="xl:absolute xl:-top-5 xl:left-2 mt-2"
+      className="mt-2 xl:absolute xl:-top-5 xl:left-2"
       onSubmit={HandleSubmit}
     >
       <input
         type="text"
         value={Value}
         onChange={(e) => setValue(e.target.value)}
-        className="bg-black sm:text-lg rounded-l-md py-2 sm:w-96 w-80 text-center font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
+        className="text-headline focus:ring-primary-main w-80 rounded-l-md bg-black py-2 text-center font-semibold outline-none transition-all focus:ring-2 sm:w-96 sm:text-lg"
         placeholder={placeholder}
       />
       <button
         type="submit"
-        className="bg-black h-11 py-2 px-2 rounded-r-md -translate-y-px font-semibold text-headline outline-none focus:ring-2 focus:ring-primary-main transition-all"
+        className="text-headline focus:ring-primary-main h-11 -translate-y-px rounded-r-md bg-black py-2 px-2 font-semibold outline-none transition-all focus:ring-2"
       >
         <FaCheck className="icon" />
       </button>

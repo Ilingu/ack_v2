@@ -125,13 +125,13 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
       <header className="relative">
         <Link href="/anime/season/last-released-episodes">
           <a>
-            <button className="lg:absolute text-lg text-center bg-primary-main text-headline font-semibold p-2 rounded-lg">
+            <button className="bg-primary-main text-headline rounded-lg p-2 text-center text-lg font-semibold lg:absolute">
               <FaExternalLinkAlt className="icon" /> Last Release
             </button>
           </a>
         </Link>
 
-        <h1 className="text-center text-headline font-semibold text-5xl tracking-wide">
+        <h1 className="text-headline text-center text-5xl font-semibold tracking-wide">
           {UpComingAnime.current ? (
             <Fragment>
               <span className="text-primary-main">Upcoming</span> Animes
@@ -145,7 +145,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         </h1>
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="flex justify-center mt-2 mb-4"
+          className="mt-2 mb-4 flex justify-center"
         >
           <input
             type="number"
@@ -156,16 +156,16 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
               setYear(val.toString());
             }}
             min="1990"
-            className="py-2 px-1 mr-2 rounded-md bg-bgi-black shadow-lg text-center text-headline font-semibold outline-none focus:ring-2
-             focus:ring-primary-main transition"
+            className="bg-bgi-black text-headline focus:ring-primary-main mr-2 rounded-md py-2 px-1 text-center font-semibold shadow-lg outline-none
+             transition focus:ring-2"
             placeholder="Year"
           />
           <select
             value={Season}
             onChange={(e) => setSeason(e.target.value as TheFourSeason)}
             placeholder="Season"
-            className="py-2 px-1 w-52 rounded-md capitalize bg-bgi-black shadow-lg text-center text-headline font-semibold outline-none focus:ring-2
-             focus:ring-primary-main transition"
+            className="bg-bgi-black text-headline focus:ring-primary-main w-52 rounded-md py-2 px-1 text-center font-semibold capitalize shadow-lg outline-none
+             transition focus:ring-2"
           >
             <option value={TheFourSeasonEnum.SPRING}>
               {TheFourSeasonEnum.SPRING}
@@ -183,7 +183,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         </form>
         <Divider />
       </header>
-      <div className="grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6">
         {RenderedSeasonAnime}
       </div>
     </div>
@@ -195,7 +195,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
     seasonAnimeData || {};
 
   return (
-    <div className="px-4 py-2 rounded-md text-center">
+    <div className="rounded-md px-4 py-2 text-center">
       <Link href={`/anime/${MalId}`} passHref prefetch={false}>
         <a>
           <div className="flex justify-center">
@@ -205,17 +205,17 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
                 alt="cover"
                 width={210}
                 height={300}
-                className="opacity-95 hover:opacity-50 transition cursor-pointer rounded-lg"
+                className="cursor-pointer rounded-lg opacity-95 transition hover:opacity-50"
               />
-              <div className="absolute top-0 left-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
+              <div className="text-headline bg-bgi-darker absolute top-0 left-1.5 rounded-lg bg-opacity-70 px-2 py-1 font-semibold">
                 <FaStar className="icon text-yellow-500" /> {score || "None"}
               </div>
-              <div className="absolute top-0 right-1.5 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
+              <div className="text-headline bg-bgi-darker absolute top-0 right-1.5 rounded-lg bg-opacity-70 px-2 py-1 font-semibold">
                 {type}
               </div>
               <div
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 font-semibold text-headline bg-bgi-darker 
-            bg-opacity-80 px-1 py-2 rounded-lg"
+                className="text-headline bg-bgi-darker absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg 
+            bg-opacity-80 px-1 py-2 font-semibold"
               >
                 <FaCalendarAlt className="icon text-primary-whiter" />{" "}
                 {BeginAiring}
@@ -223,7 +223,7 @@ function SeasonAnimeItem({ seasonAnimeData }: SeasonAnimeItemProps) {
             </div>
           </div>
 
-          <h1 className="text-headline font-semibold cursor-pointer text-lg hover:text-gray-200 transition truncate">
+          <h1 className="text-headline cursor-pointer truncate text-lg font-semibold transition hover:text-gray-200">
             {title}
           </h1>
         </a>

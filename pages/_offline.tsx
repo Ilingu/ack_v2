@@ -4,13 +4,13 @@ import MetaTags from "../components/Common/Metatags";
 
 export default function offlinePage() {
   return (
-    <main className="flex flex-col justify-center items-center text-headline h-screen">
+    <main className="text-headline flex h-screen flex-col items-center justify-center">
       <MetaTags title="Offline Page" description="You're Offline" />
-      <h1 className="text-6xl mb-2 font-mono text-red-500 font-bold">ERROR</h1>
-      <h2 className="text-3xl mb-4 font-semibold text-center">
-        You&apos;re <span className="text-red-500 font-bold">offline</span>,
+      <h1 className="mb-2 font-mono text-6xl font-bold text-red-500">ERROR</h1>
+      <h2 className="mb-4 text-center text-3xl font-semibold">
+        You&apos;re <span className="font-bold text-red-500">offline</span>,
         please connect to ✨
-        <span className="hover:underline hover:decoration-primary-whiter font-bold">
+        <span className="hover:decoration-primary-whiter font-bold hover:underline">
           Internet
         </span>
         ✨
@@ -23,7 +23,7 @@ export default function offlinePage() {
         className="rounded-md"
       />
       <Link href="/" passHref>
-        <button className="py-2 px-2 bg-primary mt-2 rounded-lg text-headline font-bold hover:text-primary-whiter transition-all outline-none focus:ring-2">
+        <button className="bg-primary text-headline hover:text-primary-whiter mt-2 rounded-lg py-2 px-2 font-bold outline-none transition-all focus:ring-2">
           I&apos;m Online
         </button>
       </Link>

@@ -20,12 +20,12 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
   return user && username ? (
     children
   ) : !reqFinished && !fallback ? (
-    <div className="flex flex-col justify-center items-center h-screen text-center">
+    <div className="flex h-screen flex-col items-center justify-center text-center">
       <MetaTags
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}
       />
-      <h1 className="font-bold text-xl text-headline bg-gray-700 py-4 px-4 rounded-md">
+      <h1 className="text-headline rounded-md bg-gray-700 py-4 px-4 text-xl font-bold">
         <Loader show />
         <span className="text-primary-main hover:text-secondary transition">
           Connecting
@@ -34,7 +34,7 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
       </h1>
     </div>
   ) : !reqFinished && fallback ? (
-    <h1 className="font-bold text-xl text-center text-headline py-4 px-4 rounded-md">
+    <h1 className="text-headline rounded-md py-4 px-4 text-center text-xl font-bold">
       <MetaTags
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}
@@ -43,7 +43,7 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
       <span className="text-primary-main">Connecting</span> to your account
     </h1>
   ) : !fallback ? (
-    <div className="flex flex-col justify-center items-center h-screen text-center">
+    <div className="flex h-screen flex-col items-center justify-center text-center">
       <MetaTags
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}
@@ -52,11 +52,11 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
       <Link href="/sign-up">
         <a className="text-headline">
           <FaUserAltSlash
-            className="icon text-6xl 
-          bg-gray-600 rounded-full py-2 px-2 text-primary-main -mt-6 mb-6"
+            className="icon text-primary-main 
+          -mt-6 mb-6 rounded-full bg-gray-600 py-2 px-2 text-6xl"
           />
-          <h1 className="font-bold text-4xl hover:underline">
-            <FaSignInAlt className="icon text-red-500 mr-4" />
+          <h1 className="text-4xl font-bold hover:underline">
+            <FaSignInAlt className="icon mr-4 text-red-500" />
             You must be{" "}
             <span className="text-primary-main hover:text-secondary transition">
               signed in!

@@ -6,13 +6,11 @@ import MetaTags from "../components/Common/Metatags";
 import HomePoster from "../components/Home/HomePoster";
 
 /* V5: More scalable DB
-  - API endpoint for GetAnimeData and Add To /anime FB
   - Not fetch all Global Anime but only the one User have in his List
-  - In /anime (search) -> Search first in Global anime already query (so the user anime) and after
+  - In /anime (search page) -> Search first in Global anime already queried (so the user anime) and after
     get from the DB --> 
-        So add a field that map `title --> malId` OR obj { title, alternativeTitle, malId } in "animes-config"
-  - User Page
-  - Api endpoint
+        add a field "search-query": Array obj { malId, title, title_english, title_jap }[] in "animes-config"
+        query with FB query module (see doc/project firebase)
 */
 
 /* Components */

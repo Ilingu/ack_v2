@@ -118,8 +118,8 @@ const WatchPage: NextPage = () => {
 
   if (!UserAnimeData)
     return (
-      <div className="h-screen flex items-center justify-center">
-        <h1 className="text-headline text-4xl text-semibold">
+      <div className="flex h-screen items-center justify-center">
+        <h1 className="text-headline text-semibold text-4xl">
           <FaSpinner className="icon" /> Load...
         </h1>
       </div>
@@ -137,15 +137,15 @@ const WatchPage: NextPage = () => {
           <MetaTags title={`Watch ${title}`} description="User Watch Page" />{" "}
           {/* Banner */}
           <div
-            className="w-full h-80 absolute -z-10 bg-fixed bg-center bg-cover bg-no-repeat bg-gradient-to-t from-bgi-darker object-cover blur-sm opacity-80"
+            className="from-bgi-darker absolute -z-10 h-80 w-full bg-gradient-to-t bg-cover bg-fixed bg-center bg-no-repeat object-cover opacity-80 blur-sm"
             style={{
               backgroundImage: `url("${photoPath.split(".jpg")[0] + "l.jpg"}")`,
             }}
           ></div>
           <div className="flex justify-center">
-            <div className="watch-container sm:w-10/12 sm:px-0 px-2 mt-24">
+            <div className="watch-container mt-24 px-2 sm:w-10/12 sm:px-0">
               {/* Img */}
-              <div className="gta-img lg:block lg:justify-end flex justify-center relative">
+              <div className="gta-img relative flex justify-center lg:block lg:justify-end">
                 <Link href={`/anime/${malId}`} passHref>
                   <a>
                     <Image
@@ -153,7 +153,7 @@ const WatchPage: NextPage = () => {
                       alt={`${title}'s Poster`}
                       width={200}
                       height={283}
-                      className="object-cover rounded-lg"
+                      className="rounded-lg object-cover"
                       placeholder="blur"
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
                       onError={() => {
@@ -162,7 +162,7 @@ const WatchPage: NextPage = () => {
                       }}
                     />
                     {!!NewEpisodeAvailable && (
-                      <div className="absolute top-0  tracking-wide text-lg font-bold text-headline bg-primary-darker px-3 py-1 rounded-md">
+                      <div className="text-headline bg-primary-darker  absolute top-0 rounded-md px-3 py-1 text-lg font-bold tracking-wide">
                         NEW
                       </div>
                     )}
@@ -170,12 +170,12 @@ const WatchPage: NextPage = () => {
                 </Link>
               </div>
               {/* Title */}
-              <div className="gta-title lg:block lg:justify-start flex justify-center">
+              <div className="gta-title flex justify-center lg:block lg:justify-start">
                 <h1
                   id="WatchBigTitle"
                   className={`xs:text-6xl text-5xl ${
                     !!NewEpisodeAvailable ? "text-indigo-50" : "text-headline"
-                  } font-extrabold tracking-wider h-full`}
+                  } h-full font-extrabold tracking-wider`}
                 >
                   {title.slice(0, 20)}
                   <br />
@@ -183,10 +183,10 @@ const WatchPage: NextPage = () => {
                 </h1>
               </div>
               {/* Buttons */}
-              <div className="gta-buttons flex flex-wrap gap-x-4 gap-y-2 2xl:-ml-20 lg:ml-20 justify-center lg:-mt-20">
+              <div className="gta-buttons flex flex-wrap justify-center gap-x-4 gap-y-2 lg:ml-20 lg:-mt-20 2xl:-ml-20">
                 <button
                   onClick={() => setFocusMode(true)}
-                  className="shadow-md shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none"
+                  className="shadow-primary-darker bg-primary-main text-headline h-14 w-14 rounded-md text-xl shadow-md outline-none"
                 >
                   <FaPlay className="icon" />
                 </button>
@@ -194,7 +194,7 @@ const WatchPage: NextPage = () => {
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
                   }
-                  className="shadow-md xs:mb-0 mb-2 shadow-primary-darker bg-primary-main w-14 h-14 rounded-md text-headline text-xl outline-none"
+                  className="xs:mb-0 shadow-primary-darker bg-primary-main text-headline mb-2 h-14 w-14 rounded-md text-xl shadow-md outline-none"
                 >
                   {Fav ? (
                     <AiFillStar className="icon" />

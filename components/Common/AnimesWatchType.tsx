@@ -65,8 +65,8 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
       <select
         value={SelectValue || UNWATCHED}
         onChange={(e) => setSelectValue(e.target.value as AnimeWatchType)}
-        className={`w-full bg-bgi-black text-headline text-center text-2xl outline-none focus:ring-2 focus:ring-primary-main
-             rounded-lg px-1 transition${
+        className={`bg-bgi-black text-headline focus:ring-primary-main w-full rounded-lg px-1 text-center text-2xl
+             outline-none focus:ring-2 transition${
                classNameProps && ` ${classNameProps}`
              }`}
       >

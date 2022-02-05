@@ -36,10 +36,10 @@ const RecommandationsList: FC<RecommandationsListProps> = ({
 
   return (
     <Fragment>
-      <h1 className="xs:text-4xl text-3xl font-bold tracking-wider text-headline mb-8 text-center">
+      <h1 className="xs:text-4xl text-headline mb-8 text-center text-3xl font-bold tracking-wider">
         Recommendations
       </h1>
-      <div className="grid 2xl:grid-cols-7 xl:grid-cols-5 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-7">
         {RenderElements}
       </div>
     </Fragment>
@@ -49,7 +49,7 @@ const RecommandationsList: FC<RecommandationsListProps> = ({
 function RecommendationItem({ RecomData }: RecommandationItemProps) {
   const { malId, photoUrl, recommendationCount, title } = RecomData || {};
   return (
-    <div className="px-4 py-2 rounded-md relative">
+    <div className="relative rounded-md px-4 py-2">
       <Link href={`/anime/${malId}`} passHref prefetch={false}>
         <a>
           <Image
@@ -57,12 +57,12 @@ function RecommendationItem({ RecomData }: RecommandationItemProps) {
             alt="cover"
             width={200}
             height={250}
-            className="opacity-95 hover:opacity-50 transition cursor-pointer rounded-lg"
+            className="cursor-pointer rounded-lg opacity-95 transition hover:opacity-50"
           />
-          <h1 className="text-headline font-semibold text-center cursor-pointer text-lg hover:text-gray-200 transition">
+          <h1 className="text-headline cursor-pointer text-center text-lg font-semibold transition hover:text-gray-200">
             {title}
           </h1>
-          <h2 className="text-description text-center font-semibold uppercase tracking-wider mt-1">
+          <h2 className="text-description mt-1 text-center font-semibold uppercase tracking-wider">
             {recommendationCount} Votes
           </h2>
         </a>

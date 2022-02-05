@@ -488,7 +488,7 @@ const HomePoster: FC = () => {
 
   /* COMPONENT JSX */
   return (
-    <div className="mt-5 flex flex-col items-center relative">
+    <div className="relative mt-5 flex flex-col items-center">
       <HomeHeader
         HomeDisplayType={HomeDisplayType}
         setHomeDisplayType={setHomeDisplayType}
@@ -512,7 +512,7 @@ const HomePoster: FC = () => {
       ) : undefined}
       {AnimeSearchMode && <AnimeSearchFormInput SearchAnime={SearchAnime} />}
 
-      <div className="w-10/12 relative">
+      <div className="relative w-10/12">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
@@ -539,9 +539,9 @@ function HomeHeader({
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
-        } group font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase mr-2 ${
+        } group hover:text-headline mr-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-          " underline decoration-primary-darker text-headline"
+          " decoration-primary-darker text-headline underline"
         }`}
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
@@ -573,9 +573,9 @@ function HomeHeader({
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
-        } font-bold sm:text-2xl text-xl cursor-pointer hover:text-headline transition-all uppercase ml-2 ${
+        } hover:text-headline ml-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-          " underline decoration-primary-darker text-headline"
+          " decoration-primary-darker text-headline underline"
         }`}
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
@@ -607,7 +607,7 @@ function SortByWatchType({
 
   return (
     <div
-      className={`flex flex-wrap justify-center gap-4 text-headline text-lg font-semibold cursor-pointer capitalize ${
+      className={`text-headline flex cursor-pointer flex-wrap justify-center gap-4 text-lg font-semibold capitalize ${
         IsModeGroup ? "mb-2" : "mb-4"
       }`}
     >
@@ -669,14 +669,14 @@ function GroupFormInput({
         />
         {GroupsMatch && (
           <div
-            className="xl:absolute xl:top-8 xl:left-2 z-10 rounded-md p-0.5 sm:w-96 w-80 text-center font-semibold text-primary-whitest 
-          outline-none bg-slate-800 capitalize mb-3 cursor-pointer"
+            className="text-primary-whitest z-10 mb-3 w-80 cursor-pointer rounded-md bg-slate-800 p-0.5 text-center font-semibold capitalize 
+          outline-none sm:w-96 xl:absolute xl:top-8 xl:left-2"
           >
             {GroupsMatch.map((text) => (
               <p
                 key={text}
                 onClick={() => setInputGroupName(text)}
-                className="hover:text-headline transition-all mb-1 border-t border-t-primary-darker"
+                className="hover:text-headline border-t-primary-darker mb-1 border-t transition-all"
               >
                 {text}
               </p>
@@ -724,9 +724,9 @@ function AnimePosterComponent({
   AnimeRenderedElements,
 }: AnimePosterComponentProps) {
   return (
-    <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
+    <div className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5">
       {AnimeRenderedElements?.length <= 0 ? (
-        <span className="font-bold text-2xl text-red-300">💢 No Anime</span>
+        <span className="text-2xl font-bold text-red-300">💢 No Anime</span>
       ) : (
         AnimeRenderedElements
       )}
@@ -742,17 +742,17 @@ function GroupComponent({
 }: GroupComponentProps) {
   return (
     <Fragment>
-      <div className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center">
+      <div className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5">
         {GroupRenderedElements}
       </div>
 
-      <div className="absolute top-0 w-9/12 left-1/2 -translate-x-1/2">
+      <div className="absolute top-0 left-1/2 w-9/12 -translate-x-1/2">
         {selectedGroupName?.name && (
           <div
-            className="flex flex-col animate-fadeIn p-2 bg-bgi-darker 
-          bg-opacity-90 cursor-pointer rounded-lg"
+            className="animate-fadeIn bg-bgi-darker flex cursor-pointer flex-col 
+          rounded-lg bg-opacity-90 p-2"
           >
-            <h1 className="text-headline font-bold text-2xl capitalize text-center">
+            <h1 className="text-headline text-center text-2xl font-bold capitalize">
               <span className="text-primary-main">
                 {selectedGroupName.data.GroupName}
               </span>{" "}
@@ -764,7 +764,7 @@ function GroupComponent({
             >
               <AiFillCloseCircle className="icon" />
             </button>
-            <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-3 justify-items-center mt-3">
+            <div className="mt-3 grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
               {selectedGroupName.data.Animes.map((AnimeData, i) => (
                 <AnimeItemPoster
                   key={AnimeData?.AnimeId || i}
@@ -804,7 +804,7 @@ function AnimeItemPoster({
   const AddToGroup = RenderType === "animeList" && (
     <div
       onClick={() => ToggleGroup(AnimeId.toString(), "ADD")}
-      className="absolute top-1 right-1 font-semibold z-10 text-lg text-green-400 bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+      className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-green-400"
     >
       <FaPlus className="icon" />
     </div>
@@ -818,19 +818,19 @@ function AnimeItemPoster({
         }
         ToggleGroup(AnimeId.toString(), "DELETE");
       }}
-      className="absolute top-1 right-1 font-semibold z-10 text-lg text-red-500 bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+      className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-red-500"
     >
       <FaMinus className="icon" />
     </div>
   );
 
   return (
-    <div className="group xl:w-56 xl:min-h-80 w-52 min-h-72 bg-bgi-whiter cursor-pointer rounded-lg p-1 relative">
+    <div className="group xl:min-h-80 min-h-72 bg-bgi-whiter relative w-52 cursor-pointer rounded-lg p-1 xl:w-56">
       <div>
         <div
           className={`absolute top-1 ${
             !!NewEpisodeAvailable ? "right-10" : "left-1"
-          } font-semibold z-10 text-xl text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg`}
+          } text-headline bg-bgi-darker z-10 rounded-lg bg-opacity-70 px-2 py-1 text-xl font-semibold`}
           onClick={() => ToggleFav(AnimeId.toString(), Fav)}
         >
           {Fav ? (
@@ -853,12 +853,12 @@ function AnimeItemPoster({
               setCopyClicked(false);
             }, 2000);
           }}
-          className="group-hover:block absolute hidden bottom-5 left-1/2 z-10 text-xl -translate-x-1/2 -translate-y-1/2 text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg"
+          className="text-headline bg-bgi-darker absolute bottom-5 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-lg bg-opacity-70 px-2 py-1 text-xl group-hover:block"
         >
           {CopyClicked ? <FcOk /> : <FaCopy className="icon" />}
         </div>
         {!!NewEpisodeAvailable && (
-          <div className="absolute top-1 z-10 tracking-wide font-bold text-headline bg-primary-darker px-3 py-1 rounded-md">
+          <div className="text-headline bg-primary-darker absolute top-1 z-10 rounded-md px-3 py-1 font-bold tracking-wide">
             NEW
           </div>
         )}
@@ -881,7 +881,7 @@ function AnimeItemPoster({
             }}
           />
           <h1
-            className={`${Color} text-center text-xl font-bold capitalize items-center truncate`}
+            className={`${Color} items-center truncate text-center text-xl font-bold capitalize`}
           >
             {title}
           </h1>
@@ -902,13 +902,13 @@ function GroupItemPoster({
       width={30}
       height={30}
       layout="responsive"
-      className="object-cover rounded-lg"
+      className="rounded-lg object-cover"
     />
   );
 
   return (
     <div
-      className="w-52 h-80 bg-bgi-whiter grid grid-rows-6 cursor-pointer rounded-lg"
+      className="bg-bgi-whiter grid h-80 w-52 cursor-pointer grid-rows-6 rounded-lg"
       onClick={() => {
         scrollTo(0, 80);
         setSelectedGroup({ name: GroupData.GroupName, data: GroupData });
@@ -919,7 +919,7 @@ function GroupItemPoster({
           <PreviewImg key={i} src={photoURL} />
         ))}
       </div>
-      <h1 className="text-headline font-bold text-xl capitalize row-span-1 flex justify-center items-center">
+      <h1 className="text-headline row-span-1 flex items-center justify-center text-xl font-bold capitalize">
         {GroupData.GroupName}
       </h1>
     </div>

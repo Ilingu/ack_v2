@@ -41,10 +41,10 @@ function AnimeItem({ animeData }: AnimeItemProps) {
       );
 
   return (
-    <div className="cursor-pointer relative">
+    <div className="relative cursor-pointer">
       <Link href={`/anime/${animeData.malId}`} prefetch={false}>
         <a>
-          <div className="relative group">
+          <div className="group relative">
             <Image
               src={animeData?.photoPath}
               alt={`${animeData?.title}'s cover`}
@@ -53,22 +53,22 @@ function AnimeItem({ animeData }: AnimeItemProps) {
               layout="responsive"
               objectFit="cover"
               loading="lazy"
-              className="opacity-95 group-hover:opacity-50 transition rounded-lg"
+              className="rounded-lg opacity-95 transition group-hover:opacity-50"
             />
-            <button className="absolute opacity-0 group-hover:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition ease-in bg-primary-whiter py-2 px-2 rounded-full">
-              <FaInfo className="icon text-4xl font-bold text-headline" />
+            <button className="bg-primary-whiter absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full py-2 px-2 opacity-0 transition ease-in hover:scale-110 group-hover:opacity-100">
+              <FaInfo className="icon text-headline text-4xl font-bold" />
             </button>
           </div>
-          <div className="absolute top-1 left-1 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
+          <div className="text-headline bg-bgi-darker absolute top-1 left-1 rounded-lg bg-opacity-70 px-2 py-1 font-semibold">
             <FaStar className="icon text-yellow-500" />{" "}
             {animeData?.OverallScore}
           </div>
-          <div className="absolute top-1 right-1 font-semibold text-headline bg-bgi-darker bg-opacity-70 px-2 py-1 rounded-lg">
+          <div className="text-headline bg-bgi-darker absolute top-1 right-1 rounded-lg bg-opacity-70 px-2 py-1 font-semibold">
             {animeData?.type}
           </div>
           <h1
             dangerouslySetInnerHTML={{ __html: enhanceWord(animeData?.title) }}
-            className="text-center text-headline font-semibold text-lg capitalize"
+            className="text-headline text-center text-lg font-semibold capitalize"
           ></h1>
         </a>
       </Link>

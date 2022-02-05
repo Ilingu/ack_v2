@@ -2,7 +2,10 @@ import React, { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { EpisodesSearchContext } from "../../lib/context";
 // Types
-import { EpisodesShape, JikanApiResEpisodes } from "../../lib/utils/types/interface";
+import {
+  EpisodesShape,
+  JikanApiResEpisodes,
+} from "../../lib/utils/types/interface";
 // Imp
 import { JikanApiToEpisodesShape } from "../../lib/utils/UtilsFunc";
 // UI
@@ -37,20 +40,20 @@ const EpisodesList: FC<EpisodesListProps> = ({ Eps }) => {
 
   return (
     <Fragment>
-      <h1 className="text-4xl font-bold tracking-wider text-headline mb-8 text-center">
+      <h1 className="text-headline mb-8 text-center text-4xl font-bold tracking-wider">
         Episodes{" "}
-        <span className="text-2xl text-description">({Eps?.length})</span>
+        <span className="text-description text-2xl">({Eps?.length})</span>
       </h1>
-      <div className="grid 2xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6">
         {RenderElements}
       </div>
 
       {RenderElements?.length !== Eps?.length ? (
-        <div className="w-full flex justify-center">
+        <div className="flex w-full justify-center">
           <button
             onClick={() => LoadEps(false)}
-            className="text-center text-headline bg-primary-darker py-2 px-2 rounded-lg font-bold w-56 outline-none focus:ring-2
-             focus:ring-primary-whiter transition"
+            className="text-headline bg-primary-darker focus:ring-primary-whiter w-56 rounded-lg py-2 px-2 text-center font-bold outline-none
+             transition focus:ring-2"
           >
             <FaEye className="icon" /> Load All
           </button>
@@ -66,17 +69,17 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
 
   return (
     <div
-      className={`px-2 py-2 rounded-md relative${
-        Filler ? " transform scale-90 bg-bgi-whiter" : ""
-      }${Recap ? " transform scale-90 bg-bgi-whiter" : ""}`}
+      className={`rounded-md px-2 py-2 relative${
+        Filler ? " bg-bgi-whiter scale-90 transform" : ""
+      }${Recap ? " bg-bgi-whiter scale-90 transform" : ""}`}
     >
       {Filler && (
-        <div className="absolute -top-1 -left-1 z-10 bg-red-500 px-2 py-1 font-semibold tracking-wide text-headline rounded-md">
+        <div className="text-headline absolute -top-1 -left-1 z-10 rounded-md bg-red-500 px-2 py-1 font-semibold tracking-wide">
           FILLER
         </div>
       )}
       {Recap && (
-        <div className="absolute -top-1 -right-1 z-10 bg-gray-400 px-2 py-1 font-semibold tracking-wide text-headline rounded-md">
+        <div className="text-headline absolute -top-1 -right-1 z-10 rounded-md bg-gray-400 px-2 py-1 font-semibold tracking-wide">
           RECAP
         </div>
       )}
@@ -89,15 +92,15 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
           layout="responsive"
           objectFit="cover"
           loading="lazy"
-          className="opacity-95 hover:opacity-50 transition rounded-lg"
+          className="rounded-lg opacity-95 transition hover:opacity-50"
         />
       </a>
 
-      <h2 className="text-description font-semibold uppercase tracking-wider mt-2">
+      <h2 className="text-description mt-2 font-semibold uppercase tracking-wider">
         Episode {epsId}
       </h2>
       <a href={EpsURL} target="_blank" rel="noreferrer">
-        <h1 className="text-headline font-semibold text-xl hover:text-gray-200 transition">
+        <h1 className="text-headline text-xl font-semibold transition hover:text-gray-200">
           {title}
         </h1>
       </a>

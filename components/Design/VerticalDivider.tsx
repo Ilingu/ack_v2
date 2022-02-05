@@ -2,7 +2,7 @@ import React, { FC } from "react";
 
 const VerticalDivider: FC<{ Styling?: string }> = ({ Styling }) => (
   <div
-    className={`h-full w-2 rounded-sm cursor-default py-3 text-headline overflow-hidden bg-headline  
+    className={`text-headline bg-headline h-full w-2 cursor-default overflow-hidden rounded-sm py-3  
     ${Styling ? Styling : "translate-y-1"}`}
   ></div>
 );

@@ -22,7 +22,7 @@ const UserProfil: FC<UserProfilProps> = ({
   return (
     <Fragment>
       {/* Basic User Data */}
-      <section className="flex sm:gap-5 gap-2 mt-10 mb-2 px-3">
+      <section className="mt-10 mb-2 flex gap-2 px-3 sm:gap-5">
         <div>
           <Image
             src={user?.photoURL}
@@ -33,21 +33,21 @@ const UserProfil: FC<UserProfilProps> = ({
           />
         </div>
         <div>
-          <div className="flex flex-col text-headline font-bold text-3xl">
+          <div className="text-headline flex flex-col text-3xl font-bold">
             {user?.displayName}
             <Link href={`/user/${username}`} passHref>
-              <a className="text-lg font-semibold text-primary-whitest hover:underline">
+              <a className="text-primary-whitest text-lg font-semibold hover:underline">
                 @{username}
               </a>
             </Link>
           </div>
-          <div className="mt-2 font-semibold text-headline">
+          <div className="text-headline mt-2 font-semibold">
             <FaClock className="icon" /> Member since{" "}
             <span className="text-primary-whitest">
               {new Date(user?.metadata.creationTime).toLocaleDateString()}
             </span>
           </div>
-          <div className="mt-2 font-semibold text-headline">
+          <div className="text-headline mt-2 font-semibold">
             <AiFillMail className="icon" /> Email -{" "}
             <span className="text-primary-whitest">{user?.email}</span>
           </div>
@@ -55,19 +55,19 @@ const UserProfil: FC<UserProfilProps> = ({
       </section>
       <Divider />
       {/* User's Stats */}
-      <section className="my-5 px-3 text-description-whiter">
+      <section className="text-description-whiter my-5 px-3">
         <header>
-          <h1 className="text-2xl font-bold text-description-whiter capitalize">
+          <h1 className="text-description-whiter text-2xl font-bold capitalize">
             <BiStats className="icon" /> {username}&apos;s Stats
           </h1>
         </header>
-        <div className="mt-5 grid md:grid-cols-2 gap-y-3 justify-items-center">
+        <div className="mt-5 grid justify-items-center gap-y-3 md:grid-cols-2">
           {UserStats &&
             UserStats?.map(({ data, desc }, i) => (
               <div
                 key={i}
-                className="h-20 w-80 rounded-lg ring-2 ring-description bg-bgi-whiter flex flex-col
-              justify-center items-center font-semibold text-lg"
+                className="ring-description bg-bgi-whiter flex h-20 w-80 flex-col items-center justify-center
+              rounded-lg text-lg font-semibold ring-2"
               >
                 <span className="text-primary-whitest">{data}</span>
                 {desc}
