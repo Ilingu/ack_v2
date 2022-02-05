@@ -118,28 +118,28 @@ const Settings: NextPage = () => {
         "Private Page - Please Connect To Access It",
       ]}
     >
-      <main className="h-screen flex flex-col items-center">
+      <main className="flex h-screen flex-col items-center">
         <MetaTags title="User's Settings" description="Settings of ACK User" />
-        <div className="2xl:w-1/2 lg:w-2/3 md:w-11/12 sm:w-5/6 w-11/12">
+        <div className="w-11/12 sm:w-5/6 md:w-11/12 lg:w-2/3 2xl:w-1/2">
           {/* User's Profile */}
           <UserProfil UserData={{ user, username }} UserStats={UserStats} />
           {/* User's Settings */}
           <Divider />(
           <section className="my-5 px-3">
             <header>
-              <h1 className="text-2xl font-bold text-description-whiter">
+              <h1 className="text-description-whiter text-2xl font-bold">
                 <FiSettings className="icon" /> Settings{" "}
-                <span className="font-semibold text-description text-lg">
+                <span className="text-description text-lg font-semibold">
                   [ACK::OPEN BETA]
                 </span>
               </h1>
             </header>
-            <div className="flex flex-col items-center mt-5">
+            <div className="mt-5 flex flex-col items-center">
               {/* Basics User Button */}
               <section>
                 <button
                   onClick={() => auth.signOut()}
-                  className="p-1 bg-yellow-400 text-black rounded-md font-semibold text-lg"
+                  className="rounded-md bg-yellow-400 p-1 text-lg font-semibold text-black"
                 >
                   <FaSignOutAlt className="icon" /> Sign Out
                 </button>
@@ -155,16 +155,16 @@ const Settings: NextPage = () => {
                       }
                     }
                   }}
-                  className="p-1 bg-primary-main text-headline rounded-md font-semibold text-lg ml-4"
+                  className="bg-primary-main text-headline ml-4 rounded-md p-1 text-lg font-semibold"
                 >
                   <FaHome className="icon" /> A2HS
                 </button>
               </section>
-              <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
-                <h1 className="text-xl font-bold text-description-whiter mb-1">
+              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
+                <h1 className="text-description-whiter mb-1 text-xl font-bold">
                   Session Data:
                 </h1>
-                <ul className="grid grid-cols-2  text-headline text-lg">
+                <ul className="text-headline grid  grid-cols-2 text-lg">
                   <li>
                     App Version:{" "}
                     <span className="text-primary-whitest">
@@ -204,7 +204,7 @@ const Settings: NextPage = () => {
                   </li>
                   <li>
                     Login Service:{" "}
-                    <span className="capitalize text-primary-whitest">
+                    <span className="text-primary-whitest capitalize">
                       {user?.providerId}
                     </span>
                   </li>
@@ -226,17 +226,17 @@ const Settings: NextPage = () => {
                   </li>
                 </ul>
               </section>
-              <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
-                <h1 className="text-xl font-bold text-description-whiter mb-1">
+              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
+                <h1 className="text-description-whiter mb-1 text-xl font-bold">
                   Username:
                 </h1>
                 <RenameUsername DefaultUsername={username} />
               </section>
-              <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
-                <h1 className="text-xl font-bold text-description-whiter mb-1">
+              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
+                <h1 className="text-description-whiter mb-1 text-xl font-bold">
                   Delete Account:
                 </h1>
-                <p className="text-red-200 font-semibold text-center">
+                <p className="text-center font-semibold text-red-200">
                   ⚡ Warning: By deleting your account you accept to delete ALL
                   your datas from this service (animes, username, account...)
                 </p>
@@ -246,10 +246,10 @@ const Settings: NextPage = () => {
                   }
                   className={`${
                     DAConfirmation > 1 ? "bg-green-500" : "bg-red-400"
-                  } text-headline font-semibold text-lg py-1 px-5 rounded-lg mt-3 hover:${
+                  } text-headline mt-3 rounded-lg py-1 px-5 text-lg font-semibold hover:${
                     DAConfirmation <= 1 && "bg-red-500"
                   } 
-                  transition-all outline-none focus:ring focus:ring-headline`}
+                  focus:ring-headline outline-none transition-all focus:ring`}
                 >
                   {DAConfirmation <= 1 ? (
                     <FaTrashAlt className="icon" />
@@ -263,8 +263,8 @@ const Settings: NextPage = () => {
                     : "Click To Cancel"}
                 </button>
               </section>
-              <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
-                <h1 className="text-xl font-bold text-description-whiter mb-1">
+              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
+                <h1 className="text-description-whiter mb-1 text-xl font-bold">
                   Contact Dev:
                 </h1>
                 <ul className="text-headline grid grid-cols-2">
@@ -376,18 +376,18 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
 
   return (
     <form onSubmit={ChangeUsername}>
-      <span className="text-headline font-bold text-lg">@</span>
+      <span className="text-headline text-lg font-bold">@</span>
       <input
         type="text"
         value={Username}
         onChange={HandleChange}
-        className="p-1 rounded-md outline-none focus:ring focus:ring-primary-main transition-all"
+        className="focus:ring-primary-main rounded-md p-1 outline-none transition-all focus:ring"
       />
       <button
         type="submit"
         disabled={!IsValid}
-        className="py-1 px-2 ml-2 rounded-md text-headline bg-primary-main hover:bg-primary-whiter
-                     font-semibold tracking-wide transition-all outline-none focus:ring focus:ring-primary-darker"
+        className="text-headline bg-primary-main hover:bg-primary-whiter focus:ring-primary-darker ml-2 rounded-md py-1
+                     px-2 font-semibold tracking-wide outline-none transition-all focus:ring"
       >
         Change
       </button>

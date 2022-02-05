@@ -36,10 +36,10 @@ const SignUpPage: NextPage = () => {
   return (
     <Fragment>
       <MetaTags title="Sign up" description="Sign up Page for ACK" />
-      <main className="h-screen flex flex-col justify-center items-center">
+      <main className="flex h-screen flex-col items-center justify-center">
         <div
-          className="bg-bgi-whiter text-primary-main md:w-[500px] md:h-[600px] w-[350px] h-[500px] py-4 px-4 rounded-lg 
-        shadow-lg flex flex-col justify-center items-center"
+          className="bg-bgi-whiter text-primary-main flex h-[500px] w-[350px] flex-col items-center justify-center rounded-lg 
+        py-4 px-4 shadow-lg md:h-[600px] md:w-[500px]"
         >
           {user ? (
             !username ? (
@@ -59,12 +59,12 @@ const SignUpPage: NextPage = () => {
 function SignOutButton() {
   return (
     <Fragment>
-      <h1 className="font-semibold text-3xl tracking-wide text-headline">
+      <h1 className="text-headline text-3xl font-semibold tracking-wide">
         Already Sign-in!
       </h1>
       <button
         onClick={() => auth.signOut()}
-        className="mt-4 py-2 px-2 bg-red-400 w-1/3 text-headline font-semibold text-lg rounded-md"
+        className="text-headline mt-4 w-1/3 rounded-md bg-red-400 py-2 px-2 text-lg font-semibold"
       >
         <FaSignOutAlt className="icon" />
         Sign Out
@@ -103,28 +103,28 @@ function SignInButton() {
           height={48}
           className="rounded-full"
         />
-        <h1 className="text-center text-4xl font-bold mb-6">Sign In/Up</h1>
+        <h1 className="mb-6 text-center text-4xl font-bold">Sign In/Up</h1>
         <Divider />
       </header>
-      <aside className="shadow-2xl bg-bgi-main md:w-3/4 w-full py-4 rounded-lg flex flex-col justify-evenly items-center">
+      <aside className="bg-bgi-main flex w-full flex-col items-center justify-evenly rounded-lg py-4 shadow-2xl md:w-3/4">
         <button
           onClick={() => signIn("google")}
-          className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
-          focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
+          className="bg-headline focus:ring-description hover:bg-description mb-4 w-5/6 rounded py-2
+          px-2 text-xl font-semibold text-black outline-none transition focus:ring-4"
         >
           <FcGoogle className="icon" /> Google
         </button>
         <button
           onClick={() => signIn("twitter")}
-          className="py-2 px-2 bg-headline rounded text-black outline-none focus:ring-4
-          focus:ring-description hover:bg-description transition text-xl w-5/6 font-semibold mb-4"
+          className="bg-headline focus:ring-description hover:bg-description mb-4 w-5/6 rounded py-2
+          px-2 text-xl font-semibold text-black outline-none transition focus:ring-4"
         >
           <FaTwitter className="icon text-blue-500" /> Twitter
         </button>
         <button
           onClick={() => signIn("github")}
-          className="py-2 px-2 bg-bgi-darker rounded text-headline outline-none focus:ring-4 
-          focus:ring-headline hover:bg-gray-600 transition text-xl w-5/6 font-semibold"
+          className="bg-bgi-darker text-headline focus:ring-headline w-5/6 rounded py-2 px-2 
+          text-xl font-semibold outline-none transition hover:bg-gray-600 focus:ring-4"
         >
           <AiFillGithub className="icon" /> Github
         </button>
@@ -198,7 +198,7 @@ function UsernameForm() {
   return (
     <div>
       <header className="mb-8 -mt-16">
-        <h1 className="text-center text-4xl font-bold mb-6">Choose Username</h1>
+        <h1 className="mb-6 text-center text-4xl font-bold">Choose Username</h1>
         <hr />
       </header>
       <form onSubmit={onSubmit} className="flex flex-col items-center">
@@ -208,7 +208,7 @@ function UsernameForm() {
           placeholder="username"
           value={formValue}
           onChange={onChange}
-          className="w-full py-2 pl-2 rounded-lg text-xl outline-none text-black focus:ring-4 focus:ring-offset-2 focus:ring-primary-main transition"
+          className="focus:ring-primary-main w-full rounded-lg py-2 pl-2 text-xl text-black outline-none transition focus:ring-4 focus:ring-offset-2"
         />
 
         <UsernameMessage
@@ -220,40 +220,40 @@ function UsernameForm() {
         <div className="w-full">
           <button
             type="submit"
-            className="w-4/6 text-gray-800 mt-2 py-2 px-2 bg-green-300 rounded outline-none focus:ring-4 focus:ring-offset-2  
-          focus:ring-green-200 hover:bg-green-200 transition text-xl font-semibold"
+            className="mt-2 w-4/6 rounded bg-green-300 py-2 px-2 text-xl font-semibold text-gray-800 outline-none  
+          transition hover:bg-green-200 focus:ring-4 focus:ring-green-200 focus:ring-offset-2"
             disabled={!isValid}
           >
             Choose
           </button>
           <button
             type="submit"
-            className="w-2/6 text-gray-800 mt-1 py-2 px-2 bg-red-400 rounded outline-none focus:ring-4 focus:ring-offset-2 
-          focus:ring-green-200 hover:bg-red-200 transition text-xl font-semibold"
+            className="mt-1 w-2/6 rounded bg-red-400 py-2 px-2 text-xl font-semibold text-gray-800 outline-none 
+          transition hover:bg-red-200 focus:ring-4 focus:ring-green-200 focus:ring-offset-2"
             onClick={() => auth.signOut()}
           >
             Cancel
           </button>
         </div>
 
-        <h3 className="font-semibold text-lg text-headline mt-4">
+        <h3 className="text-headline mt-4 text-lg font-semibold">
           Debug State
         </h3>
         <hr className="w-1/2" />
         <div className="text-headline">
           Username:{" "}
-          <span className="text-gray-300 font-medium">{formValue}</span>
+          <span className="font-medium text-gray-300">{formValue}</span>
           <br />
           Loading:{" "}
-          <span className="text-gray-300 font-medium">
+          <span className="font-medium text-gray-300">
             {loading.toString()}
           </span>
           <br />
           Username Valid:{" "}
           {isValid ? (
-            <span className="text-green-500 font-medium">true</span>
+            <span className="font-medium text-green-500">true</span>
           ) : (
-            <span className="text-red-500 font-medium">false</span>
+            <span className="font-medium text-red-500">false</span>
           )}
         </div>
       </form>
@@ -264,9 +264,9 @@ function UsernameForm() {
 function UsernameMessage({ username, isValid, loading }) {
   if (loading) return <p className="mt-1">Checking...</p>;
   if (isValid)
-    return <p className="text-green-500 mt-1">{username} is available!</p>;
+    return <p className="mt-1 text-green-500">{username} is available!</p>;
   if (username && !isValid)
-    return <p className="text-red-500 mt-1">That username is taken!</p>;
+    return <p className="mt-1 text-red-500">That username is taken!</p>;
   return <p></p>;
 }
 
