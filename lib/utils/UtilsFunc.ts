@@ -1,3 +1,4 @@
+import crypto from "crypto";
 // Types
 import {
   AdkamiLastReleasedEpisodeShape,
@@ -27,6 +28,53 @@ import toast from "react-hot-toast";
 
 /* FUNC */
 
+export const encryptCookie = (cookie: Buffer) => {
+  try {
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv(
+      "aes-256-gcm",
+      Buffer.from(process.env.NEXT_PUBLIC_COOKIES_ENCRYPT_KEY),
+      iv
+    );
+    const encryptedCookie = Buffer.concat([
+      Buffer.from("v10"),
+      iv,
+      cipher.update(cookie),
+      cipher.final(),
+      cipher.getAuthTag(),
+    ]);
+    return encryptedCookie;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const decryptCookie = (encryptedCookie: Buffer): string => {
+  try {
+    const iv = encryptedCookie.slice(3, 3 + 12);
+    const ciphertext = encryptedCookie.slice(
+      3 + 12,
+      encryptedCookie.length - 16
+    );
+    const authTag = encryptedCookie.slice(encryptedCookie.length - 16);
+    const decipher = crypto.createDecipheriv(
+      "aes-256-gcm",
+      Buffer.from(process.env.NEXT_PUBLIC_COOKIES_ENCRYPT_KEY),
+      iv
+    );
+    decipher.setAuthTag(authTag);
+    const decryptedCookie = Buffer.concat([
+      decipher.update(ciphertext),
+      decipher.final(),
+    ]);
+    return decryptedCookie.toString("utf8");
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
 /**
  * Fetch Data From Api
  * @param {URL} url
@@ -34,13 +82,16 @@ import toast from "react-hot-toast";
 export async function callApi(
   url: string,
   internalApi = false,
-  params?: RequestInit
+  params?: RequestInit,
+  AcessToken?: string
 ) {
   if (!isValidUrl(url)) return;
   const req = await fetch(url, {
     ...params,
     headers: {
-      authorization: internalApi
+      authorization: AcessToken
+        ? AcessToken
+        : internalApi
         ? await auth.currentUser.getIdToken()
         : undefined,
     },
@@ -66,7 +117,11 @@ export function isValidUrl(url: string) {
  * Converts a firestore doc to JSON
  * @param {DocumentSnapshot} doc
  */
-export function postToJSON(doc: DocumentSnapshot) {
+export function postToJSON(
+  doc:
+    | DocumentSnapshot
+    | FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+) {
   const data = doc.data();
   return {
     ...data,

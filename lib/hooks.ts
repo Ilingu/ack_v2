@@ -12,7 +12,7 @@ import {
   UserShape,
 } from "./utils/types/interface";
 // Func
-import { postToJSON } from "./utils/UtilsFunc";
+import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
@@ -22,6 +22,7 @@ export function useUserData() {
   useEffect(() => {
     let unsubscribe: Unsubscribe;
 
+    document.cookie = "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // 🍪
     const unSub = onAuthStateChanged(auth, async (user: User) => {
       if (user) {
         const UserRef = doc(db, "users", user.uid);
@@ -36,11 +37,24 @@ export function useUserData() {
           setFinished(true);
         });
 
-        setUser(user);
+        // 🍪
+        const token = await user.getIdToken();
+        const encryptedCookie = encryptCookie(Buffer.from(token));
+        document.cookie = `UsT=${encryptedCookie.toString(
+          "base64"
+        )}; expires=${new Date(
+          Date.now() + 1000 * 60 * 60 * 24
+        ).toUTCString()}`;
+
+        setUser(user); // Settings User
       } else {
         setUser(null);
         setUsername(null);
         setFinished(true);
+
+        // 🍪
+        document.cookie =
+          "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       }
     });
 
@@ -48,6 +62,11 @@ export function useUserData() {
       unsubscribe();
       unSub();
     };
+  }, []);
+
+  useEffect(() => {
+    document.cookie = "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    return auth.onIdTokenChanged(async (user) => {});
   }, []);
 
   return { user, username: usernameState, reqFinished };

@@ -49,6 +49,7 @@ const Settings: NextPage = () => {
     );
     setMounted(true);
   }, []);
+
   useEffect(() => {
     if (DAConfirmation >= 2 && !deleteAccountTimeout.current) {
       toast.success("Your account will be deleted in 10s");
@@ -345,7 +346,7 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
   };
 
   const HandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const NewUsername = e.target.value.toLowerCase();
+    const NewUsername = e.target.value.trim().toLowerCase();
     const re = /^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
     if (NewUsername.length < 3 || NewUsername === DefaultUsername) {
       setUserName(NewUsername);

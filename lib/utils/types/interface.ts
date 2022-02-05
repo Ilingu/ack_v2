@@ -1,3 +1,4 @@
+import { User } from "firebase/auth";
 import { AnimeWatchType } from "./enums";
 import {
   AnimeStatusType,
@@ -27,6 +28,11 @@ export interface ResApiRoutes {
 export interface InternalApiResError {
   message: string;
   err: boolean;
+}
+export interface ResDataUser {
+  User: User;
+  NoOfAnimes: number;
+  NoOfWatchAnimes: number;
 }
 // Others
 export interface AnimeConfigPathsIdShape {
