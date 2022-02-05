@@ -13,6 +13,17 @@ declare global {
   }
 }
 
+// Api routes
+export interface ResApiRoutes {
+  succeed: boolean;
+  code: number;
+  data?: object;
+  message?: string;
+}
+export interface InternalApiResError {
+  message: string;
+  err: boolean;
+}
 // Others
 export interface AnimeConfigPathsIdShape {
   AllAnimeId: string[];
@@ -24,10 +35,6 @@ export interface NetworkInformationShape {
   rtt: number;
   saveData: boolean;
   type: NetworkType;
-}
-export interface InternalApiResError {
-  message: string;
-  err: boolean;
 }
 /* LastEpReleased */
 export interface AdkamiLastReleasedEpisodeShape {

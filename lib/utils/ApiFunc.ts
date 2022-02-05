@@ -10,6 +10,7 @@ import {
   JikanApiResEpisodesRoot,
   JikanApiResRecommandations,
   JikanApiResRecommandationsRoot,
+  ResApiRoutes,
 } from "./types/interface";
 import { callApi, IsError, JikanApiToAnimeShape } from "./UtilsFunc";
 
@@ -18,6 +19,30 @@ type AnimeDatasShape = [
   JikanApiResEpisodes[],
   JikanApiResRecommandations[]
 ];
+
+/**
+ * Return API Response Error Object
+ * @param {number} code Code of error (4**)
+ * @param {string} reason Reason of error/failure
+ * @returns {ResApiRoutes} ResApiRoutes interface
+ */
+export const ErrorHandling = (code: number, reason?: string): ResApiRoutes => ({
+  succeed: false,
+  code,
+  message: reason,
+});
+
+/**
+ * Return API Response Success Object
+ * @param {number} code Code of success (2**)
+ * @param {object} data Data to send back to the client
+ * @returns {ResApiRoutes} ResApiRoutes interface
+ */
+export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
+  succeed: true,
+  code,
+  data,
+});
 
 /**
  * Fetch Anime Data
