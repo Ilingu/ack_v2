@@ -19,6 +19,15 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
+    if (
+      window.location.host === "ack-git-dev-ilingu.vercel.app" &&
+      window.location.pathname !== "/error"
+    ) {
+      history.pushState("", "", "/error");
+      window.location.reload();
+      return;
+    }
+
     /* AppVersion */
     // setAppVersion(!window.matchMedia("(display-mode: standalone)").matches);
     /* Browser Version */
@@ -71,7 +80,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     /* ERROR DETECTION */
     window.onerror = async () => {
       if (process?.env?.NODE_ENV === "development") return;
-      history.pushState("", "", "/_error");
+      history.pushState("", "", "/error");
       window.location.reload();
     };
   }, []);

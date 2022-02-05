@@ -36,6 +36,10 @@ export interface NetworkInformationShape {
   saveData: boolean;
   type: NetworkType;
 }
+export interface UserStatsShape {
+  data: string | number;
+  desc: string;
+}
 /* LastEpReleased */
 export interface AdkamiLastReleasedEpisodeShape {
   title: string; // Black Clover
