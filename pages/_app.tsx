@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { useGlobalAnimeData, useUserData } from "../lib/hooks";
 // TS
 import { AppProps } from "next/app";
-import { NetworkInformationShape } from "../lib/utils/types/interface";
 // UI
 import "../styles/globals.css";
 import Navbar from "../components/Common/Navbar";
 import { GlobalAppContext } from "../lib/context";
+import { NetworkCheck } from "../lib/utils/UtilsFunc";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
@@ -16,20 +16,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     UserAnimesData: UserAnimes,
     UserGroupsData: UserGroups,
   } = useGlobalAnimeData(userData?.user?.uid);
-  // const [IsWebVersion, setAppVersion] = useState(false);
 
   useEffect(() => {
-    if (
-      window.location.host === "ack-git-dev-ilingu.vercel.app" &&
-      window.location.pathname !== "/error"
-    ) {
-      history.pushState("", "", "/error");
-      window.location.reload();
-      return;
-    }
-
     /* AppVersion */
-    // setAppVersion(!window.matchMedia("(display-mode: standalone)").matches);
+    window.appVersion = () =>
+      window.matchMedia("(display-mode: standalone)").matches ? "Web" : "PWA";
     /* Browser Version */
     window.mobileAndTabletCheck = () => {
       let check = false;
@@ -48,35 +39,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
 
     /* Network Connection */
-    const onChangeNetwork = (e: Event) => {
-      CheckConn(e.currentTarget as unknown as NetworkInformationShape);
-    };
-    const CheckConn = (ConnInfo: NetworkInformationShape) => {
-      if (
-        ConnInfo?.effectiveType === "slow-2g" ||
-        ConnInfo?.effectiveType === "2g"
-      ) {
-        toast.error(
-          `Unstable internet connection (${ConnInfo?.effectiveType})`,
-          {
-            position: "bottom-right",
-          }
-        );
-      }
-
-      if (ConnInfo?.downlink === 0) {
-        toast.error(`You are offline`, {
-          position: "bottom-right",
-        });
-        if (window.location.pathname === "/_offline") return;
-        history.pushState("", "", "/_offline");
-        window.location.reload();
-      }
-    };
-    const connectionInfo =
-      navigator.connection as unknown as NetworkInformationShape;
-    if (connectionInfo?.onchange) connectionInfo.onchange = onChangeNetwork;
-    CheckConn(connectionInfo);
+    NetworkCheck();
     /* ERROR DETECTION */
     window.onerror = async () => {
       if (process?.env?.NODE_ENV === "development") return;

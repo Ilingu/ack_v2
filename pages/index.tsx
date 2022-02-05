@@ -11,7 +11,8 @@ import HomePoster from "../components/Home/HomePoster";
   - In /anime (search) -> Search first in Global anime already query (so the user anime) and after
     get from the DB --> 
         So add a field that map `title --> malId` OR obj { title, alternativeTitle, malId } in "animes-config"
-  - Settings Page
+  - User Page
+  - Api endpoint
 */
 
 /* Components */

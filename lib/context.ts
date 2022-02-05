@@ -1,12 +1,15 @@
 import { createContext } from "react";
 import { User } from "@firebase/auth";
-import { AnimeShape, UserAnimeShape, UserGroupShape } from "./utils/types/interface";
+import {
+  AnimeShape,
+  UserAnimeShape,
+  UserGroupShape,
+} from "./utils/types/interface";
 
 interface GlobalAppContext {
   user: User;
   username: string;
   reqFinished: boolean;
-  // IsWebVersion: boolean;
   UserAnimes: UserAnimeShape[]; // Interface User anime
   GlobalAnime: AnimeShape[];
   UserGroups: UserGroupShape[];
@@ -25,7 +28,6 @@ export const GlobalAppContext = createContext<GlobalAppContext>({
   reqFinished: false,
   UserAnimes: [],
   GlobalAnime: [],
-  // IsWebVersion: false,
   UserGroups: [],
 });
 

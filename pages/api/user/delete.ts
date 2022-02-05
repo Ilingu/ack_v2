@@ -15,24 +15,29 @@ const DeletUserHandler = async (
   // Request Verifier
   const { method, headers } = req;
 
+  if (headers.host === "ack-git-dev-ilingu.vercel.app")
+    return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
+
   if (!headers || !headers.authorization)
-    return Respond(ErrorHandling(401, "Missing User Authentification Token")); // ❌
+    return Respond(ErrorHandling(400, "Missing User Authentification Token")); // ❌
 
   if (method !== "DELETE")
-    return Respond(ErrorHandling(401, "Only accept DELETE req")); // ❌
+    return Respond(ErrorHandling(400, "Only accept DELETE req")); // ❌
 
   // Req Handler
   try {
     const { uid } = await auth.verifyIdToken(headers.authorization);
 
-    await db.collection("users").doc(uid).delete(); // 🚮 Delete User Data
-    await db.collection("usernames").doc(uid).delete(); // 🚮 Free the username
-    await auth.deleteUser(uid); // 🚮 Delete permanently the user
+    const batch = db.batch();
+    batch.delete(db.collection("users").doc(uid)); // 🚮 Delete User Data
+    batch.delete(db.collection("usernames").doc(uid)); // 🚮 Free the username
+    await batch.commit();
 
-    Respond(SuccessHandling(201));
+    await auth.deleteUser(uid); // 🚮 Delete permanently the user
+    Respond(SuccessHandling(200));
   } catch (err) {
     console.error("Error on api route '/[animeId]'");
-    Respond(ErrorHandling(500, JSON.stringify(err)));
+    Respond(ErrorHandling(401, JSON.stringify(err)));
   }
 };
 export default DeletUserHandler;

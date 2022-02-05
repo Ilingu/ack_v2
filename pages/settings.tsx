@@ -20,6 +20,7 @@ import Divider from "../components/Design/Divider";
 // Types
 import {
   BeforeInstallPromptEvent,
+  ResApiRoutes,
   UserStatsShape,
 } from "../lib/utils/types/interface";
 import { FiSettings } from "react-icons/fi";
@@ -27,11 +28,11 @@ import { AnimeWatchType } from "../lib/utils/types/enums";
 import UserProfil from "../components/User/UserProfil";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 import { doc, getDoc } from "firebase/firestore";
+import { callApi } from "../lib/utils/UtilsFunc";
 
 /* 
    - User Interaction (delete, change username)
 */
-// await user.getIdToken()
 
 /* Components */
 const Settings: NextPage = () => {
@@ -82,49 +83,51 @@ const Settings: NextPage = () => {
           <UserProfil UserData={{ user, username }} UserStats={UserStats} />
           {/* User's Settings */}
           <Divider />
-          <section className="my-5 px-3">
-            <header>
-              <h1 className="text-2xl font-bold text-description-whiter">
-                <FiSettings className="icon" /> Settings{" "}
-                <span className="font-semibold text-description text-lg">
-                  [ACK::OPEN BETA]
-                </span>
-              </h1>
-            </header>
-            <div className="flex flex-col items-center mt-5">
-              {/* Basics User Button */}
-              <section>
-                <button
-                  onClick={() => auth.signOut()}
-                  className="p-1 bg-red-500 text-headline rounded-md font-semibold text-lg"
-                >
-                  <FaSignOutAlt className="icon" /> Sign Out
-                </button>
-                <button
-                  onClick={async () => {
-                    if (deferredPrompt.current !== null) {
-                      deferredPrompt.current.prompt();
-                      const { outcome } = await deferredPrompt.current
-                        .userChoice;
-                      if (outcome === "accepted") {
-                        deferredPrompt.current = null;
-                        toast.success("Thanks !");
-                      }
-                    }
-                  }}
-                  className="p-1 bg-primary-main text-headline rounded-md font-semibold text-lg ml-4"
-                >
-                  <FaHome className="icon" /> A2HS
-                </button>
-              </section>
-              <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
-                <h1 className="text-xl font-bold text-description-whiter mb-1">
-                  Username:
+          {window.location.host !== "ack-git-dev-ilingu.vercel.app" && (
+            <section className="my-5 px-3">
+              <header>
+                <h1 className="text-2xl font-bold text-description-whiter">
+                  <FiSettings className="icon" /> Settings{" "}
+                  <span className="font-semibold text-description text-lg">
+                    [ACK::OPEN BETA]
+                  </span>
                 </h1>
-                <RenameUsername DefaultUsername={username} />
-              </section>
-            </div>
-          </section>
+              </header>
+              <div className="flex flex-col items-center mt-5">
+                {/* Basics User Button */}
+                <section>
+                  <button
+                    onClick={() => auth.signOut()}
+                    className="p-1 bg-red-500 text-headline rounded-md font-semibold text-lg"
+                  >
+                    <FaSignOutAlt className="icon" /> Sign Out
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (deferredPrompt.current !== null) {
+                        deferredPrompt.current.prompt();
+                        const { outcome } = await deferredPrompt.current
+                          .userChoice;
+                        if (outcome === "accepted") {
+                          deferredPrompt.current = null;
+                          toast.success("Thanks !");
+                        }
+                      }
+                    }}
+                    className="p-1 bg-primary-main text-headline rounded-md font-semibold text-lg ml-4"
+                  >
+                    <FaHome className="icon" /> A2HS
+                  </button>
+                </section>
+                <section className="mt-5 w-full ring-2 ring-description text-center rounded-md p-2">
+                  <h1 className="text-xl font-bold text-description-whiter mb-1">
+                    Username:
+                  </h1>
+                  <RenameUsername DefaultUsername={username} />
+                </section>
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </AuthCheck>
@@ -141,12 +144,36 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Username]);
 
-  const ChangeUsername = (e: React.FormEvent<HTMLFormElement>) => {
+  const ChangeUsername = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!IsValid) return;
     if (Username === DefaultUsername) {
       toast.error("Cannot Change to your current username");
       return;
+    }
+
+    try {
+      const res: ResApiRoutes = await callApi(
+        `http://${window.location.host}/api/user/rename`,
+        true,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            "old-username": DefaultUsername,
+            "new-username": Username,
+          }),
+        }
+      );
+      console.log(res);
+      if (res.succeed) {
+        toast.success(`Hello ${Username} !`);
+        return;
+      }
+
+      toast.error("Cannot Change your username");
+    } catch (err) {
+      toast.error("Cannot Change your username");
+      console.error(err);
     }
   };
 

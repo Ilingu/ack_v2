@@ -20,15 +20,18 @@ const DeletUserHandler = async (
     body,
   } = req;
 
+  if (headers.host === "ack-git-dev-ilingu.vercel.app")
+    return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
+
   const FormattedUID = uid && uid.toString().toLocaleLowerCase().trim();
   if (!uid || FormattedUID.length <= 0)
-    return Respond(ErrorHandling(401, "Missing User Username")); // ❌
+    return Respond(ErrorHandling(400, "Missing User Username")); // ❌
 
   if (!headers || !headers.authorization)
-    return Respond(ErrorHandling(401, "Missing User Authentification Token")); // ❌
+    return Respond(ErrorHandling(400, "Missing User Authentification Token")); // ❌
 
   if (method !== "GET")
-    return Respond(ErrorHandling(401, "Only accept GET req")); // ❌
+    return Respond(ErrorHandling(400, "Only accept GET req")); // ❌
 
   if (!body || !body["new-username"])
     return Respond(ErrorHandling(400, "Missing User New Username")); // ❌
@@ -38,10 +41,10 @@ const DeletUserHandler = async (
     await auth.verifyIdToken(headers.authorization);
     const UserRes = await auth.getUser(FormattedUID);
 
-    Respond(SuccessHandling(201));
+    Respond(SuccessHandling(200, { User: UserRes.toJSON() }));
   } catch (err) {
     console.error("Error on api route '/[animeId]'");
-    Respond(ErrorHandling(500, JSON.stringify(err)));
+    Respond(ErrorHandling(401, JSON.stringify(err)));
   }
 };
 export default DeletUserHandler;

@@ -15,25 +15,57 @@ const DeletUserHandler = async (
   // Request Verifier
   const { method, headers, body } = req;
 
+  if (headers.host === "ack-git-dev-ilingu.vercel.app")
+    return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
+
   if (!headers || !headers.authorization)
-    return Respond(ErrorHandling(401, "Missing User Authentification Token")); // ❌
+    return Respond(ErrorHandling(400, "Missing User Authentification Token")); // ❌
 
   if (method !== "PUT")
-    return Respond(ErrorHandling(401, "Only accept PUT req")); // ❌
+    return Respond(ErrorHandling(400, "Only accept PUT req")); // ❌
 
-  if (!body || !body["new-username"])
-    return Respond(ErrorHandling(400, "Missing User New Username")); // ❌
+  const Body = JSON.parse(body);
+  if (!Body || !Body["new-username"] || !Body["old-username"])
+    return Respond(ErrorHandling(400, "Missing User New/Old Username Params")); // ❌
 
   // Req Handler
   try {
     const { uid } = await auth.verifyIdToken(headers.authorization);
+    const OldUsername: string = Body["old-username"].trim();
+    const NewUsername: string = Body["new-username"].trim();
 
-    await db.collection("users").doc(uid).delete();
+    if (
+      !OldUsername ||
+      !NewUsername ||
+      OldUsername.length <= 0 ||
+      NewUsername.length <= 0
+    )
+      return Respond(ErrorHandling(422, "This Username Already exist !")); // ❌
 
-    Respond(SuccessHandling(201));
+    const newUsernameRef = db.collection("usernames").doc(NewUsername);
+    const CurrentUsernameRef = db.collection("usernames").doc(OldUsername);
+    const UsernameDoc = await newUsernameRef.get();
+
+    const isAvailable = !UsernameDoc.exists;
+    if (!isAvailable)
+      return Respond(ErrorHandling(422, "This Username Already exist !")); // ❌
+
+    const batch = db.batch();
+
+    // /usernames
+    batch.delete(CurrentUsernameRef);
+    batch.set(newUsernameRef, { uid });
+
+    // /users
+    batch.update(db.collection("users").doc(uid), {
+      username: NewUsername,
+    });
+
+    await batch.commit();
+    Respond(SuccessHandling(200));
   } catch (err) {
-    console.error("Error on api route '/[animeId]'");
-    Respond(ErrorHandling(500, JSON.stringify(err)));
+    console.error("Error on api route '/[animeId]'", err);
+    Respond(ErrorHandling(401, JSON.stringify(err)));
   }
 };
 export default DeletUserHandler;

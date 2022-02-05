@@ -9,6 +9,7 @@ import {
   JikanApiResEpisodes,
   JikanApiResRecommandations,
   JikanApiResSeason,
+  NetworkInformationShape,
   RecommendationsShape,
   SeasonAnimesShape,
 } from "./types/interface";
@@ -30,9 +31,20 @@ import toast from "react-hot-toast";
  * Fetch Data From Api
  * @param {URL} url
  */
-export async function callApi(url: string, params?: RequestInit) {
+export async function callApi(
+  url: string,
+  internalApi = false,
+  params?: RequestInit
+) {
   if (!isValidUrl(url)) return;
-  const req = await fetch(url, params);
+  const req = await fetch(url, {
+    ...params,
+    headers: {
+      authorization: internalApi
+        ? await auth.currentUser.getIdToken()
+        : undefined,
+    },
+  });
   return await req.json();
 }
 
@@ -444,4 +456,38 @@ export const GetLastReleasedAnimeEp = (): Promise<
       reject("Error: Cannot fetch Last Released Ep");
     }
   });
+};
+
+/**
+ * Check User Connection (in realtime)
+ */
+export const NetworkCheck = () => {
+  // Func
+  const onChangeNetwork = (e: Event) =>
+    CheckConn(e.currentTarget as unknown as NetworkInformationShape);
+
+  const CheckConn = (ConnInfo: NetworkInformationShape) => {
+    if (
+      ConnInfo?.effectiveType === "slow-2g" ||
+      ConnInfo?.effectiveType === "2g"
+    ) {
+      toast.error(`Unstable internet connection (${ConnInfo?.effectiveType})`, {
+        position: "bottom-right",
+      });
+    }
+
+    if (ConnInfo?.downlink === 0) {
+      toast.error(`You are offline`, {
+        position: "bottom-right",
+      });
+      if (window.location.pathname === "/_offline") return;
+      history.pushState("", "", "/_offline");
+      window.location.reload();
+    }
+  };
+  // Main
+  const connectionInfo =
+    navigator.connection as unknown as NetworkInformationShape;
+  if (connectionInfo?.onchange) connectionInfo.onchange = onChangeNetwork;
+  CheckConn(connectionInfo);
 };
