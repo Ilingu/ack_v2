@@ -83,10 +83,10 @@ const WatchPage: NextPage = () => {
     if (!GlobalAnime || !UserAnimes) return;
 
     const UserAnimeData = UserAnimes.find(
-      ({ AnimeId }) => AnimeId.toString() === query.anime
+      ({ AnimeId }) => AnimeId?.toString() === query.anime
     );
     const CurrentAnimeData = GlobalAnime.find(
-      ({ malId }) => malId.toString() === query.anime
+      ({ malId }) => malId?.toString() === query.anime
     );
 
     if (!UserAnimeData) push("/404");
