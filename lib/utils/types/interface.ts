@@ -35,6 +35,10 @@ export interface ResDataUser {
   NoOfWatchAnimes: number;
 }
 // Others
+export interface IDBShape {
+  expire: number;
+  AnimesStored: AnimeShape[];
+}
 export interface AnimeConfigPathsIdShape {
   AllAnimeId: string[];
 }

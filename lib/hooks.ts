@@ -14,12 +14,14 @@ import {
 // Types
 import {
   AnimeShape,
+  IDBShape,
   UserAnimeShape,
   UserGroupShape,
   UserShape,
 } from "./utils/types/interface";
 // Func
 import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
+import { GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
@@ -78,8 +80,10 @@ export function useGlobalAnimeData(userUid: string) {
   const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
+  const GlobalAnimeAlreadyFecth = useRef(false);
 
   const GetUserGlobalAnimeDatas = useCallback(async () => {
+    if (!!GlobalAnimeAlreadyFecth.current) return;
     const GlobalUserAnimeDocs = await Promise.all(
       UserAnimesData.map(async ({ AnimeId }) => {
         const QueryRef = doc(db, "animes", AnimeId.toString());
@@ -90,13 +94,41 @@ export function useGlobalAnimeData(userUid: string) {
       postToJSON
     ) as AnimeShape[];
 
+    // Save
     setGlobalAnime(GlobalUserAnimeDatas);
+
+    const IDBObject: IDBShape = {
+      AnimesStored: GlobalUserAnimeDatas,
+      expire: Date.now() + 54000000, // 15H
+    };
+    WriteIDB(IDBObject);
+
+    GlobalAnimeAlreadyFecth.current = true;
   }, [UserAnimesData]);
+
+  const GetCachedAnimesDatas = useCallback(async () => {
+    const CachedAnimesDatas = await GetIDBAnimes();
+    console.log(CachedAnimesDatas);
+
+    if (!CachedAnimesDatas || CachedAnimesDatas.length <= 0)
+      return GetUserGlobalAnimeDatas(); // FB query
+
+    if (
+      CachedAnimesDatas[0]?.expire < Date.now() ||
+      !CachedAnimesDatas[0]?.AnimesStored ||
+      CachedAnimesDatas[0]?.AnimesStored.length <= 0
+    )
+      return GetUserGlobalAnimeDatas(); // FB query
+
+    const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
+    setGlobalAnime(GlobalUserAnimeDatas);
+  }, [GetUserGlobalAnimeDatas]);
 
   useEffect(() => {
     if (!UserAnimesData || GlobalAnimeData) return null;
-    GetUserGlobalAnimeDatas();
-  }, [GetUserGlobalAnimeDatas, GlobalAnimeData, UserAnimesData]);
+    // Check IDB
+    GetCachedAnimesDatas();
+  }, [GetCachedAnimesDatas, GlobalAnimeData, UserAnimesData]);
 
   useEffect(() => {
     if (!userUid) {

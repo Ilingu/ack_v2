@@ -124,7 +124,7 @@ const Settings: NextPage = () => {
           {/* User's Profile */}
           <UserProfil UserData={{ user, username }} UserStats={UserStats} />
           {/* User's Settings */}
-          <Divider />(
+          <Divider />
           <section className="my-5 px-3">
             <header>
               <h1 className="text-description-whiter text-2xl font-bold">
