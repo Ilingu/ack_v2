@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 // Auth
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { Unsubscribe, User } from "@firebase/auth";
-import { doc, onSnapshot, collection } from "@firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  collection,
+  getDoc,
+  DocumentChange,
+  DocumentData,
+} from "@firebase/firestore";
 // Types
 import {
   AnimeShape,
@@ -13,11 +20,6 @@ import {
 } from "./utils/types/interface";
 // Func
 import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
-
-/*
- Make List of user dependencies animes (Array of malId number)
-  -> query(animeRef, where("state", "in", [array of malId]));
-*/
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
@@ -77,16 +79,24 @@ export function useGlobalAnimeData(userUid: string) {
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
 
-  useEffect(() => {
-    let unsub = onSnapshot(collection(db, "animes"), (Snapdocs) => {
-      const GlobalAnime = (Snapdocs?.docs
-        ?.map(postToJSON)
-        .filter((dt) => !dt.AllAnimeId) || []) as AnimeShape[];
-      setGlobalAnime(GlobalAnime);
-    });
+  const GetUserGlobalAnimeDatas = useCallback(async () => {
+    const GlobalUserAnimeDocs = await Promise.all(
+      UserAnimesData.map(async ({ AnimeId }) => {
+        const QueryRef = doc(db, "animes", AnimeId.toString());
+        return await getDoc(QueryRef);
+      })
+    );
+    const GlobalUserAnimeDatas = GlobalUserAnimeDocs.map(
+      postToJSON
+    ) as AnimeShape[];
 
-    return unsub;
-  }, []);
+    setGlobalAnime(GlobalUserAnimeDatas);
+  }, [UserAnimesData]);
+
+  useEffect(() => {
+    if (!UserAnimesData || GlobalAnimeData) return null;
+    GetUserGlobalAnimeDatas();
+  }, [GetUserGlobalAnimeDatas, GlobalAnimeData, UserAnimesData]);
 
   useEffect(() => {
     if (!userUid) {

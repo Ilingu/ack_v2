@@ -85,6 +85,7 @@ const SearchPage: NextPage = () => {
         const { data: animesRes }: JikanApiResSearchRoot = await callApi(
           `https://api.jikan.moe/v4/anime?q=${title}&limit=16`
         );
+
         // Format
         const ToPosterShape = JikanDataToPosterData(animesRes);
         const ResultObject: AnimesFoundShape = {
@@ -115,11 +116,9 @@ const SearchPage: NextPage = () => {
           })
         );
 
-      // query(animeRef, where("title", "==", searchKey));
-
       const filterIt = (searchKey: string) => {
         const strEquality = (base: string) =>
-          base.includes(searchKey.toLowerCase());
+          base?.includes(searchKey.toLowerCase());
         if (!animes.current) return [];
         return animes.current.filter((obj) => {
           const {

@@ -20,7 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     /* AppVersion */
     window.appVersion = () =>
-      window.matchMedia("(display-mode: standalone)").matches ? "PWA" : "Web";
+      window?.matchMedia("(display-mode: standalone)").matches ? "PWA" : "Web";
     /* Browser Version */
     window.mobileAndTabletCheck = () => {
       let check = false;
@@ -34,7 +34,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           )
         )
           check = true;
-      })(navigator.userAgent || navigator.vendor || window?.opera);
+      })(navigator?.userAgent || navigator?.vendor || window?.opera);
       return check;
     };
 
@@ -42,7 +42,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     NetworkCheck();
     /* ERROR DETECTION */
     window.onerror = async () => {
-      if (process?.env?.NODE_ENV === "development") return;
+      if (
+        process?.env?.NODE_ENV === "development" ||
+        window.location.pathname === "/error"
+      )
+        return;
       history.pushState("", "", "/error");
       window.location.reload();
     };

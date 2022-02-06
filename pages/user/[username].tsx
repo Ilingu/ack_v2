@@ -10,7 +10,7 @@ import {
   UserStatsShape,
 } from "../../lib/utils/types/interface";
 // Func
-import { callApi, decryptCookie } from "../../lib/utils/UtilsFunc";
+import { callApi } from "../../lib/utils/UtilsFunc";
 
 interface UserProfilePageProps {
   UserData: ResDataUser;
@@ -28,17 +28,16 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   } = ctx;
 
   if (!cookies.UsT) return { notFound: true };
-  const EncryptedToken = Buffer.from(cookies.UsT, "base64");
-  const decryptedToken = decryptCookie(EncryptedToken);
 
   const Username = username.toString().trim().toLocaleLowerCase();
   const UserData: ResApiRoutes = await callApi(
     `http://${host}/api/user/${Username}`,
     true,
     {},
-    decryptedToken
+    cookies.UsT
   );
 
+  console.log(UserData);
   if (!UserData.succeed || !UserData.data) return { notFound: true };
   return {
     props: { UserData: UserData.data, Username },

@@ -83,19 +83,26 @@ export async function callApi(
   url: string,
   internalApi = false,
   params?: RequestInit,
-  AcessToken?: string
+  AccessToken?: string
 ) {
   if (!isValidUrl(url)) return;
-  const req = await fetch(url, {
-    ...params,
-    headers: {
-      authorization: AcessToken
-        ? AcessToken
-        : internalApi
-        ? await auth.currentUser.getIdToken()
-        : undefined,
-    },
-  });
+
+  let req = null;
+  if (!internalApi) {
+    req = await fetch(url);
+  } else {
+    req = await fetch(url, {
+      ...params,
+      headers: {
+        authorization: AccessToken
+          ? AccessToken
+          : internalApi
+          ? await auth.currentUser.getIdToken()
+          : undefined,
+      },
+    });
+  }
+
   return await req.json();
 }
 

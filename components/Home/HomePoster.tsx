@@ -203,6 +203,7 @@ const HomePoster: FC = () => {
             NewEpisodeAvailable,
             NextEpisodeReleaseDate,
           }) => {
+            if (!GlobalAnime) return null;
             const AnimeData = GlobalAnime.find(
               ({ malId }) => malId === AnimeId
             );
