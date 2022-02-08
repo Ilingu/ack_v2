@@ -55,7 +55,7 @@ const Settings: NextPage = () => {
       toast.success("Your account will be deleted in 10s");
       deleteAccountTimeout.current = setTimeout(() => {
         DeleteAccount();
-      }, 1000);
+      }, 10000);
       return;
     }
 
@@ -87,8 +87,9 @@ const Settings: NextPage = () => {
     if (DAConfirmation < 2) return;
 
     try {
+      const ProdMode = process.env.NODE_ENV === "production";
       const res: ResApiRoutes = await callApi(
-        `http://${window.location.host}/api/user/delete`,
+        `http${ProdMode ? "s" : ""}://${window.location.host}/api/user/delete`,
         true,
         {
           method: "DELETE",
@@ -321,8 +322,9 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
     }
 
     try {
+      const ProdMode = process.env.NODE_ENV === "production";
       const res: ResApiRoutes = await callApi(
-        `http://${window.location.host}/api/user/rename`,
+        `http${ProdMode ? "s" : ""}://${window.location.host}/api/user/rename`,
         true,
         {
           method: "PUT",

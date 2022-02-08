@@ -51,7 +51,7 @@ export const getStaticProps: GetStaticProps = async () => {
           ? []
           : seasonAnime.data.slice(0, 50),
       },
-      revalidate: IsError(seasonAnime as unknown as JikanApiERROR) ? 60 : 3600,
+      revalidate: IsError(seasonAnime as unknown as JikanApiERROR) ? 60 : 900,
     };
   } catch (err) {
     console.error(err);

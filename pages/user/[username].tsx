@@ -29,15 +29,16 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   if (!cookies.UsT) return { notFound: true };
 
+  const ProdMode = process.env.NODE_ENV === "production";
+
   const Username = username.toString().trim().toLocaleLowerCase();
   const UserData: ResApiRoutes = await callApi(
-    `http://${host}/api/user/${Username}`,
+    `http${ProdMode ? "s" : ""}://${host}/api/user/${Username}`,
     true,
     {},
     cookies.UsT
   );
 
-  console.log(UserData);
   if (!UserData.succeed || !UserData.data) return { notFound: true };
   return {
     props: { UserData: UserData.data, Username },
