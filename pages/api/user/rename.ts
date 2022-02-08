@@ -42,8 +42,14 @@ const DeletUserHandler = async (
     )
       return Respond(ErrorHandling(422, "This Username Already exist !")); // ❌
 
-    const newUsernameRef = db.collection("usernames").doc(NewUsername);
     const CurrentUsernameRef = db.collection("usernames").doc(OldUsername);
+    const UserUidToRename = await CurrentUsernameRef.get();
+    if (!UserUidToRename.exists || UserUidToRename.data().uid !== uid)
+      return Respond(
+        ErrorHandling(403, "You're not the owner of this account") // ❌
+      );
+
+    const newUsernameRef = db.collection("usernames").doc(NewUsername);
     const UsernameDoc = await newUsernameRef.get();
 
     const isAvailable = !UsernameDoc.exists;

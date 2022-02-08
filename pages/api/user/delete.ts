@@ -25,13 +25,23 @@ const DeletUserHandler = async (
     return Respond(ErrorHandling(400, "Only accept DELETE req")); // ❌
 
   const Body = JSON.parse(body);
-  if (!Body || !Body["username"])
+  if (!Body || !Body["username"] || !Body["user_uid"])
     return Respond(ErrorHandling(400, "Missing User New/Old Username Params")); // ❌
 
   // Req Handler
   try {
     const { uid } = await auth.verifyIdToken(headers.authorization);
     const Username: string = Body["username"].trim();
+
+    const UserUidToDelete = await db
+      .collection("usernames")
+      .doc(Username)
+      .get();
+
+    if (!UserUidToDelete.exists || UserUidToDelete.data().uid !== uid)
+      return Respond(
+        ErrorHandling(403, "You're not the owner of this account") // ❌
+      );
 
     await db.collection("usernames").doc(Username).delete(); // 🚮 Free the username
     await db.recursiveDelete(db.collection("users").doc(uid)); // 🚮 Delete User Data
