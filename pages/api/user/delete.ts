@@ -25,7 +25,7 @@ const DeletUserHandler = async (
     return Respond(ErrorHandling(400, "Only accept DELETE req")); // ❌
 
   const Body = JSON.parse(body);
-  if (!Body || !Body["username"] || !Body["user_uid"])
+  if (!Body || !Body["username"])
     return Respond(ErrorHandling(400, "Missing User New/Old Username Params")); // ❌
 
   // Req Handler
