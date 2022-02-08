@@ -68,8 +68,9 @@ export const GetAnimeData = async (
       return { message: `Error when fetching: ${animeId}.`, err: true };
     }
 
-    if (animeEpsRes.length <= 0) {
-      for (let i = 0; i < 12; i++) {
+    const EpisodesLength = animeEpsRes?.length || 0;
+    if (EpisodesLength < 12) {
+      for (let i = EpisodesLength; i < 12; i++) {
         animeEpsRes = [
           ...animeEpsRes,
           {

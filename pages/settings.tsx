@@ -17,18 +17,26 @@ import { auth, db } from "../lib/firebase";
 import MetaTags from "../components/Common/Metatags";
 import toast from "react-hot-toast";
 import Divider from "../components/Design/Divider";
+import { FiSettings } from "react-icons/fi";
+import UserProfil from "../components/User/UserProfil";
 // Types
 import {
   BeforeInstallPromptEvent,
   ResApiRoutes,
   UserStatsShape,
 } from "../lib/utils/types/interface";
-import { FiSettings } from "react-icons/fi";
 import { AnimeWatchType } from "../lib/utils/types/enums";
-import UserProfil from "../components/User/UserProfil";
-import { FaBan, FaHome, FaSignOutAlt, FaTrashAlt } from "react-icons/fa";
+// Auth
+import {
+  FaBan,
+  FaHome,
+  FaSignOutAlt,
+  FaSync,
+  FaTrashAlt,
+} from "react-icons/fa";
 import { doc, getDoc } from "firebase/firestore";
 import { callApi } from "../lib/utils/UtilsFunc";
+import { ClearIDB } from "../lib/utils/IDB";
 
 /* Components */
 const Settings: NextPage = () => {
@@ -140,9 +148,18 @@ const Settings: NextPage = () => {
               <section>
                 <button
                   onClick={() => auth.signOut()}
-                  className="rounded-md bg-yellow-400 p-1 text-lg font-semibold text-black"
+                  className="xs:px-3 xs:text-lg rounded-md bg-yellow-400 py-1 px-1 font-semibold text-black"
                 >
                   <FaSignOutAlt className="icon" /> Sign Out
+                </button>
+                <button
+                  onClick={async () => {
+                    await ClearIDB();
+                    window.location.reload();
+                  }}
+                  className="text-headline bg-secondary xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
+                >
+                  <FaSync className="icon" /> Refresh Datas
                 </button>
                 <button
                   onClick={async () => {
@@ -156,7 +173,7 @@ const Settings: NextPage = () => {
                       }
                     }
                   }}
-                  className="bg-primary-main text-headline ml-4 rounded-md p-1 text-lg font-semibold"
+                  className="bg-primary-main text-headline xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
                 >
                   <FaHome className="icon" /> A2HS
                 </button>
@@ -165,7 +182,7 @@ const Settings: NextPage = () => {
                 <h1 className="text-description-whiter mb-1 text-xl font-bold">
                   Session Data:
                 </h1>
-                <ul className="text-headline grid  grid-cols-2 text-lg">
+                <ul className="text-headline xs:grid-cols-2 grid text-lg">
                   <li>
                     App Version:{" "}
                     <span className="text-primary-whitest">
