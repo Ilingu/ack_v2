@@ -152,7 +152,7 @@ export function useGlobalAnimeData(userUid: string) {
       setUserAnimesData(UserAnimes);
 
       const ChangedDatas = Snapdocs.docChanges();
-      if (ChangedDatas && ChangedDatas.length === 1) {
+      if (ChangedDatas && ChangedDatas.length === 1 && !!GlobalAnimeData) {
         const ChangedData = ChangedDatas[0];
         if (ChangedData.type === "added") {
           const IsAnimeDataNotCached = GlobalAnimeData.find(
