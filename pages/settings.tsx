@@ -210,7 +210,7 @@ const Settings: NextPage = () => {
                   </li>
                   <li>
                     ACK Version:{" "}
-                    <span className="text-primary-whitest">Open Beta (5)</span>
+                    <span className="text-primary-whitest">Open Beta</span>
                   </li>
                   <li>
                     Network Listener:{" "}

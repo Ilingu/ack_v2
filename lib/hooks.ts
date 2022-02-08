@@ -80,55 +80,64 @@ export function useGlobalAnimeData(userUid: string) {
   const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
-  const GlobalAnimeAlreadyFecth = useRef(false);
+  const GlobalAnimeFecthFB = useRef(0);
 
-  const GetUserGlobalAnimeDatas = useCallback(async () => {
-    if (!!GlobalAnimeAlreadyFecth.current) return;
-    const GlobalUserAnimeDocs = await Promise.all(
-      UserAnimesData.map(async ({ AnimeId }) => {
-        const QueryRef = doc(db, "animes", AnimeId.toString());
-        return await getDoc(QueryRef);
-      })
-    );
-    const GlobalUserAnimeDatas = GlobalUserAnimeDocs.map(
-      postToJSON
-    ) as AnimeShape[];
+  const GetAnimesDatasFB = useCallback(
+    async (UserAnimesDataCustom?: UserAnimeShape[]) => {
+      if (
+        GlobalAnimeFecthFB.current >= 50 ||
+        (!UserAnimesData && !UserAnimesDataCustom)
+      )
+        return;
 
-    // Save
-    setGlobalAnime(GlobalUserAnimeDatas);
+      const GlobalUserAnimeDocs = await Promise.all(
+        (UserAnimesDataCustom || UserAnimesData).map(async ({ AnimeId }) => {
+          const QueryRef = doc(db, "animes", AnimeId.toString());
+          return await getDoc(QueryRef);
+        })
+      );
+      const GlobalUserAnimeDatas = GlobalUserAnimeDocs.map(
+        postToJSON
+      ) as AnimeShape[];
 
-    const IDBObject: IDBShape = {
-      AnimesStored: GlobalUserAnimeDatas,
-      expire: Date.now() + 54000000, // 15H
-    };
-    WriteIDB(IDBObject);
+      // Save
+      setGlobalAnime(GlobalUserAnimeDatas);
 
-    GlobalAnimeAlreadyFecth.current = true;
-  }, [UserAnimesData]);
+      const IDBObject: IDBShape = {
+        AnimesStored: GlobalUserAnimeDatas,
+        expire: Date.now() + 54000000, // 15H
+      };
+      console.log(IDBObject);
+      WriteIDB(IDBObject);
 
-  const GetCachedAnimesDatas = useCallback(async () => {
+      GlobalAnimeFecthFB.current++;
+    },
+    [UserAnimesData]
+  );
+
+  const GetAnimesDatas = useCallback(async () => {
     const CachedAnimesDatas = await GetIDBAnimes();
-    console.log(CachedAnimesDatas);
 
     if (!CachedAnimesDatas || CachedAnimesDatas.length <= 0)
-      return GetUserGlobalAnimeDatas(); // FB query
+      return GetAnimesDatasFB(); // FB query
 
     if (
       CachedAnimesDatas[0]?.expire < Date.now() ||
       !CachedAnimesDatas[0]?.AnimesStored ||
       CachedAnimesDatas[0]?.AnimesStored.length <= 0
     )
-      return GetUserGlobalAnimeDatas(); // FB query
+      return GetAnimesDatasFB(); // FB query
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
     setGlobalAnime(GlobalUserAnimeDatas);
-  }, [GetUserGlobalAnimeDatas]);
+  }, [GetAnimesDatasFB]);
 
   useEffect(() => {
-    if (!UserAnimesData || GlobalAnimeData) return null;
-    // Check IDB
-    GetCachedAnimesDatas();
-  }, [GetCachedAnimesDatas, GlobalAnimeData, UserAnimesData]);
+    if (!UserAnimesData || GlobalAnimeData || GlobalAnimeFecthFB.current >= 50)
+      return null;
+    // Get User Animes Datas
+    GetAnimesDatas();
+  }, [GetAnimesDatas, GlobalAnimeData, UserAnimesData]);
 
   useEffect(() => {
     if (!userUid) {
@@ -140,11 +149,25 @@ export function useGlobalAnimeData(userUid: string) {
     let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
       const UserAnimes = (Snapdocs?.docs?.map(postToJSON) ||
         []) as UserAnimeShape[];
-
       setUserAnimesData(UserAnimes);
+
+      const ChangedDatas = Snapdocs.docChanges();
+      if (ChangedDatas && ChangedDatas.length === 1) {
+        const ChangedData = ChangedDatas[0];
+        if (ChangedData.type === "added") {
+          const IsAnimeDataNotCached = GlobalAnimeData.find(
+            ({ malId }) =>
+              malId === (ChangedData?.doc?.data() as UserAnimeShape).AnimeId
+          );
+          if (Object.keys(IsAnimeDataNotCached || {})?.length > 0) return;
+
+          GetAnimesDatasFB(UserAnimes); // FB query
+        }
+      }
     });
 
     return unsub;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userUid]);
 
   useEffect(() => {
@@ -163,5 +186,9 @@ export function useGlobalAnimeData(userUid: string) {
     return unsub;
   }, [userUid]);
 
-  return { GlobalAnimeData, UserAnimesData, UserGroupsData };
+  return {
+    GlobalAnimeData,
+    UserAnimesData,
+    UserGroupsData,
+  };
 }

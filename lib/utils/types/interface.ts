@@ -29,6 +29,10 @@ export interface InternalApiResError {
   message: string;
   err: boolean;
 }
+export interface InternalApiResSuccess {
+  AddedToDB: boolean;
+  AnimeData: AnimeShape;
+}
 export interface ResDataUser {
   User: User;
   NoOfAnimes: number;

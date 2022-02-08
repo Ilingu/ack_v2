@@ -42,13 +42,6 @@ const FocusMode: FC<FocusModeProps> = ({
   );
 
   /* FUNC */
-  const GenerateEp = useMemo(
-    (): { id: number }[] =>
-      Array.apply(null, Array(EpisodesLength)).map((_: null, i) => ({
-        id: i + 1,
-      })),
-    [EpisodesLength]
-  );
 
   useEffect(() => {
     // FocusData
@@ -62,21 +55,23 @@ const FocusMode: FC<FocusModeProps> = ({
       NextEpFiller: boolean = null,
       NextEpRecap: boolean = null;
 
-    GenerateEp.forEach(({ id }) => {
-      if (!Progress) return;
-      if (!ProgressToObj[id] && !NextEpId && !NextEpTitle) {
-        const { title, filler, recap } = EpisodesData.find(
-          ({ mal_id }) => mal_id === id
-        );
+    for (let id = 1; id < EpisodesLength; id++) {
+      if ((!ProgressToObj || !ProgressToObj[id]) && !NextEpId) {
         NextEpId = id;
+        console.log(id);
+
+        const EpisodeData = EpisodesData.find(({ mal_id }) => mal_id === id);
+        if (!EpisodeData) continue;
+        const { title, filler, recap } = EpisodeData;
         NextEpTitle = title;
         NextEpFiller = filler;
         NextEpRecap = recap;
       }
-    });
+    }
+
     setFocusEpisodeShape({
       EpId: NextEpId || 1,
-      EpTitle: NextEpTitle || EpisodesData[0].title,
+      EpTitle: NextEpTitle,
       Filler: NextEpFiller,
       Recap: NextEpRecap,
     });
@@ -89,7 +84,7 @@ const FocusMode: FC<FocusModeProps> = ({
     return () => {
       document.body.style.overflow = null;
     };
-  }, [EpisodesData, GenerateEp, Progress]);
+  }, [EpisodesData, EpisodesLength, Progress]);
 
   const UpdateUserAnimeProgress = async () => {
     const NewProgress = Progress ? [...Progress, EpId] : [EpId];

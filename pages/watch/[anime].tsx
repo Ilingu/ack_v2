@@ -89,7 +89,7 @@ const WatchPage: NextPage = () => {
       ({ malId }) => malId?.toString() === query.anime
     );
 
-    if (!UserAnimeData) push("/404");
+    if (!UserAnimeData || !CurrentAnimeData) push("/404");
 
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
@@ -116,7 +116,7 @@ const WatchPage: NextPage = () => {
     AddNextEpisodeReleaseDate(BroadcastTime, CurrentAnimeData.malId.toString());
   };
 
-  if (!UserAnimeData)
+  if (!UserAnimeData || !CurrentAnimeData)
     return (
       <div className="flex h-screen items-center justify-center">
         <h1 className="text-headline text-semibold text-4xl">
@@ -186,7 +186,8 @@ const WatchPage: NextPage = () => {
               <div className="gta-buttons flex flex-wrap justify-center gap-x-4 gap-y-2 lg:ml-20 lg:-mt-20 2xl:-ml-20">
                 <button
                   onClick={() => setFocusMode(true)}
-                  className="shadow-primary-darker bg-primary-main text-headline h-14 w-14 rounded-md text-xl shadow-md outline-none"
+                  className="shadow-primary-darker bg-primary-main text-headline h-14 w-14 rounded-md text-xl shadow-md 
+                  outline-none"
                 >
                   <FaPlay className="icon" />
                 </button>
@@ -194,7 +195,8 @@ const WatchPage: NextPage = () => {
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
                   }
-                  className="xs:mb-0 shadow-primary-darker bg-primary-main text-headline mb-2 h-14 w-14 rounded-md text-xl shadow-md outline-none"
+                  className="xs:mb-0 shadow-primary-darker bg-primary-main text-headline mb-2 h-14 w-14 rounded-md text-xl 
+                  shadow-md outline-none"
                 >
                   {Fav ? (
                     <AiFillStar className="icon" />
@@ -208,8 +210,8 @@ const WatchPage: NextPage = () => {
                   classNameProps="h-14 w-72"
                 />
               </div>
-              {/* Anime Content/Focus Mode */}
 
+              {/* Anime Content/Focus Mode */}
               <div className="gta-content">
                 {type === "Movie" || type === "Music" ? (
                   <MovieList Duration={duration.replace("hr", "Hr")} />

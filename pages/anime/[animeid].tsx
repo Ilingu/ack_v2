@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import React, {
   Fragment,
-  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { GetStaticProps, GetStaticPaths, NextPage } from "next";
@@ -17,6 +17,7 @@ import {
   GenreTag,
   AlternativeTitleShape,
   InternalApiResError,
+  InternalApiResSuccess,
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
@@ -49,7 +50,7 @@ import { GetAnimeData } from "../../lib/utils/ApiFunc";
 
 /* Interface */
 interface AnimeInfoProps {
-  animeData: AnimeShape;
+  animeData: InternalApiResSuccess;
 }
 interface SpecialInfoProps {
   AgeRating: string;
@@ -67,7 +68,7 @@ interface MyAnimeProps {
   malId: number;
 }
 
-const ReturnProps = (animeData: AnimeShape) => ({
+const ReturnProps = (animeData: InternalApiResSuccess) => ({
   props: { animeData },
   revalidate: 600,
 });
@@ -83,7 +84,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     const animeData = postToJSON(animeFB) as AnimeShape;
 
     if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
-      return ReturnProps(animeData);
+      return ReturnProps({ AddedToDB: false, AnimeData: animeData });
   }
 
   // No Anime -> Api Req
@@ -98,12 +99,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true) {
       console.error(`Cannot Fetch Anime "${animeId}"`);
-      if (animeFB.exists())
-        return ReturnProps(postToJSON(animeFB) as AnimeShape);
+      if (animeFB.exists()) {
+        const AnimeData = postToJSON(animeFB) as AnimeShape;
+        return ReturnProps({ AddedToDB: false, AnimeData });
+      }
       return Return404(60);
     }
 
-    const animeData = JikanAnimeRes as AnimeShape;
+    const animeData = JikanAnimeRes as InternalApiResSuccess;
     return ReturnProps(animeData);
   } catch (err) {
     console.error(err);
@@ -159,21 +162,21 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     broadcast,
     Status,
     AiringDate,
-  } = animeData || {};
-
-  const ScoredByTransform = useCallback((): string => {
-    if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
-    return ScoredBy?.toString();
-  }, [ScoredBy]);
+  } = animeData?.AnimeData || {};
 
   useEffect(() => {
     if (UserAnimes) {
       const CurrentAnime =
-        UserAnimes.find(({ AnimeId }) => AnimeId === animeData?.malId) || null;
+        UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
 
       setAnimeWatchType(CurrentAnime?.WatchType || null);
     }
-  }, [UserAnimes, animeData, GlobalAnime]);
+  }, [UserAnimes, animeData, GlobalAnime, malId]);
+
+  const ScoredByTransform = useMemo((): string => {
+    if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
+    return ScoredBy?.toString();
+  }, [ScoredBy]);
 
   if (router.isFallback)
     return (
@@ -212,7 +215,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                   {OverallScore || "No score yet"}
                 </span>{" "}
                 <span className="text-description text-xl italic">
-                  {ScoredByTransform() && `(${ScoredByTransform()} people)`}
+                  {ScoredByTransform && `(${ScoredByTransform} people)`}
                 </span>
               </div>
               <div>

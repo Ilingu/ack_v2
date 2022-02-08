@@ -3,6 +3,7 @@ import {
   AnimeConfigPathsIdShape,
   AnimeShape,
   InternalApiResError,
+  InternalApiResSuccess,
   JikanApiERROR,
   JikanApiResAnime,
   JikanApiResAnimeRoot,
@@ -50,7 +51,7 @@ export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
  */
 export const GetAnimeData = async (
   animeId: string
-): Promise<AnimeShape | InternalApiResError> => {
+): Promise<InternalApiResSuccess | InternalApiResError> => {
   let animeData: AnimeShape;
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
@@ -92,8 +93,11 @@ export const GetAnimeData = async (
       const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(AnimeDatas);
       animeData = AnimeData;
 
-      if (IsAddableToDB) await AddNewGlobalAnime(animeId, animeData);
-      return animeData;
+      let AddedToDB = false;
+      if (IsAddableToDB)
+        AddedToDB = await AddNewGlobalAnime(animeId, animeData);
+
+      return { AddedToDB, AnimeData: animeData };
     }
     return { message: `Anime with ID "${animeId}" NotFound`, err: true };
   } catch (err) {

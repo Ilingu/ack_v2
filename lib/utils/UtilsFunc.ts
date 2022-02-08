@@ -5,6 +5,7 @@ import {
   ADKamiScrapperApiERROR,
   AnimeShape,
   EpisodesShape,
+  IDBShape,
   JikanApiERROR,
   JikanApiResAnime,
   JikanApiResEpisodes,
@@ -13,6 +14,7 @@ import {
   NetworkInformationShape,
   RecommendationsShape,
   SeasonAnimesShape,
+  UserAnimeShape,
 } from "./types/interface";
 import {
   AnimeStatusType,
@@ -25,6 +27,8 @@ import { doc, updateDoc, DocumentSnapshot } from "@firebase/firestore";
 import { auth, db } from "../firebase";
 // Toast
 import toast from "react-hot-toast";
+import { getDoc } from "firebase/firestore";
+import { GetIDBAnimes, WriteIDB } from "./IDB";
 
 /* FUNC */
 
@@ -75,6 +79,7 @@ export const decryptCookie = (encryptedCookie: Buffer): string => {
   }
 };
 
+/* UTILS */
 /**
  * Fetch Data From Api
  * @param {URL} url
