@@ -52,6 +52,22 @@ export const WriteIDB = async (data: IDBShape) => {
   }
 };
 
+/**
+ * Clear all data in IndexedDB
+ */
+export const ClearIDB = async () => {
+  try {
+    const db = await GetIDB();
+    const store = db
+      .transaction("GlobalAnimesDatas", "readwrite")
+      .objectStore("GlobalAnimesDatas");
+
+    await store.clear();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 // /**
 //  * Update key with the new given data in IndexedDB
 //  * @param {string} where

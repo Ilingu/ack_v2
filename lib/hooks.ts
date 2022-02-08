@@ -21,7 +21,7 @@ import {
 } from "./utils/types/interface";
 // Func
 import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
-import { GetIDBAnimes, WriteIDB } from "./utils/IDB";
+import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
@@ -61,7 +61,8 @@ export function useUserData() {
         setUsername(null);
         setFinished(true);
 
-        // 🍪
+        // Clear Cached Datas
+        await ClearIDB();
         document.cookie =
           "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       }
@@ -107,7 +108,6 @@ export function useGlobalAnimeData(userUid: string) {
         AnimesStored: GlobalUserAnimeDatas,
         expire: Date.now() + 54000000, // 15H
       };
-      console.log(IDBObject);
       WriteIDB(IDBObject);
 
       GlobalAnimeFecthFB.current++;
@@ -142,6 +142,7 @@ export function useGlobalAnimeData(userUid: string) {
   useEffect(() => {
     if (!userUid) {
       setUserAnimesData(undefined);
+      setGlobalAnime(undefined);
       return null;
     }
 

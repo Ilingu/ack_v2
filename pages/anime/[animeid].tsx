@@ -98,11 +98,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true) {
-      console.error(`Cannot Fetch Anime "${animeId}"`);
       if (animeFB.exists()) {
         const AnimeData = postToJSON(animeFB) as AnimeShape;
         return ReturnProps({ AddedToDB: false, AnimeData });
       }
+      console.error(`Cannot Fetch Anime "${animeId}"`);
       return Return404(60);
     }
 
