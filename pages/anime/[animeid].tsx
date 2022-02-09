@@ -30,6 +30,7 @@ import {
 import AuthCheck from "../../components/Common/AuthCheck";
 import { doc, getDoc } from "@firebase/firestore";
 import { db } from "../../lib/firebase";
+import { db as AdminDB } from "../../lib/firebase-admin";
 // UI
 import MetaTags from "../../components/Common/Metatags";
 import Loader from "../../components/Design/Loader";
@@ -78,10 +79,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { animeid: animeId } = params as { animeid: string };
 
   // Check on FB
-  const animeFBRef = doc(db, "animes", animeId);
-  const animeFB = await getDoc(animeFBRef);
-  if (animeFB.exists()) {
-    const animeData = postToJSON(animeFB) as AnimeShape;
+  const animeFB = await AdminDB.collection("animes").doc(animeId).get();
+  if (animeFB.exists) {
+    const animeData = animeFB.data() as AnimeShape;
 
     if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
       return ReturnProps({ AddedToDB: false, AnimeData: animeData });
@@ -98,8 +98,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
     const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
     if ((JikanAnimeRes as InternalApiResError).err === true) {
-      if (animeFB.exists()) {
-        const AnimeData = postToJSON(animeFB) as AnimeShape;
+      if (animeFB.exists) {
+        const AnimeData = animeFB.data() as AnimeShape;
         return ReturnProps({ AddedToDB: false, AnimeData });
       }
       console.error(`Cannot Fetch Anime "${animeId}"`);
@@ -117,7 +117,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 export const getStaticPaths: GetStaticPaths = async () => {
   // Get all anime path name from DB
   const animesPaths = (
-    await getDoc(doc(db, "animes", "animes-config"))
+    await AdminDB.collection("animes").doc("animes-config").get()
   ).data() as AnimeConfigPathsIdShape;
 
   const paths = (animesPaths?.AllAnimeId || ["31478"]).map((doc) => ({

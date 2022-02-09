@@ -70,6 +70,9 @@ export const GetAnimeData = async (
 
     const EpisodesLength = animeEpsRes?.length || 0;
     if (EpisodesLength < 12) {
+      // TODO: More Dyna (Ex: Princess Connect)
+      // Where the 1 and 4 ep are added but not the 2-3
+      // Do array of Missing Ep (if 1 and 4 don't miss add them, but the other generate them)
       for (let i = EpisodesLength; i < 12; i++) {
         animeEpsRes = [
           ...animeEpsRes,
