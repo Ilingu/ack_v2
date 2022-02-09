@@ -152,7 +152,7 @@ export function useGlobalAnimeData(userUid: string) {
       setUserAnimesData(UserAnimes);
 
       const ChangedDatas = Snapdocs.docChanges();
-      if (ChangedDatas && ChangedDatas.length === 1 && !!GlobalAnimeData) {
+      if (!!ChangedDatas && ChangedDatas.length === 1 && !!GlobalAnimeData) {
         const ChangedData = ChangedDatas[0];
         if (ChangedData.type === "added") {
           const IsAnimeDataNotCached = GlobalAnimeData.find(
@@ -168,7 +168,7 @@ export function useGlobalAnimeData(userUid: string) {
 
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userUid]);
+  }, [userUid, GlobalAnimeData]);
 
   useEffect(() => {
     if (!userUid) {
