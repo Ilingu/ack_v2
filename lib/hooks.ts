@@ -97,7 +97,7 @@ export function useGlobalAnimeData(userUid: string) {
 
       const IDBObject: IDBShape = {
         AnimesStored: GlobalUserAnimeDatas,
-        expire: Date.now() + 54000000, // 15H
+        expire: Date.now() + 259200000, // 3J --> Force Refresh for AnimesDatas Updates (Like Season)
       };
       WriteIDB(IDBObject);
 
