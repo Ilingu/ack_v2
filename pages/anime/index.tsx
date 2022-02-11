@@ -171,7 +171,9 @@ const SearchPage: NextPage = () => {
 
 function FormInput({ Submit }: FormInputProps) {
   const [title, setTitle] = useState("");
+  const SearchInputRef = useRef<any>();
 
+  useEffect(() => SearchInputRef && SearchInputRef.current.focus(), []);
   useEffect(() => {
     checkWritting(title);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -188,13 +190,20 @@ function FormInput({ Submit }: FormInputProps) {
   );
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="text-center">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        Submit(title.trim().toLowerCase(), true);
+      }}
+      className="text-center"
+    >
       <h1 className="text-headline mb-2 text-4xl font-bold tracking-wider sm:text-5xl">
         <FaSearch className="icon" /> Find your{" "}
         <span className="text-primary-darker">anime</span>
       </h1>
       <input
         type="text"
+        ref={SearchInputRef}
         placeholder="Bungo Stray Dogs"
         className="bg-bgi-darker text-headline focus:ring-primary-whiter h-16 w-11/12 rounded-md px-2 text-center text-2xl font-semibold outline-none transition focus:ring-2 xl:w-2/3"
         value={title}

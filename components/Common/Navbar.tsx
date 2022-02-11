@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { FC, Fragment, useContext, useEffect, useState } from "react";
+import { install } from "@github/hotkey";
 // Auth
 import { auth } from "../../lib/firebase";
 import AuthCheck from "./AuthCheck";
@@ -17,7 +18,12 @@ const Navbar: FC = () => {
   const { user } = useContext(GlobalAppContext);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
+      install(el as HTMLElement);
+    }
+    setMounted(true);
+  }, []);
 
   if (!mounted) return <NavItem />;
   const afterHydrated = (
@@ -75,7 +81,10 @@ function NavItem({ afterHydrated }: NavItemProps) {
   return (
     <nav className="bg-bgi-black relative flex h-20 w-full rounded-bl-lg rounded-br-lg">
       <Link href="/" replace passHref>
-        <a className="absolute ml-2 flex h-full scale-90 items-center sm:scale-100">
+        <a
+          className="absolute ml-2 flex h-full scale-90 items-center sm:scale-100"
+          data-hotkey="Alt+h"
+        >
           <Image
             title="Go Home"
             src="/IconAck192.png"
@@ -88,7 +97,7 @@ function NavItem({ afterHydrated }: NavItemProps) {
       </Link>
       <div className="text-headline ml-11 flex h-full w-full scale-75 items-center sm:scale-100 sm:justify-end md:mr-0 md:justify-center">
         <Link href="/anime" passHref>
-          <a>
+          <a data-hotkey="Alt+k">
             <button className="btn-navbar group">
               <FaSearch className="text-secondary -translate-y-0.5" />{" "}
               <span className="text-description-whiter group-hover:text-headline mt-1 transition">
@@ -98,7 +107,7 @@ function NavItem({ afterHydrated }: NavItemProps) {
           </a>
         </Link>
         <Link href="/anime/season" passHref>
-          <a>
+          <a data-hotkey="Alt+s">
             <button className="btn-navbar group">
               <FaLeaf className="text-secondary -translate-y-0.5" />{" "}
               <span className="text-description-whiter group-hover:text-headline mt-1 transition">

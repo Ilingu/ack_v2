@@ -3,14 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { Unsubscribe, User } from "@firebase/auth";
-import {
-  doc,
-  onSnapshot,
-  collection,
-  getDoc,
-  DocumentChange,
-  DocumentData,
-} from "@firebase/firestore";
+import { doc, onSnapshot, collection, getDoc } from "@firebase/firestore";
 // Types
 import {
   AnimeShape,
@@ -31,7 +24,7 @@ export function useUserData() {
   useEffect(() => {
     let unsubscribe: Unsubscribe;
 
-    document.cookie = "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // 🍪
+    document.cookie = "UsT=; expires=Thu, 01 Jan 1970 00:00:00 UTC"; // 🍪
     const unSub = onAuthStateChanged(auth, async (user: User) => {
       if (user) {
         const UserRef = doc(db, "users", user.uid);
@@ -51,9 +44,7 @@ export function useUserData() {
         const encryptedCookie = encryptCookie(Buffer.from(token));
         document.cookie = `UsT=${encryptedCookie.toString(
           "base64"
-        )}; expires=${new Date(
-          Date.now() + 1000 * 60 * 60 * 24
-        ).toUTCString()}`;
+        )}; expires=${new Date(Date.now() + 153360000000).toISOString()}`; // 153360000000 = 5y = Session Cookie
 
         setUser(user); // Settings User
       } else {
@@ -81,11 +72,12 @@ export function useGlobalAnimeData(userUid: string) {
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
   const GlobalAnimeFecthFB = useRef(0);
+  const CountOfRefreshFromFB = useRef(0);
 
   const GetAnimesDatasFB = useCallback(
     async (UserAnimesDataCustom?: UserAnimeShape[]) => {
       if (
-        GlobalAnimeFecthFB.current >= 50 ||
+        GlobalAnimeFecthFB.current >= 20 ||
         (!UserAnimesData && !UserAnimesDataCustom)
       )
         return;
@@ -132,7 +124,7 @@ export function useGlobalAnimeData(userUid: string) {
   }, [GetAnimesDatasFB]);
 
   useEffect(() => {
-    if (!UserAnimesData || GlobalAnimeData || GlobalAnimeFecthFB.current >= 50)
+    if (!UserAnimesData || GlobalAnimeData || GlobalAnimeFecthFB.current >= 20)
       return null;
     // Get User Animes Datas
     GetAnimesDatas();
@@ -151,18 +143,14 @@ export function useGlobalAnimeData(userUid: string) {
         []) as UserAnimeShape[];
       setUserAnimesData(UserAnimes);
 
-      const ChangedDatas = Snapdocs.docChanges();
-      if (!!ChangedDatas && ChangedDatas.length === 1 && !!GlobalAnimeData) {
-        const ChangedData = ChangedDatas[0];
-        if (ChangedData.type === "added") {
-          const IsAnimeDataNotCached = GlobalAnimeData.find(
-            ({ malId }) =>
-              malId === (ChangedData?.doc?.data() as UserAnimeShape).AnimeId
-          );
-          if (Object.keys(IsAnimeDataNotCached || {})?.length > 0) return;
-
-          GetAnimesDatasFB(UserAnimes); // FB query
-        }
+      // Scalability: Do array of missing animesDatas, and query only them from DB (Limiting queries numbers)
+      if (
+        !!GlobalAnimeData &&
+        UserAnimes.length > GlobalAnimeData.length &&
+        CountOfRefreshFromFB.current <= 5
+      ) {
+        CountOfRefreshFromFB.current++;
+        GetAnimesDatasFB(UserAnimes); // FB query
       }
     });
 
