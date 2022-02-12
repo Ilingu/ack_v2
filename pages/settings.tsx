@@ -161,22 +161,24 @@ const Settings: NextPage = () => {
                 >
                   <FaSync className="icon" /> Refresh Datas
                 </button>
-                <button
-                  onClick={async () => {
-                    if (deferredPrompt.current !== null) {
-                      deferredPrompt.current.prompt();
-                      const { outcome } = await deferredPrompt.current
-                        .userChoice;
-                      if (outcome === "accepted") {
-                        deferredPrompt.current = null;
-                        toast.success("Thanks !");
+                {window.appVersion() === "Web" && (
+                  <button
+                    onClick={async () => {
+                      if (deferredPrompt.current !== null) {
+                        deferredPrompt.current.prompt();
+                        const { outcome } = await deferredPrompt.current
+                          .userChoice;
+                        if (outcome === "accepted") {
+                          deferredPrompt.current = null;
+                          toast.success("Thanks !");
+                        }
                       }
-                    }
-                  }}
-                  className="bg-primary-main text-headline xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
-                >
-                  <FaHome className="icon" /> A2HS
-                </button>
+                    }}
+                    className="bg-primary-main text-headline xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
+                  >
+                    <FaHome className="icon" /> A2HS
+                  </button>
+                )}
               </section>
               <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
                 <h1 className="text-description-whiter mb-1 text-xl font-bold">

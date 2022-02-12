@@ -26,6 +26,7 @@ import {
 } from "../../lib/utils/types/interface";
 // Auth
 import {
+  deleteDoc,
   deleteField,
   doc,
   getDoc,
@@ -43,7 +44,7 @@ import {
 } from "../../lib/utils/UtilsFunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaCopy, FaMinus, FaPlus, FaSearch } from "react-icons/fa";
+import { FaCopy, FaMinus, FaPlus, FaSearch, FaTrashAlt } from "react-icons/fa";
 import { FcOk } from "react-icons/fc";
 import toast from "react-hot-toast";
 import VerticalDivider from "../Design/VerticalDivider";
@@ -108,6 +109,7 @@ interface GroupComponentProps {
     method: "ADD" | "DELETE" | "DELETE_DB",
     GrName?: string
   ) => void;
+  DeleteGroup: (GrName: string) => Promise<void>;
 }
 interface AnimeSearchFormInputProps {
   SearchAnime: (AnimeName: string) => void;
@@ -463,6 +465,25 @@ const HomePoster: FC = () => {
     [AnimesToAdd, user.uid]
   );
 
+  const DeleteGroup = useCallback(
+    async (GrName: string) => {
+      const SafeGrName = encodeURI(kebabCase(GrName));
+      try {
+        if (!SafeGrName || SafeGrName.trim().length <= 0) throw new Error();
+
+        const GroupRef = doc(doc(db, "users", user.uid), "groups", SafeGrName);
+        await deleteDoc(GroupRef);
+
+        setSelectedGroup(null);
+        toast.success("Group successfully deleted");
+      } catch (err) {
+        toast.error("Couldn't delete this group");
+      }
+    },
+    [user.uid]
+  );
+
+  /* Other Func */
   const SearchGroup = useCallback(
     (GrName: string) =>
       UserGroups.filter(({ GroupName }) => {
@@ -472,7 +493,6 @@ const HomePoster: FC = () => {
     [UserGroups]
   );
 
-  /* Other Func */
   const SearchAnime = useCallback(
     (AnimeName: string) => {
       if (!AnimeName) return setAnimeSearchScope([]);
@@ -520,6 +540,7 @@ const HomePoster: FC = () => {
             selectedGroupName={selectedGroupName}
             setSelectedGroup={setSelectedGroup}
             ToggleGroup={ToggleGroup}
+            DeleteGroup={DeleteGroup}
           />
         ) : (
           <AnimePosterComponent AnimeRenderedElements={AnimeRenderedElements} />
@@ -740,6 +761,7 @@ function GroupComponent({
   setSelectedGroup,
   GroupRenderedElements,
   ToggleGroup,
+  DeleteGroup,
 }: GroupComponentProps) {
   return (
     <Fragment>
@@ -764,6 +786,13 @@ function GroupComponent({
               onClick={() => setSelectedGroup(null)}
             >
               <AiFillCloseCircle className="icon" />
+            </button>
+            <button
+              className="text-headline absolute top-0 left-2 text-3xl transition-all hover:text-red-500"
+              title="Delete this group"
+              onClick={() => DeleteGroup(selectedGroupName?.name)}
+            >
+              <FaTrashAlt className="icon" />
             </button>
             <div className="mt-3 grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
               {selectedGroupName.data.Animes.map((AnimeData, i) => (

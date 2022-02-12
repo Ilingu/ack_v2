@@ -68,24 +68,25 @@ export const GetAnimeData = async (
       return { message: `Error when fetching: ${animeId}.`, err: true };
     }
 
+    // Episodes Generation
     const EpisodesLength = animeEpsRes?.length || 0;
+    let AnimeEpsDatas: JikanApiResEpisodes[] = [];
+
     if (EpisodesLength < 12) {
-      // TODO: More Dyna (Ex: Princess Connect)
-      // Where the 1 and 4 ep are added but not the 2-3
-      // Do array of Missing Ep (if 1 and 4 don't miss add them, but the other generate them)
-      for (let i = EpisodesLength; i < 12; i++) {
-        animeEpsRes = [
-          ...animeEpsRes,
-          {
-            mal_id: i + 1,
-          },
-        ];
+      const NonMissingEp = animeEpsRes.map(({ mal_id }) => mal_id);
+      for (let i = 1; i <= 12; i++) {
+        const EpToAdd: JikanApiResEpisodes = NonMissingEp.includes(i)
+          ? animeEpsRes.find(({ mal_id }) => mal_id === i)
+          : {
+              mal_id: i,
+            };
+        AnimeEpsDatas = [...AnimeEpsDatas, EpToAdd];
       }
-    }
+    } else AnimeEpsDatas = animeEpsRes;
 
     const AnimeDatas: AnimeDatasShape = [
       animeRes,
-      animeEpsRes,
+      AnimeEpsDatas,
       animeRecommendationsRes,
     ];
 

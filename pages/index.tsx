@@ -12,11 +12,7 @@ const Home: NextPage = () => {
       PageMetaData={["Home-Please Connect", "Home Page - Please Connect"]}
     >
       <main>
-        <MetaTags
-          title="Anim-Checker"
-          description="Home Page, Your anime list"
-        />
-
+        <MetaTags />
         <HomePoster />
       </main>
     </AuthCheck>

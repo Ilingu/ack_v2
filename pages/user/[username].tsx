@@ -70,7 +70,10 @@ const UserProfilePage: NextPage<UserProfilePageProps> = ({
 
   return (
     <main className="flex h-screen flex-col items-center">
-      <MetaTags title="User's Settings" description="Settings of ACK User" />
+      <MetaTags
+        title={`${UserData.User?.displayName}'s profile`}
+        description="ACK User Profile"
+      />
       <div className="w-11/12 sm:w-5/6 md:w-11/12 lg:w-2/3 2xl:w-1/2">
         <UserProfil
           UserData={{ user: UserData.User, username: Username }}

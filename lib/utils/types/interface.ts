@@ -26,7 +26,7 @@ export interface ResApiRoutes {
   message?: string;
 }
 export interface InternalApiResError {
-  message: string;
+  message?: string;
   err: boolean;
 }
 export interface InternalApiResSuccess {

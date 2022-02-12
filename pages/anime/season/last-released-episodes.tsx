@@ -95,7 +95,7 @@ const LastEpPage: NextPage<LastEpPageProps> = ({ LastAnimeEpISR }) => {
     <div className="relative py-2 px-2">
       <MetaTags
         title="Last Released Episodes"
-        description="All the Last 2days Released Anime Episodes in the world!"
+        description="All the Last Released Anime Episodes in the world!"
       />
       <header>
         <p className="text-headline text-center font-semibold md:absolute md:top-2 md:left-2">

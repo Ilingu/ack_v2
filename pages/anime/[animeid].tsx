@@ -190,7 +190,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       <MetaTags
         title={title}
         description={`${title} anime info page`}
-        image={photoPath}
+        image={photoPath.replace(".jpg", "t.jpg")}
       />
       {/* Overall Info */}
       <section className="relative lg:w-5/6">
