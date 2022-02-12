@@ -24,7 +24,7 @@ const DeletUserHandler = async (
     headers,
   } = req;
 
-  if (headers.host === "ack-git-dev-ilingu.vercel.app")
+  if (headers.host !== "ack.vercel.app")
     return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
 
   const Username = username && username.toString().trim();

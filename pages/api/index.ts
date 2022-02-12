@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
-  const AccessDenied = req.headers.host === "ack-git-dev-ilingu.vercel.app";
+  const AccessDenied = req.headers.host !== "ack.vercel.app";
   const responseTexte = `ACK API ROUTE${
     AccessDenied ? ": Access DENIED" : ": Access ACCEPTED"
   }`;
