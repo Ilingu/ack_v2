@@ -17,6 +17,7 @@ import {
   removeDuplicates,
   removeParamsFromPhotoUrl,
 } from "../../lib/utils/UtilsFunc";
+import { SearchAnimeInAlgolia } from "../../lib/algolia/algolia";
 // Types
 import {
   AnimeShape,
@@ -25,7 +26,7 @@ import {
   PosterSearchData,
 } from "../../lib/utils/types/interface";
 // Icon
-import { FaSearch, FaGlobe } from "react-icons/fa";
+import { FaSearch, FaGlobe, FaAlgolia } from "react-icons/fa";
 import { GlobalAppContext, SearchPosterContext } from "../../lib/context";
 
 /* Interface */
@@ -138,9 +139,21 @@ const SearchPage: NextPage = () => {
       };
 
       // Format
-      const resultAnimesFound = AnimeShapeToPosterData(
+      let resultAnimesFound = AnimeShapeToPosterData(
         removeDuplicates(filterIt(title))
       );
+
+      if (!resultAnimesFound || resultAnimesFound?.length <= 0) {
+        // Query Algolia
+        const resAlgolia = await SearchAnimeInAlgolia(title);
+        if (
+          resAlgolia?.success &&
+          resAlgolia?.data &&
+          resAlgolia.data.length > 0
+        )
+          resultAnimesFound = resAlgolia.data;
+      }
+
       const ResultObject: AnimesFoundShape = {
         animesFound: resultAnimesFound,
         reqTitle: title,
@@ -210,7 +223,18 @@ function FormInput({ Submit }: FormInputProps) {
         onChange={(e) => setTitle(e.target.value)}
       />
       <p className="text-description font-semibold tracking-wide">
-        <span className="text-base">Aucun résultats pertinent ?</span>{" "}
+        <span className="text-base">
+          Powered by{" "}
+          <a
+            href="https://www.algolia.com/"
+            className="text-primary-whitest font-semibold"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <FaAlgolia className="icon" /> Algolia
+          </a>{" "}
+          {"//"}
+        </span>{" "}
         <span
           onClick={() => Submit(title.trim().toLowerCase(), true)}
           className="text-primary-whiter hover:text-primary-main cursor-pointer text-lg transition hover:underline"

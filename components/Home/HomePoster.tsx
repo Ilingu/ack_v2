@@ -27,14 +27,13 @@ import {
 // Auth
 import {
   deleteDoc,
-  deleteField,
   doc,
   getDoc,
   setDoc,
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firebase/firebase";
 // Func
 import {
   copyToClipboard,

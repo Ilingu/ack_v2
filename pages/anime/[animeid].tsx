@@ -21,16 +21,10 @@ import {
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
-import {
-  ConvertBroadcastTimeZone,
-  postToJSON,
-  Return404,
-} from "../../lib/utils/UtilsFunc";
+import { ConvertBroadcastTimeZone, Return404 } from "../../lib/utils/UtilsFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
-import { doc, getDoc } from "@firebase/firestore";
-import { db } from "../../lib/firebase";
-import { db as AdminDB } from "../../lib/firebase-admin";
+import { db as AdminDB } from "../../lib/firebase/firebase-admin";
 // UI
 import MetaTags from "../../components/Common/Metatags";
 import Loader from "../../components/Design/Loader";

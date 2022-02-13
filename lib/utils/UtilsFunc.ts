@@ -24,11 +24,9 @@ import {
 } from "./types/types";
 // DB
 import { doc, updateDoc, DocumentSnapshot } from "@firebase/firestore";
-import { auth, db } from "../firebase";
+import { auth, db } from "../firebase/firebase";
 // Toast
 import toast from "react-hot-toast";
-import { getDoc } from "firebase/firestore";
-import { GetIDBAnimes, WriteIDB } from "./IDB";
 
 /* FUNC */
 

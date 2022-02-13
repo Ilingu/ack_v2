@@ -1,4 +1,6 @@
-import { db } from "../firebase-admin";
+import { db } from "../firebase/firebase-admin";
+import { IndexAnimeInAlgolia } from "../algolia/algolia-admin";
+// Types
 import {
   AnimeConfigPathsIdShape,
   AnimeShape,
@@ -13,6 +15,7 @@ import {
   JikanApiResRecommandationsRoot,
   ResApiRoutes,
 } from "./types/interface";
+// Func
 import { callApi, IsError, JikanApiToAnimeShape } from "./UtilsFunc";
 
 type AnimeDatasShape = [
@@ -99,8 +102,10 @@ export const GetAnimeData = async (
       animeData = AnimeData;
 
       let AddedToDB = false;
-      if (IsAddableToDB)
+      if (IsAddableToDB) {
         AddedToDB = await AddNewGlobalAnime(animeId, animeData);
+        await IndexAnimeInAlgolia(animeData);
+      }
 
       return { AddedToDB, AnimeData: animeData };
     }
@@ -112,11 +117,11 @@ export const GetAnimeData = async (
 };
 
 /**
- * Fetch Anime Data
+ * Add Anime Data To FB
  * @param {string} animeId
  * @param {AnimeShape} animeData
  */
-export const AddNewGlobalAnime = async (
+const AddNewGlobalAnime = async (
   animeId: string,
   animeData: AnimeShape
 ): Promise<boolean> => {

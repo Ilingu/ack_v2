@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 // Auth
-import { auth, db } from "./firebase";
+import { auth, db } from "./firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { Unsubscribe, User } from "@firebase/auth";
 import { doc, onSnapshot, collection, getDoc } from "@firebase/firestore";

@@ -7,6 +7,9 @@ import { GlobalAppContext } from "../../lib/context";
 // Auth
 import AuthCheck from "../../components/Common/AuthCheck";
 import MetaTags from "../../components/Common/Metatags";
+// FB
+import { doc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase/firebase";
 // Func
 import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utils/UtilsFunc";
 // Types
@@ -20,8 +23,6 @@ import { FaPlay, FaSpinner } from "react-icons/fa";
 import MovieList from "../../components/WatchComponents/MovieList";
 import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
-import { doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase";
 
 /* Func */
 const AddNextEpisodeReleaseDate = async (

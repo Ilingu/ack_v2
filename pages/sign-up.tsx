@@ -9,7 +9,7 @@ import {
   GithubAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, db } from "../lib/firebase";
+import { auth, db } from "../lib/firebase/firebase";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import debounce from "lodash.debounce";
 // UI

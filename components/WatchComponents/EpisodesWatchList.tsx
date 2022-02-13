@@ -9,7 +9,7 @@ import React, {
 } from "react";
 // DB
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase/firebase";
 import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 import toast from "react-hot-toast";
 // Types

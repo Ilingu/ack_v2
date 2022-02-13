@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase/firebase";
 import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 // Types
 import {

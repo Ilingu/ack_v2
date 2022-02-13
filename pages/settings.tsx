@@ -12,7 +12,7 @@ import debounce from "lodash.debounce";
 // Auth
 import AuthCheck from "../components/Common/AuthCheck";
 import { GlobalAppContext } from "../lib/context";
-import { auth, db } from "../lib/firebase";
+import { auth, db } from "../lib/firebase/firebase";
 // UI
 import MetaTags from "../components/Common/Metatags";
 import toast from "react-hot-toast";

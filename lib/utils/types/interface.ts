@@ -39,6 +39,10 @@ export interface ResDataUser {
   NoOfWatchAnimes: number;
 }
 // Others
+export interface AlgoliaResShape {
+  success: boolean;
+  data?: AnimeShape[];
+}
 export interface IDBShape {
   expire: number;
   AnimesStored: AnimeShape[];

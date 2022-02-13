@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { auth, db } from "../../../lib/firebase-admin";
+import { auth, db } from "../../../lib/firebase/firebase-admin";
 import { ErrorHandling, SuccessHandling } from "../../../lib/utils/ApiFunc";
 import { AnimeWatchType } from "../../../lib/utils/types/enums";
 import {

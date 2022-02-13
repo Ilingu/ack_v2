@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from "react";
 // DB
 import { doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase/firebase";
 // UI
 import { AiOutlineCheckSquare, AiOutlineCloseSquare } from "react-icons/ai";
 import toast from "react-hot-toast";

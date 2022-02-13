@@ -1,7 +1,7 @@
 {
   "name": "ack_v2",
   "private": true,
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Make yout animes lists!",
   "keywords": [
     "Anime",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@github/hotkey": "^2.0.0",
+    "algoliasearch": "^4.12.1",
     "firebase": "^9.6.4",
     "firebase-admin": "^10.0.2",
     "idb": "^7.0.0",

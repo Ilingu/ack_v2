@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 // DB
-import { auth, db } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase/firebase";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
 // Types
 import { AnimeWatchType } from "../../lib/utils/types/enums";

@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { FC, Fragment, useContext, useEffect, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import { install } from "@github/hotkey";
 // Auth
-import { auth } from "../../lib/firebase";
 import AuthCheck from "./AuthCheck";
 // UI
-import { FaLeaf, FaSearch, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaLeaf, FaSearch, FaSignInAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";
 import { GlobalAppContext } from "../../lib/context";
 
@@ -42,36 +41,26 @@ const Navbar: FC = () => {
         </Link>
       }
     >
-      <Fragment>
-        <Link href="/settings" passHref>
-          <a>
-            <button className="btn-navbar group">
-              {user?.photoURL ? (
-                <Image
-                  src={user?.photoURL}
-                  alt="User Profile"
-                  width={20}
-                  height={20}
-                  className="rounded"
-                />
-              ) : (
-                <FiSettings className="text-secondary -translate-y-0.5" />
-              )}
-              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
-                Settings
-              </span>
-            </button>
-          </a>
-        </Link>
-        <button onClick={() => auth.signOut()} className="btn-navbar group">
-          <FaSignOutAlt className="-translate-y-0.5 text-red-500" />
-          {screen?.width > 768 && (
+      <Link href="/settings" passHref>
+        <a>
+          <button className="btn-navbar group">
+            {user?.photoURL ? (
+              <Image
+                src={user?.photoURL}
+                alt="User Profile"
+                width={20}
+                height={20}
+                className="rounded"
+              />
+            ) : (
+              <FiSettings className="text-secondary -translate-y-0.5" />
+            )}
             <span className="text-description-whiter group-hover:text-headline mt-1 transition">
-              Sign out
+              Settings
             </span>
-          )}
-        </button>
-      </Fragment>
+          </button>
+        </a>
+      </Link>
     </AuthCheck>
   );
   return <NavItem afterHydrated={afterHydrated} />;
