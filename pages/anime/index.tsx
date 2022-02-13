@@ -72,6 +72,7 @@ const SearchPage: NextPage = () => {
       if (typeof title !== "string" || title.length < 3) return;
 
       if (api) {
+        // Query JikanAPI
         const JikanDataToPosterData = (JikanObj: JikanApiResSearch[]) =>
           JikanObj.map(
             ({ type, title, images, score, mal_id }): PosterSearchData => ({
@@ -138,21 +139,16 @@ const SearchPage: NextPage = () => {
         });
       };
 
-      // Format
-      let resultAnimesFound = AnimeShapeToPosterData(
-        removeDuplicates(filterIt(title))
-      );
-
-      if (!resultAnimesFound || resultAnimesFound?.length <= 0) {
-        // Query Algolia
-        const resAlgolia = await SearchAnimeInAlgolia(title);
-        if (
-          resAlgolia?.success &&
-          resAlgolia?.data &&
-          resAlgolia.data.length > 0
-        )
-          resultAnimesFound = resAlgolia.data;
-      }
+      let resultAnimesFound = [];
+      // Query Algolia
+      const resAlgolia = await SearchAnimeInAlgolia(title);
+      if (resAlgolia?.success && resAlgolia?.data && resAlgolia.data.length > 0)
+        resultAnimesFound = AnimeShapeToPosterData(resAlgolia.data);
+      // Query Internal (Very Few Cases, i.e: Algolia Quota Exceeded)
+      else
+        resultAnimesFound = AnimeShapeToPosterData(
+          removeDuplicates(filterIt(title))
+        );
 
       const ResultObject: AnimesFoundShape = {
         animesFound: resultAnimesFound,
