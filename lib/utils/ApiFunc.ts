@@ -75,9 +75,9 @@ export const GetAnimeData = async (
     const EpisodesLength = animeEpsRes?.length || 0;
     let AnimeEpsDatas: JikanApiResEpisodes[] = [];
 
-    if (EpisodesLength < 12) {
+    if (EpisodesLength < (animeRes?.episodes || 12)) {
       const NonMissingEp = animeEpsRes.map(({ mal_id }) => mal_id);
-      for (let i = 1; i <= 12; i++) {
+      for (let i = 1; i <= (animeRes?.episodes || 12); i++) {
         const EpToAdd: JikanApiResEpisodes = NonMissingEp.includes(i)
           ? animeEpsRes.find(({ mal_id }) => mal_id === i)
           : {

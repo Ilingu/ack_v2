@@ -138,17 +138,16 @@ const SearchPage: NextPage = () => {
           );
         });
       };
+      const FormatResult = (data: AnimeShape[]) =>
+        AnimeShapeToPosterData(removeDuplicates(data));
 
       let resultAnimesFound = [];
       // Query Algolia
       const resAlgolia = await SearchAnimeInAlgolia(title);
       if (resAlgolia?.success && resAlgolia?.data && resAlgolia.data.length > 0)
-        resultAnimesFound = AnimeShapeToPosterData(resAlgolia.data);
+        resultAnimesFound = FormatResult(resAlgolia.data);
       // Query Internal (Very Few Cases, i.e: Algolia Quota Exceeded)
-      else
-        resultAnimesFound = AnimeShapeToPosterData(
-          removeDuplicates(filterIt(title))
-        );
+      else resultAnimesFound = FormatResult(filterIt(title));
 
       const ResultObject: AnimesFoundShape = {
         animesFound: resultAnimesFound,

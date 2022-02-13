@@ -7,12 +7,19 @@ const AlgoliaClient = algoliasearch(
 );
 const SearchDB = AlgoliaClient.initIndex("prod_ACK");
 
+// [UPGRADE]: Only Stock PosterSearchData require for the index display
+// Because here we stock AnimeShape Datas, and that a lot
+
 /**
  * Index a New Anime in Algoria
- * @param {AnimeShape} animeData
+ * @param {AlgoliaDataShape} animeData
  */
 export const IndexAnimeInAlgolia = async (animeData: AnimeShape) => {
   try {
+    const AlreadyExist = await SearchDB.search(animeData?.title);
+    if (AlreadyExist && AlreadyExist?.hits.length > 0)
+      throw new Error("Already Exist");
+
     await SearchDB.saveObject(animeData, {
       autoGenerateObjectIDIfNotExist: true,
     });
