@@ -104,7 +104,14 @@ export const GetAnimeData = async (
       let AddedToDB = false;
       if (IsAddableToDB) {
         AddedToDB = await AddNewGlobalAnime(animeId, animeData);
-        await IndexAnimeInAlgolia(animeData);
+        await IndexAnimeInAlgolia({
+          title: animeData.title,
+          AlternativeTitle: animeData.AlternativeTitle,
+          OverallScore: animeData.OverallScore,
+          objectID: animeData.malId,
+          photoPath: animeData.photoPath,
+          type: animeData.type,
+        });
       }
 
       return { AddedToDB, AnimeData: animeData };

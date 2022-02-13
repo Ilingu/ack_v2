@@ -41,7 +41,15 @@ export interface ResDataUser {
 // Algolia
 export interface AlgoliaResShape {
   success: boolean;
-  data?: AnimeShape[];
+  data?: AlgoliaDatasShape[];
+}
+export interface AlgoliaDatasShape {
+  title: string;
+  AlternativeTitle: AlternativeTitleShape;
+  OverallScore: number;
+  photoPath: string;
+  type: AnimeType;
+  objectID: number;
 }
 // Others
 export interface IDBShape {

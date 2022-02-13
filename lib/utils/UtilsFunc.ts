@@ -3,6 +3,7 @@ import crypto from "crypto";
 import {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
+  AlgoliaDatasShape,
   AnimeShape,
   EpisodesShape,
   IDBShape,
@@ -12,6 +13,7 @@ import {
   JikanApiResRecommandations,
   JikanApiResSeason,
   NetworkInformationShape,
+  PosterSearchData,
   RecommendationsShape,
   SeasonAnimesShape,
   UserAnimeShape,
@@ -179,8 +181,25 @@ export function JikanApiToRecommendationShape(
 }
 
 /**
+ * Transform JikanApi/Algolia obj to PosterSearchData obj
+ * @param {AlgoliaDatasShape[]} JikanObj
+ */
+export const AnimeShapeToPosterData = (
+  AlgoliaJikanArr?: AlgoliaDatasShape[]
+): PosterSearchData[] =>
+  AlgoliaJikanArr.map((AlgoliaJikanObj) => ({
+    title: AlgoliaJikanObj.title,
+    OverallScore: AlgoliaJikanObj.OverallScore,
+    photoPath: removeParamsFromPhotoUrl(AlgoliaJikanObj.photoPath),
+    type: AlgoliaJikanObj.type,
+    malId:
+      AlgoliaJikanObj.objectID ||
+      (AlgoliaJikanObj as unknown as AnimeShape).malId,
+  }));
+
+/**
  * Transform JikanApi obj to JikanApiToRecommendationShape obj
- * @param {JikanApiResAnimeEpisodes[]} JikanObj
+  * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToSeasonAnimeShape(
   JikanObj: JikanApiResSeason[]

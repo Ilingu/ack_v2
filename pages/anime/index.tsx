@@ -13,6 +13,7 @@ import Divider from "../../components/Design/Divider";
 import AnimePoster from "../../components/Search/SearchPoster";
 // Utility Func
 import {
+  AnimeShapeToPosterData,
   callApi,
   removeDuplicates,
   removeParamsFromPhotoUrl,
@@ -20,6 +21,7 @@ import {
 import { SearchAnimeInAlgolia } from "../../lib/algolia/algolia";
 // Types
 import {
+  AlgoliaDatasShape,
   AnimeShape,
   JikanApiResSearch,
   JikanApiResSearchRoot,
@@ -101,23 +103,6 @@ const SearchPage: NextPage = () => {
         return;
       }
 
-      const AnimeShapeToPosterData = (JikanObj: AnimeShape[]) =>
-        JikanObj.map(
-          ({
-            type,
-            title,
-            photoPath,
-            OverallScore,
-            malId,
-          }): PosterSearchData => ({
-            title,
-            OverallScore,
-            photoPath: removeParamsFromPhotoUrl(photoPath),
-            type,
-            malId,
-          })
-        );
-
       const filterIt = (searchKey: string) => {
         const strEquality = (base: string) =>
           base?.includes(searchKey.toLowerCase());
@@ -138,16 +123,17 @@ const SearchPage: NextPage = () => {
           );
         });
       };
-      const FormatResult = (data: AnimeShape[]) =>
-        AnimeShapeToPosterData(removeDuplicates(data));
 
-      let resultAnimesFound = [];
+      let resultAnimesFound: PosterSearchData[] = [];
       // Query Algolia
       const resAlgolia = await SearchAnimeInAlgolia(title);
       if (resAlgolia?.success && resAlgolia?.data && resAlgolia.data.length > 0)
-        resultAnimesFound = FormatResult(resAlgolia.data);
+        resultAnimesFound = AnimeShapeToPosterData(resAlgolia.data);
       // Query Internal (Very Few Cases, i.e: Algolia Quota Exceeded)
-      else resultAnimesFound = FormatResult(filterIt(title));
+      else
+        resultAnimesFound = AnimeShapeToPosterData(
+          removeDuplicates(filterIt(title)) as unknown as AlgoliaDatasShape[]
+        );
 
       const ResultObject: AnimesFoundShape = {
         animesFound: resultAnimesFound,

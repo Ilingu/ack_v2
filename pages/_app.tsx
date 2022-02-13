@@ -48,6 +48,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       )
         return;
       history.pushState("", "", "/error");
+      localStorage.clear();
+      sessionStorage.clear();
       window.location.reload();
     };
   }, []);
