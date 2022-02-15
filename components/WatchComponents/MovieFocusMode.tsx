@@ -1,4 +1,5 @@
 import React, { FC, useEffect } from "react";
+import { ManageFullScreen } from "../../lib/utils/UtilsFunc";
 // DB
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
@@ -24,10 +25,12 @@ const MovieFocusMode: FC<MovieFocusMode> = ({
   useEffect(() => {
     scrollTo(0, 0);
     document.body.style.overflow = "hidden";
+    ManageFullScreen("activate");
 
     // UnMounted
     return () => {
       document.body.style.overflow = null;
+      ManageFullScreen("desactivate");
     };
   }, []);
 

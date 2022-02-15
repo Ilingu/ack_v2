@@ -7,7 +7,7 @@
     @apply inline -translate-y-0.5;
   }
   .btn-navbar {
-    @apply font-bold flex flex-col items-center text-xl transition hover:bg-bgi-whiter px-4 py-4;
+    @apply hover:bg-bgi-whiter flex flex-col items-center px-4 py-4 text-xl font-bold transition;
   }
 }
 
@@ -67,7 +67,7 @@
   grid-area: img;
   display: -ms-grid;
   display: grid;
-  justify-items: end;
+  justify-items: center;
 }
 
 .watch-container .gta-title {
@@ -77,7 +77,6 @@
   grid-area: title;
   display: -ms-grid;
   display: grid;
-  justify-items: start;
 }
 
 .watch-container .gta-buttons {
@@ -97,6 +96,9 @@
 @media screen and (max-width: 1024px) {
   .watch-container {
         grid-template-areas: "img" "title" "buttons" "content";
+  }
+  .watch-container .gta-title {
+    justify-items: center;
   }
 }
 

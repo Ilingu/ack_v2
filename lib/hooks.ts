@@ -16,6 +16,7 @@ import {
 import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
+/* FB */
 export function useUserData() {
   const [user, setUser] = useState<User>(null);
   const [usernameState, setUsername] = useState<string>(null);

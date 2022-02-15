@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
-import { removeDuplicates } from "../../lib/utils/UtilsFunc";
+import { ManageFullScreen, removeDuplicates } from "../../lib/utils/UtilsFunc";
 // Types
 import {
   JikanApiResEpisodes,
@@ -42,7 +42,6 @@ const FocusMode: FC<FocusModeProps> = ({
   );
 
   /* FUNC */
-
   useEffect(() => {
     // FocusData
     const ProgressToObj =
@@ -58,7 +57,6 @@ const FocusMode: FC<FocusModeProps> = ({
     for (let id = 1; id < EpisodesLength; id++) {
       if ((!ProgressToObj || !ProgressToObj[id]) && !NextEpId) {
         NextEpId = id;
-        console.log(id);
 
         const EpisodeData = EpisodesData.find(({ mal_id }) => mal_id === id);
         if (!EpisodeData) continue;
@@ -79,10 +77,12 @@ const FocusMode: FC<FocusModeProps> = ({
     // UX
     scrollTo(0, 0);
     document.body.style.overflow = "hidden";
+    ManageFullScreen("activate");
 
     // UnMounted
     return () => {
       document.body.style.overflow = null;
+      ManageFullScreen("desactivate");
     };
   }, [EpisodesData, EpisodesLength, Progress]);
 

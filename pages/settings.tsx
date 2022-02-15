@@ -139,7 +139,7 @@ const Settings: NextPage = () => {
               <h1 className="text-description-whiter text-2xl font-bold">
                 <FiSettings className="icon" /> Settings{" "}
                 <span className="text-description text-lg font-semibold">
-                  [ACK::OPEN BETA]
+                  [ACK::RC]
                 </span>
               </h1>
             </header>
@@ -230,7 +230,7 @@ const Settings: NextPage = () => {
                   </li>
                   <li>
                     ACK Version:{" "}
-                    <span className="text-primary-whitest">Open Beta</span>
+                    <span className="text-primary-whitest">RC</span>
                   </li>
                   <li>
                     Network Listener:{" "}

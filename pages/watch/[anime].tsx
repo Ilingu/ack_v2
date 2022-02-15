@@ -99,13 +99,13 @@ const WatchPage: NextPage = () => {
 
   useEffect(() => {
     /* NOTIF */
-    if (!NextEpisodeReleaseDate) AddNextEpisodeReleaseDateToFB();
-    if (NextEpisodeReleaseDate && Date.now() >= NextEpisodeReleaseDate) {
+    if (!NextEpisodeReleaseDate) return AddNextEpisodeReleaseDateToFB();
+    if (Date.now() >= NextEpisodeReleaseDate) {
       !NewEpisodeAvailable && NewEpReleased(CurrentAnimeData.malId.toString());
       AddNextEpisodeReleaseDateToFB();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [NextEpisodeReleaseDate]);
+  }, [NextEpisodeReleaseDate, CurrentAnimeData]);
 
   const AddNextEpisodeReleaseDateToFB = () => {
     if (!broadcast || !Airing) return;
@@ -146,7 +146,7 @@ const WatchPage: NextPage = () => {
           <div className="flex justify-center">
             <div className="watch-container mt-24 px-2 sm:w-10/12 sm:px-0">
               {/* Img */}
-              <div className="gta-img relative flex justify-center lg:block lg:justify-end">
+              <div className="gta-img relative">
                 <Link href={`/anime/${malId}`} passHref>
                   <a>
                     <Image
@@ -171,10 +171,10 @@ const WatchPage: NextPage = () => {
                 </Link>
               </div>
               {/* Title */}
-              <div className="gta-title flex justify-center lg:block lg:justify-start">
+              <div className="gta-title">
                 <h1
                   id="WatchBigTitle"
-                  className={`xs:text-6xl text-5xl ${
+                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl ${
                     !!NewEpisodeAvailable ? "text-indigo-50" : "text-headline"
                   } h-full font-extrabold tracking-wider`}
                 >

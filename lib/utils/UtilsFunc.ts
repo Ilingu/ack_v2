@@ -199,7 +199,7 @@ export const AnimeShapeToPosterData = (
 
 /**
  * Transform JikanApi obj to JikanApiToRecommendationShape obj
-  * @param {JikanApiResAnimeEpisodes[]} JikanObj
+ * @param {JikanApiResAnimeEpisodes[]} JikanObj
  */
 export function JikanApiToSeasonAnimeShape(
   JikanObj: JikanApiResSeason[]
@@ -574,4 +574,17 @@ export const NetworkCheck = () => {
     navigator.connection as unknown as NetworkInformationShape;
   if (connectionInfo?.onchange) connectionInfo.onchange = onChangeNetwork;
   CheckConn(connectionInfo);
+};
+
+/**
+ * Activate/Desactivate Fullscreen
+ * @param {"activate" | "desactivate"} action
+ */
+export const ManageFullScreen = async (action: "activate" | "desactivate") => {
+  try {
+    if (action === "activate" && !document.fullscreenElement)
+      return await document?.documentElement?.requestFullscreen();
+    if (action === "desactivate" && document.fullscreenElement)
+      return await document?.exitFullscreen();
+  } catch (err) {}
 };
