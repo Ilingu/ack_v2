@@ -144,15 +144,14 @@ export function useGlobalAnimeData(userUid: string) {
         []) as UserAnimeShape[];
       setUserAnimesData(UserAnimes);
 
-      // Scalability: Do array of missing animesDatas, and query only them from DB (Limiting queries numbers)
-      if (
-        !!GlobalAnimeData &&
-        UserAnimes.length > GlobalAnimeData.length &&
-        CountOfRefreshFromFB.current <= 5
-      ) {
+      // Scalability: Do array of missing animesDatas, and query only them from DB (--> Limiting queries numbers)
+      const RequireIf = !!GlobalAnimeData && CountOfRefreshFromFB.current <= 5;
+      if (RequireIf && UserAnimes.length > GlobalAnimeData.length) {
         CountOfRefreshFromFB.current++;
         GetAnimesDatasFB(UserAnimes); // FB query
       }
+      if (RequireIf && UserAnimes.length < GlobalAnimeData.length)
+        GetAnimesDatas(); // Cache Query
     });
 
     return unsub;

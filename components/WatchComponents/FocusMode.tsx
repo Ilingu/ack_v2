@@ -43,6 +43,18 @@ const FocusMode: FC<FocusModeProps> = ({
 
   /* FUNC */
   useEffect(() => {
+    scrollTo(0, 0); // UX
+    document.body.style.overflow = "hidden";
+    ManageFullScreen("activate");
+
+    // UnMounted UX
+    return () => {
+      document.body.style.overflow = null;
+      ManageFullScreen("desactivate");
+    };
+  }, []);
+
+  useEffect(() => {
     // FocusData
     const ProgressToObj =
       (Progress &&
@@ -73,17 +85,6 @@ const FocusMode: FC<FocusModeProps> = ({
       Filler: NextEpFiller,
       Recap: NextEpRecap,
     });
-
-    // UX
-    scrollTo(0, 0);
-    document.body.style.overflow = "hidden";
-    ManageFullScreen("activate");
-
-    // UnMounted
-    return () => {
-      document.body.style.overflow = null;
-      ManageFullScreen("desactivate");
-    };
   }, [EpisodesData, EpisodesLength, Progress]);
 
   const UpdateUserAnimeProgress = async () => {

@@ -68,11 +68,30 @@ export const ClearIDB = async () => {
   }
 };
 
-// /**
-//  * Update key with the new given data in IndexedDB
-//  * @param {string} where
-//  * @param {object} data
-//  */
+/**
+ * Delete Anime in IDB with its animeID
+ * @param {number} AnimeID
+ */
+export const DeleteAnimeIDB = async (AnimeID: number) => {
+  const CachedAnimesDatas = await GetIDBAnimes();
+  if (!!CachedAnimesDatas && CachedAnimesDatas.length > 0) {
+    const CachedAnimesObject = CachedAnimesDatas[0];
+    if (CachedAnimesObject?.AnimesStored?.length > 0) {
+      const AnimesCopy = [...CachedAnimesObject?.AnimesStored];
+      const IndexToDel = AnimesCopy.findIndex(
+        ({ malId: currAnimeID }) => currAnimeID === AnimeID
+      );
+      if (IndexToDel !== -1) {
+        AnimesCopy.splice(IndexToDel, 1);
+        await WriteIDB({
+          AnimesStored: AnimesCopy,
+          expire: CachedAnimesObject.expire,
+        });
+      }
+    }
+  }
+};
+
 // export const UpdateIDB = async (data: IDBShape) => {
 //   try {
 //     const db = await GetIDB();
@@ -80,18 +99,6 @@ export const ClearIDB = async () => {
 //       .transaction("GlobalAnimesDatas", "readwrite")
 //       .objectStore("GlobalAnimesDatas");
 //     await store.put(data);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
-
-// export const DeleteIDB = async (where: string) => {
-//   try {
-//     const db = await GetIDB();
-//     const store = db
-//       .transaction("GlobalAnimesDatas", "readwrite")
-//       .objectStore("GlobalAnimesDatas");
-//     await store.delete(where);
 //   } catch (err) {
 //     console.error(err);
 //   }

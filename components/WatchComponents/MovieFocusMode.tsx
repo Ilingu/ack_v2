@@ -23,7 +23,7 @@ const MovieFocusMode: FC<MovieFocusMode> = ({
   CancelModeFocus,
 }) => {
   useEffect(() => {
-    scrollTo(0, 0);
+    scrollTo(0, 0); // UX
     document.body.style.overflow = "hidden";
     ManageFullScreen("activate");
 
