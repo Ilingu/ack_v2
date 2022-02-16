@@ -443,9 +443,8 @@ export const ConvertBroadcastTimeZone = (
     if (ReturnType === "NextBroadcastString") return NextBroadcastUTC1Str;
 
     const SplitedUTC1Date = NextBroadcastUTC1Str.split(",");
-    const ToDay = WhitchDay(
-      new Date(SplitedUTC1Date[0]).getDay() as DateOfWeek
-    );
+    const UTC1DayDate = SplitedUTC1Date[0].split("/").reverse().join("/");
+    const ToDay = WhitchDay(new Date(UTC1DayDate).getDay() as DateOfWeek);
     return `${ToDay} ${SplitedUTC1Date[1].trim().replace(":00", "")}`;
   } catch (err) {
     return "None";
