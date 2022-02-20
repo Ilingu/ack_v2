@@ -21,7 +21,11 @@ import {
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
-import { ConvertBroadcastTimeZone, Return404 } from "../../lib/utils/UtilsFunc";
+import {
+  callApi,
+  ConvertBroadcastTimeZone,
+  Return404,
+} from "../../lib/utils/UtilsFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
 import { db as AdminDB } from "../../lib/firebase/firebase-admin";
@@ -78,7 +82,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     const animeData = animeFB.data() as AnimeShape;
 
     if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
-      return ReturnProps({ AddedToDB: false, AnimeData: animeData });
+      return ReturnProps({
+        AddedToDB: false,
+        AnimeUpdated: false,
+        AnimeData: animeData,
+      });
   }
 
   // No Anime -> Api Req
@@ -94,7 +102,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     if ((JikanAnimeRes as InternalApiResError).err === true) {
       if (animeFB.exists) {
         const AnimeData = animeFB.data() as AnimeShape;
-        return ReturnProps({ AddedToDB: false, AnimeData });
+        return ReturnProps({
+          AddedToDB: false,
+          AnimeUpdated: false,
+          AnimeData,
+        });
       }
       console.error(`Cannot Fetch Anime "${animeId}"`);
       return Return404(60);
@@ -157,6 +169,17 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     Status,
     AiringDate,
   } = animeData?.AnimeData || {};
+
+  useEffect(() => {
+    // Revalidate If Anime Updated
+    const ProdMode = process.env.NODE_ENV === "production";
+    if (animeData.AnimeUpdated && ProdMode)
+      (async () => {
+        await callApi(
+          `https://ack.vercel.app/api/revalidate/${animeData.AnimeData.malId}`
+        );
+      })();
+  }, [animeData]);
 
   useEffect(() => {
     if (UserAnimes) {

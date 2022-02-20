@@ -233,17 +233,17 @@ export function JikanApiToAnimeShape(
   let NextRefresh = null;
   let IsAddableToDB = true;
 
-  const NewSesonAnime =
-    !AnimeData.aired.to &&
-    (AnimeData.airing ||
-      (AnimeData.status as AnimeStatusType) === "Not yet aired");
+  const NewSeasonAnime =
+    !!AnimeData?.airing ||
+    !AnimeData?.aired?.to ||
+    (AnimeData?.status as AnimeStatusType) === "Not yet aired";
 
-  if (NewSesonAnime) NextRefresh = Date.now() + 345600000;
+  if (NewSeasonAnime) NextRefresh = Date.now() + 345600000;
   if (
-    !NewSesonAnime &&
-    AnimeData.score < 6 &&
-    AnimeData.rank >= 1500 &&
-    AnimeData.members < 15000
+    !NewSeasonAnime &&
+    AnimeData?.score < 6 &&
+    AnimeData?.rank >= 1500 &&
+    AnimeData?.members < 15000
   )
     IsAddableToDB = false;
 

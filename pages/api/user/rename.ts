@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, db } from "../../../lib/firebase/firebase-admin";
-import { ErrorHandling, SuccessHandling } from "../../../lib/utils/ApiFunc";
+import {
+  ErrorHandling,
+  IsBlacklistedHost,
+  SuccessHandling,
+} from "../../../lib/utils/ApiFunc";
 import { ResApiRoutes } from "../../../lib/utils/types/interface";
 
 const DeletUserHandler = async (
@@ -15,7 +19,7 @@ const DeletUserHandler = async (
   // Request Verifier
   const { method, headers, body } = req;
 
-  if (headers.host === "ack-git-dev-ilingu.vercel.app")
+  if (IsBlacklistedHost(headers.host))
     return Respond(ErrorHandling(401, `Access Denied, blacklisted host`)); // ❌
 
   if (!headers || !headers.authorization)

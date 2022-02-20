@@ -74,6 +74,7 @@ export function useGlobalAnimeData(userUid: string) {
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
   const GlobalAnimeFecthFB = useRef(0);
   const CountOfRefreshFromFB = useRef(0);
+  const SyncCache = useRef(false);
 
   const GetAnimesDatasFB = useCallback(
     async (UserAnimesDataCustom?: UserAnimeShape[]) => {
@@ -145,13 +146,30 @@ export function useGlobalAnimeData(userUid: string) {
       setUserAnimesData(UserAnimes);
 
       // Scalability: Do array of missing animesDatas, and query only them from DB (--> Limiting queries numbers)
-      const RequireIf = !!GlobalAnimeData && CountOfRefreshFromFB.current <= 5;
-      if (RequireIf && UserAnimes.length > GlobalAnimeData.length) {
+      const FBQueryCacheAndVar = () => {
         CountOfRefreshFromFB.current++;
+        SyncCache.current = false;
         GetAnimesDatasFB(UserAnimes); // FB query
+      };
+
+      const RequestCountOK = CountOfRefreshFromFB.current <= 5;
+      const RefreshIfNew =
+        !!GlobalAnimeData &&
+        RequestCountOK &&
+        UserAnimes.length > GlobalAnimeData.length;
+      if (RefreshIfNew) return FBQueryCacheAndVar();
+
+      const RefreshIfOld =
+        !!GlobalAnimeData && UserAnimes.length < GlobalAnimeData.length;
+      if (RefreshIfOld && RequestCountOK && !!SyncCache.current)
+        return FBQueryCacheAndVar();
+
+      if (RefreshIfOld) {
+        SyncCache.current = true;
+        return GetAnimesDatas(); // Cache Query
       }
-      if (RequireIf && UserAnimes.length < GlobalAnimeData.length)
-        GetAnimesDatas(); // Cache Query
+
+      SyncCache.current = false; // Nor RefreshIfNew Nor RefreshIfOld
     });
 
     return unsub;

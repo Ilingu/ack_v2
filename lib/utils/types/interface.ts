@@ -31,6 +31,7 @@ export interface InternalApiResError {
 }
 export interface InternalApiResSuccess {
   AddedToDB: boolean;
+  AnimeUpdated: boolean;
   AnimeData: AnimeShape;
 }
 export interface ResDataUser {

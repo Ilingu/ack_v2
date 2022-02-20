@@ -49,6 +49,16 @@ export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
 });
 
 /**
+ * Return Is The Host Is BlackListed
+ * @param {string} host The Host To Test
+ * @returns {boolean} True = BlackListed || False = WhiteListed
+ */
+export const IsBlacklistedHost = (host: string): boolean => {
+  const WhiteListedHost = ["ack.vercel.app", "localhost:3000"];
+  return !WhiteListedHost.includes(host);
+};
+
+/**
  * Fetch Anime Data
  * @param {string} animeId
  */
@@ -102,8 +112,9 @@ export const GetAnimeData = async (
       animeData = AnimeData;
 
       let AddedToDB = false;
+      let AnimeUpdated = false;
       if (IsAddableToDB) {
-        AddedToDB = await AddNewGlobalAnime(animeId, animeData);
+        [AddedToDB, AnimeUpdated] = await AddNewGlobalAnime(animeId, animeData);
         await IndexAnimeInAlgolia({
           title: animeData.title,
           AlternativeTitle: animeData.AlternativeTitle,
@@ -114,7 +125,7 @@ export const GetAnimeData = async (
         });
       }
 
-      return { AddedToDB, AnimeData: animeData };
+      return { AddedToDB, AnimeUpdated, AnimeData: animeData };
     }
     return { message: `Anime with ID "${animeId}" NotFound`, err: true };
   } catch (err) {
@@ -131,11 +142,12 @@ export const GetAnimeData = async (
 const AddNewGlobalAnime = async (
   animeId: string,
   animeData: AnimeShape
-): Promise<boolean> => {
+): Promise<[boolean, boolean]> => {
   try {
     const batch = db.batch();
 
     const newAnimesRef = db.collection("animes").doc(animeId);
+    const UpdateAnime = (await newAnimesRef.get()).exists;
     batch.set(newAnimesRef, animeData);
 
     const animesConfigPathsRef = db.collection("animes").doc("animes-config");
@@ -154,11 +166,11 @@ const AddNewGlobalAnime = async (
       batch.update(animesConfigPathsRef, newAnimeConfigPaths);
     }
 
-    await batch.commit();
-    return true;
+    await batch.commit(); // Commit FB Change
+    return [true, UpdateAnime]; // Return Success
   } catch (err) {
     console.error(err);
-    return false;
+    return [false, false];
   }
 };
 
