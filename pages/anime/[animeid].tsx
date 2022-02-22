@@ -170,16 +170,17 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     AiringDate,
   } = animeData?.AnimeData || {};
 
-  useEffect(() => {
-    // Revalidate If Anime Updated
-    const ProdMode = process.env.NODE_ENV === "production";
-    if (animeData.AnimeUpdated && ProdMode)
-      (async () => {
-        await callApi(
-          `https://ack.vercel.app/api/revalidate/${animeData.AnimeData.malId}`
-        );
-      })();
-  }, [animeData]);
+  // Functionality Disabled
+  // useEffect(() => {
+  //   // Revalidate If Anime Updated
+  //   const ProdMode = process.env.NODE_ENV === "production";
+  //   if (animeData.AnimeUpdated && ProdMode)
+  //     (async () => {
+  //       await callApi(
+  //         `https://ack.vercel.app/api/revalidate/${animeData.AnimeData.malId}`
+  //       );
+  //     })();
+  // }, [animeData]);
 
   useEffect(() => {
     if (UserAnimes) {

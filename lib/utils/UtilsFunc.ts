@@ -6,7 +6,6 @@ import {
   AlgoliaDatasShape,
   AnimeShape,
   EpisodesShape,
-  IDBShape,
   JikanApiERROR,
   JikanApiResAnime,
   JikanApiResEpisodes,
@@ -29,6 +28,7 @@ import { doc, updateDoc, DocumentSnapshot } from "@firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 // Toast
 import toast from "react-hot-toast";
+import { AnimeWatchType } from "./types/enums";
 
 /* FUNC */
 
@@ -124,6 +124,17 @@ export function isValidUrl(url: string) {
     return false;
   }
 }
+
+/**
+ * Converts UserAnime array into filteredOne (Exclude UNWATCHED && WONT_WATCH)
+ * @param {UserAnimeShape[]} UserAnimes
+ */
+export const filterUserAnime = (UserAnimes: UserAnimeShape[]) =>
+  UserAnimes?.filter(
+    ({ WatchType }) =>
+      WatchType !== AnimeWatchType.WONT_WATCH &&
+      WatchType !== AnimeWatchType.UNWATCHED
+  );
 
 /**
  * Converts a firestore doc to JSON

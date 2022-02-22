@@ -37,6 +37,7 @@ import { db } from "../../lib/firebase/firebase";
 // Func
 import {
   copyToClipboard,
+  filterUserAnime,
   removeDuplicates,
   shuffleArray,
   ToggleFav,
@@ -183,19 +184,14 @@ const HomePoster: FC = () => {
   ]);
 
   /* Filtered Anime Data */
-  const filterUserAnime = useCallback(
-    () =>
-      UserAnimes?.filter(
-        ({ WatchType }) =>
-          WatchType !== AnimeWatchType.WONT_WATCH &&
-          WatchType !== AnimeWatchType.UNWATCHED
-      ),
+  const filteredUserAnime = useMemo(
+    () => filterUserAnime(UserAnimes),
     [UserAnimes]
   );
 
   const AnimesHomePostersData: UserAnimePosterShape[] = useMemo(
     () =>
-      filterUserAnime()
+      filteredUserAnime
         ?.map(
           ({
             AnimeId,
@@ -223,7 +219,7 @@ const HomePoster: FC = () => {
           }
         )
         .filter((UAP) => UAP),
-    [GlobalAnime, filterUserAnime]
+    [GlobalAnime, filteredUserAnime]
   );
 
   /* RENDER */
@@ -308,15 +304,15 @@ const HomePoster: FC = () => {
 
     if (!AnimesElementsOrder.current) {
       // Shuffle Array -> Order
-      const AllAnimesId = filterUserAnime().map(({ AnimeId }) =>
+      const AllAnimesId = filteredUserAnime.map(({ AnimeId }) =>
         AnimeId.toString()
       );
 
       const AnimesOrder = shuffleArray(AllAnimesId);
       AnimesElementsOrder.current = AnimesOrder;
     }
-    if (filterUserAnime().length !== AnimesElementsOrder.current.length) {
-      const AllRealAnime = filterUserAnime();
+    if (filteredUserAnime.length !== AnimesElementsOrder.current.length) {
+      const AllRealAnime = filteredUserAnime;
 
       const ToObjRA = AllRealAnime.reduce(
         (a, { AnimeId }) => ({ ...a, [AnimeId]: AnimeId }),

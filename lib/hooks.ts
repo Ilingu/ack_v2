@@ -13,8 +13,9 @@ import {
   UserShape,
 } from "./utils/types/interface";
 // Func
-import { encryptCookie, postToJSON } from "./utils/UtilsFunc";
+import { encryptCookie, filterUserAnime, postToJSON } from "./utils/UtilsFunc";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
+import { AnimeWatchType } from "./utils/types/enums";
 
 /* FB */
 export function useUserData() {
@@ -85,10 +86,12 @@ export function useGlobalAnimeData(userUid: string) {
         return;
 
       const GlobalUserAnimeDocs = await Promise.all(
-        (UserAnimesDataCustom || UserAnimesData).map(async ({ AnimeId }) => {
-          const QueryRef = doc(db, "animes", AnimeId.toString());
-          return await getDoc(QueryRef);
-        })
+        (UserAnimesDataCustom || filterUserAnime(UserAnimesData)).map(
+          async ({ AnimeId }) => {
+            const QueryRef = doc(db, "animes", AnimeId.toString());
+            return await getDoc(QueryRef);
+          }
+        )
       );
       const GlobalUserAnimeDatas = GlobalUserAnimeDocs.map(
         postToJSON
@@ -141,26 +144,28 @@ export function useGlobalAnimeData(userUid: string) {
 
     const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
     let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
-      const UserAnimes = (Snapdocs?.docs?.map(postToJSON) ||
-        []) as UserAnimeShape[];
+      const UserAnimes =
+        (Snapdocs?.docs?.map(postToJSON) as UserAnimeShape[]) || [];
       setUserAnimesData(UserAnimes);
 
       // Scalability: Do array of missing animesDatas, and query only them from DB (--> Limiting queries numbers)
+      const filteredUserAnime = filterUserAnime(UserAnimes);
       const FBQueryCacheAndVar = () => {
         CountOfRefreshFromFB.current++;
         SyncCache.current = false;
-        GetAnimesDatasFB(UserAnimes); // FB query
+
+        GetAnimesDatasFB(filteredUserAnime); // FB query
       };
 
       const RequestCountOK = CountOfRefreshFromFB.current <= 5;
       const RefreshIfNew =
         !!GlobalAnimeData &&
         RequestCountOK &&
-        UserAnimes.length > GlobalAnimeData.length;
+        filteredUserAnime.length > GlobalAnimeData.length;
       if (RefreshIfNew) return FBQueryCacheAndVar();
 
       const RefreshIfOld =
-        !!GlobalAnimeData && UserAnimes.length < GlobalAnimeData.length;
+        !!GlobalAnimeData && filteredUserAnime.length < GlobalAnimeData.length;
       if (RefreshIfOld && RequestCountOK && !!SyncCache.current)
         return FBQueryCacheAndVar();
 

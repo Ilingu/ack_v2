@@ -12,6 +12,7 @@ const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   const Respond = (ResData: ResApiRoutes) => {
     res.status(ResData.code).json(ResData);
   };
+  return Respond(ErrorHandling(404, "Functionality disabled")); // ❌
 
   // Request Verifier
   const {
