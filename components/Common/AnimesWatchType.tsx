@@ -54,8 +54,7 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
       await DeleteAnimeIDB(malId);
       return await deleteDoc(UserAnimeRef);
     }
-    if (newType === AnimeWatchType.WONT_WATCH)
-      return await DeleteAnimeIDB(malId);
+    if (newType === AnimeWatchType.WONT_WATCH) await DeleteAnimeIDB(malId);
 
     await setDoc(UserAnimeRef, {
       AnimeId: malId,
