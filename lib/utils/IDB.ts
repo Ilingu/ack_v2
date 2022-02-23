@@ -91,15 +91,3 @@ export const DeleteAnimeIDB = async (AnimeID: number) => {
     }
   }
 };
-
-// export const UpdateIDB = async (data: IDBShape) => {
-//   try {
-//     const db = await GetIDB();
-//     const store = db
-//       .transaction("GlobalAnimesDatas", "readwrite")
-//       .objectStore("GlobalAnimesDatas");
-//     await store.put(data);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };

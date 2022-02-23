@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 // DB
 import { auth, db } from "../../lib/firebase/firebase";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { DeleteAnimeIDB } from "../../lib/utils/IDB";
 // Types
 import { AnimeWatchType } from "../../lib/utils/types/enums";

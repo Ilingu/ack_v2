@@ -79,6 +79,7 @@ export function useGlobalAnimeData(userUid: string) {
 
   const GetAnimesDatasFB = useCallback(
     async (UserAnimesDataCustom?: UserAnimeShape[]) => {
+      console.count("FB Called");
       if (
         GlobalAnimeFecthFB.current >= 20 ||
         (!UserAnimesData && !UserAnimesDataCustom)
@@ -150,6 +151,8 @@ export function useGlobalAnimeData(userUid: string) {
 
       // Scalability: Do array of missing animesDatas, and query only them from DB (--> Limiting queries numbers)
       const filteredUserAnime = filterUserAnime(UserAnimes);
+      if (filteredUserAnime?.length === 0) return;
+
       const FBQueryCacheAndVar = () => {
         CountOfRefreshFromFB.current++;
         SyncCache.current = false;
