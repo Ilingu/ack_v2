@@ -79,7 +79,6 @@ export function useGlobalAnimeData(userUid: string) {
 
   const GetAnimesDatasFB = useCallback(
     async (UserAnimesDataCustom?: UserAnimeShape[]) => {
-      console.count("FB Called");
       if (
         GlobalAnimeFecthFB.current >= 20 ||
         (!UserAnimesData && !UserAnimesDataCustom)

@@ -11,7 +11,11 @@ import {
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // UI
-import { AiOutlineCloseSquare, AiOutlineRightCircle } from "react-icons/ai";
+import {
+  AiOutlineCheck,
+  AiOutlineCloseSquare,
+  AiOutlineRightCircle,
+} from "react-icons/ai";
 import toast from "react-hot-toast";
 
 /* INERFACES */
@@ -25,6 +29,7 @@ interface FocusEpisodeShape {
   EpTitle?: string;
   Filler?: boolean;
   Recap?: boolean;
+  LastEp: boolean;
 }
 
 const FocusMode: FC<FocusModeProps> = ({
@@ -35,7 +40,7 @@ const FocusMode: FC<FocusModeProps> = ({
   const [FocusEpisodeData, setFocusEpisodeShape] =
     useState<FocusEpisodeShape>(null);
 
-  const { EpId, EpTitle, Filler, Recap } = FocusEpisodeData || {};
+  const { EpId, EpTitle, Filler, Recap, LastEp } = FocusEpisodeData || {};
 
   const { current: EpisodesLength } = useRef(
     EpisodesData.length + (ExtraEpisodes || 0)
@@ -66,7 +71,7 @@ const FocusMode: FC<FocusModeProps> = ({
       NextEpFiller: boolean = null,
       NextEpRecap: boolean = null;
 
-    for (let id = 1; id < EpisodesLength; id++) {
+    for (let id = 1; id < EpisodesLength + 1; id++) {
       if ((!ProgressToObj || !ProgressToObj[id]) && !NextEpId) {
         NextEpId = id;
 
@@ -84,6 +89,7 @@ const FocusMode: FC<FocusModeProps> = ({
       EpTitle: NextEpTitle,
       Filler: NextEpFiller,
       Recap: NextEpRecap,
+      LastEp: EpisodesLength === NextEpId,
     });
   }, [EpisodesData, EpisodesLength, Progress]);
 
@@ -99,7 +105,6 @@ const FocusMode: FC<FocusModeProps> = ({
         );
 
       const IsFinished = NewProgress.length === EpisodesLength;
-
       const NewTimestampDate: UserAnimeTimestampDate = {
         BeganDate: !!TimestampDate?.BeganDate
           ? TimestampDate.BeganDate
@@ -115,7 +120,11 @@ const FocusMode: FC<FocusModeProps> = ({
         TimestampDate: NewTimestampDate || deleteField(),
         NewEpisodeAvailable: deleteField(),
       });
-      toast.success(`Marked as watched !`);
+
+      if (IsFinished) {
+        CancelModeFocus();
+        toast.success("You finished this anime!");
+      } else toast.success(`Marked as watched !`);
     } catch (err) {
       toast.error("Error, cannot execute this action.");
     }
@@ -159,7 +168,7 @@ const FocusMode: FC<FocusModeProps> = ({
           className="text-headline bg-bgi-black hover:text-primary-whiter hover:ring-primary-main rounded-full p-4 text-5xl 
         transition-all hover:ring-2"
         >
-          <AiOutlineRightCircle />
+          {LastEp ? <AiOutlineCheck /> : <AiOutlineRightCircle />}
         </button>
       </div>
     </div>
