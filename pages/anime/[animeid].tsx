@@ -180,7 +180,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     if (ProdMode)
       (async () => {
         await callApi(
-          `http://localhost:3000/api/revalidate/${malId}`,
+          `http://ack.vercel.app/api/revalidate/${malId}`,
           true,
           {},
           undefined,
