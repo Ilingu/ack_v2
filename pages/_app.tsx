@@ -12,7 +12,7 @@ import { NetworkCheck } from "../lib/utils/UtilsFunc";
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
   const {
-    GlobalAnimeData: GlobalAnime,
+    GlobalAnimesDatas: GlobalAnime,
     UserAnimesData: UserAnimes,
     UserGroupsData: UserGroups,
   } = useGlobalAnimeData(userData?.user?.uid);

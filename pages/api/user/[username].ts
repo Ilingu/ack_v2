@@ -10,7 +10,7 @@ import {
   ResApiRoutes,
   UserAnimeShape,
 } from "../../../lib/utils/types/interface";
-import { decryptCookie, postToJSON } from "../../../lib/utils/UtilsFunc";
+import { decryptDatas, postToJSON } from "../../../lib/utils/UtilsFunc";
 
 const DeletUserHandler = async (
   req: NextApiRequest,
@@ -44,7 +44,7 @@ const DeletUserHandler = async (
   // Req Handler
   try {
     const EncryptedToken = Buffer.from(headers.authorization, "base64");
-    const decryptedToken = decryptCookie(EncryptedToken);
+    const decryptedToken = decryptDatas(EncryptedToken);
     await auth.verifyIdToken(decryptedToken);
 
     const uidDoc = await db.collection("usernames").doc(Username).get();

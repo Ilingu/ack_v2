@@ -32,7 +32,7 @@ import { AnimeWatchType } from "./types/enums";
 
 /* FUNC */
 
-export const encryptCookie = (cookie: Buffer) => {
+export const encryptDatas = (cookie: Buffer) => {
   try {
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv(
@@ -54,7 +54,7 @@ export const encryptCookie = (cookie: Buffer) => {
   }
 };
 
-export const decryptCookie = (encryptedCookie: Buffer): string => {
+export const decryptDatas = (encryptedCookie: Buffer): string => {
   try {
     const iv = encryptedCookie.slice(3, 3 + 12);
     const ciphertext = encryptedCookie.slice(
@@ -88,27 +88,35 @@ export async function callApi(
   url: string,
   internalApi = false,
   params?: RequestInit,
-  AccessToken?: string
+  AccessToken?: string,
+  ProofTheCall = false
 ) {
   if (!isValidUrl(url)) return;
 
-  let req = null;
-  if (!internalApi) {
-    req = await fetch(url);
-  } else {
-    req = await fetch(url, {
-      ...params,
-      headers: {
-        authorization: AccessToken
-          ? AccessToken
-          : internalApi
-          ? await auth.currentUser.getIdToken()
-          : undefined,
-      },
-    });
-  }
+  try {
+    let req = null;
+    if (!internalApi) req = await fetch(url);
+    else {
+      req = await fetch(url, {
+        ...params,
+        headers: {
+          authorization: AccessToken
+            ? AccessToken
+            : (await auth?.currentUser?.getIdToken()) || undefined,
 
-  return await req.json();
+          proofofcall: ProofTheCall
+            ? encryptDatas(Buffer.from(Date.now().toString())).toString(
+                "base64"
+              )
+            : undefined,
+        },
+      });
+    }
+
+    return await req.json();
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 /**
@@ -157,6 +165,20 @@ export function postToJSON(
  */
 export function removeDuplicates<T>(ary: T[]) {
   return [...Array.from(new Set(ary))];
+}
+
+export function SpotDifferenciesBetweenArrays<T>(
+  BaseArray: any[],
+  ArrayToCompare: any[],
+  BaseArrayKeyToExport: string,
+  CompareArrayKeyToExport: string
+): T[] {
+  const Base = BaseArray.map((obj) => obj[BaseArrayKeyToExport]);
+  const Compare = ArrayToCompare.map((obj) => obj[CompareArrayKeyToExport]);
+  const MissingDependencies = Base.filter(
+    (Comparatif) => !Compare.includes(Comparatif)
+  );
+  return MissingDependencies;
 }
 
 /**

@@ -5,14 +5,13 @@ import {
   SuccessHandling,
 } from "../../../lib/utils/ApiFunc";
 import { ResApiRoutes } from "../../../lib/utils/types/interface";
-import { isValidUrl } from "../../../lib/utils/UtilsFunc";
+import { decryptDatas, isValidUrl } from "../../../lib/utils/UtilsFunc";
 
 const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   // Utils Func
   const Respond = (ResData: ResApiRoutes) => {
     res.status(ResData.code).json(ResData);
   };
-  return Respond(ErrorHandling(404, "Functionality disabled")); // ❌
 
   // Request Verifier
   const {
@@ -31,7 +30,23 @@ const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   if (method !== "GET")
     return Respond(ErrorHandling(400, "Only accept GET req")); // ❌
 
+  if (!headers || !headers.proofofcall)
+    return Respond(ErrorHandling(400, "Missing proofofcall Token")); // ❌
+
   try {
+    const EncryptedToken = Buffer.from(
+      headers.proofofcall.toString(),
+      "base64"
+    );
+    const decryptedToken = decryptDatas(EncryptedToken);
+    const TimeOfCall = parseInt(decryptedToken);
+
+    if (isNaN(TimeOfCall))
+      return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
+
+    if (Date.now() - TimeOfCall > 1000)
+      return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
+
     const isValid = isValidUrl(
       encodeURI(`https://ack.vercel.app/anime/${RevalidateID}`)
     );

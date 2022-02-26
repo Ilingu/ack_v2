@@ -168,28 +168,36 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     broadcast,
     Status,
     AiringDate,
+    NextRefresh,
   } = animeData?.AnimeData || {};
 
   // Functionality Disabled
-  // useEffect(() => {
-  //   // Revalidate If Anime Updated
-  //   const ProdMode = process.env.NODE_ENV === "production";
-  //   if (animeData.AnimeUpdated && ProdMode)
-  //     (async () => {
-  //       await callApi(
-  //         `https://ack.vercel.app/api/revalidate/${animeData.AnimeData.malId}`
-  //       );
-  //     })();
-  // }, [animeData]);
+  useEffect(() => {
+    if (!NextRefresh || NextRefresh > Date.now()) return;
+
+    // Revalidate If Anime Updated
+    const ProdMode = process.env.NODE_ENV === "production";
+    if (ProdMode)
+      (async () => {
+        await callApi(
+          `http://localhost:3000/api/revalidate/${malId}`,
+          true,
+          {},
+          undefined,
+          true
+        );
+      })();
+  }, [NextRefresh, malId]);
 
   useEffect(() => {
     if (UserAnimes) {
+      const { malId } = animeData.AnimeData;
       const CurrentAnime =
         UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
 
       setAnimeWatchType(CurrentAnime?.WatchType || null);
     }
-  }, [UserAnimes, animeData, GlobalAnime, malId]);
+  }, [UserAnimes, animeData, GlobalAnime]);
 
   const ScoredByTransform = useMemo((): string => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
@@ -275,7 +283,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
             </div>
             <div className="lg:grid lg:grid-cols-6">
               <div className="relative flex justify-center lg:col-span-1 lg:block">
-                {CurrentAnimeWatchType ? (
+                {CurrentAnimeWatchType &&
+                CurrentAnimeWatchType !== AnimeWatchType.WONT_WATCH ? (
                   <Link href={`/watch/${malId}`} passHref>
                     <a>
                       <img

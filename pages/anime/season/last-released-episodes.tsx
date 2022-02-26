@@ -1,15 +1,8 @@
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
 // Types/Func
-import {
-  AdkamiLastReleasedEpisodeShape,
-  ADKamiScrapperApiERROR,
-} from "../../../lib/utils/types/interface";
-import {
-  callApi,
-  GetLastReleasedAnimeEp,
-  Return404,
-} from "../../../lib/utils/UtilsFunc";
+import { AdkamiLastReleasedEpisodeShape } from "../../../lib/utils/types/interface";
+import { GetLastReleasedAnimeEp } from "../../../lib/utils/UtilsFunc";
 // UI
 import MetaTags from "../../../components/Common/Metatags";
 import Divider from "../../../components/Design/Divider";
@@ -18,9 +11,6 @@ import VerticalDivider from "../../../components/Design/VerticalDivider";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 /* INTERFACES */
-interface LastEpPageProps {
-  LastAnimeEpISR: AdkamiLastReleasedEpisodeShape[];
-}
 interface LastEpItemProps {
   EpisodeData: PosterLastReleasedEpisodeShape;
 }
@@ -29,47 +19,16 @@ type PosterLastReleasedEpisodeShape = Omit<
   "Img"
 >;
 
-/* SSR */
-export const getServerSideProps: GetServerSideProps = async () => {
-  try {
-    const LastAnimeEp:
-      | AdkamiLastReleasedEpisodeShape[]
-      | ADKamiScrapperApiERROR = await callApi(
-      `https://adkami-scapping-api.herokuapp.com/last`
-    );
-    if (!LastAnimeEp || (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode)
-      return {
-        props: {
-          LastAnimeEpISR: null,
-        },
-      };
-
-    return {
-      props: {
-        LastAnimeEpISR: (LastAnimeEp as AdkamiLastReleasedEpisodeShape[]).slice(
-          0,
-          60
-        ),
-      },
-    };
-  } catch (err) {
-    console.error(err);
-    return Return404();
-  }
-};
-
 /* COMPONENTS */
-const LastEpPage: NextPage<LastEpPageProps> = ({ LastAnimeEpISR }) => {
-  const [LastAnimeEpData, setLastAnimeEp] = useState<
-    AdkamiLastReleasedEpisodeShape[]
-  >(() => LastAnimeEpISR);
+const LastEpPage: NextPage = () => {
+  const [LastAnimeEpData, setLastAnimeEp] =
+    useState<AdkamiLastReleasedEpisodeShape[]>();
 
   const [RenderedEpisodes, setNewRender] = useState<JSX.Element[]>();
 
   useEffect(() => {
-    if (!LastAnimeEpISR || LastAnimeEpISR?.length <= 0)
-      GetLastReleasedEpBrutForce();
-  }, [LastAnimeEpISR]);
+    GetLastReleasedEpBrutForce();
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => LoadEpisodes(), [LastAnimeEpData]);

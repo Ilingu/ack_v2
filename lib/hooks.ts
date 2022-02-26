@@ -13,9 +13,21 @@ import {
   UserShape,
 } from "./utils/types/interface";
 // Func
-import { encryptCookie, filterUserAnime, postToJSON } from "./utils/UtilsFunc";
+import {
+  encryptDatas,
+  filterUserAnime,
+  postToJSON,
+  SpotDifferenciesBetweenArrays,
+} from "./utils/UtilsFunc";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
-import { AnimeWatchType } from "./utils/types/enums";
+
+const CacheDatasToIDB = async (NewGlobalAnimesDatas: AnimeShape[]) => {
+  const IDBObject: IDBShape = {
+    AnimesStored: NewGlobalAnimesDatas,
+    expire: Date.now() + 259200000, // 3J --> Force Refresh for AnimesDatas Updates (Like Season)
+  };
+  await WriteIDB(IDBObject);
+};
 
 /* FB */
 export function useUserData() {
@@ -43,7 +55,7 @@ export function useUserData() {
 
         // 🍪
         const token = await user.getIdToken();
-        const encryptedCookie = encryptCookie(Buffer.from(token));
+        const encryptedCookie = encryptDatas(Buffer.from(token));
         document.cookie = `UsT=${encryptedCookie.toString(
           "base64"
         )}; expires=${new Date(Date.now() + 153360000000).toISOString()}`; // 153360000000 = 5y = Session Cookie
@@ -70,77 +82,99 @@ export function useUserData() {
 }
 
 export function useGlobalAnimeData(userUid: string) {
-  const [GlobalAnimeData, setGlobalAnime] = useState<AnimeShape[]>();
+  const [GlobalAnimesDatas, setGlobalAnimes] = useState<AnimeShape[]>();
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
-  const GlobalAnimeFecthFB = useRef(0);
-  const CountOfRefreshFromFB = useRef(0);
-  const SyncCache = useRef(false);
+  const GlobalAnimesFecthFB = useRef(0);
 
-  const GetAnimesDatasFB = useCallback(
-    async (UserAnimesDataCustom?: UserAnimeShape[]) => {
-      if (
-        GlobalAnimeFecthFB.current >= 20 ||
-        (!UserAnimesData && !UserAnimesDataCustom)
-      )
-        return;
+  const ResetDatas = () => {
+    setUserAnimesData(undefined);
+    setGlobalAnimes(undefined);
+  };
 
-      const GlobalUserAnimeDocs = await Promise.all(
-        (UserAnimesDataCustom || filterUserAnime(UserAnimesData)).map(
-          async ({ AnimeId }) => {
-            const QueryRef = doc(db, "animes", AnimeId.toString());
-            return await getDoc(QueryRef);
-          }
-        )
+  const GetAnimesDatasByIds = async (AnimesIds: number[]) => {
+    if (GlobalAnimesFecthFB.current >= 50)
+      return console.warn("Fetch Quotas Exceeded For This Session: Reload");
+
+    const QAnimesDocs = await Promise.all(
+      AnimesIds.map(async (AnimeId) => {
+        const QAnimeRef = doc(db, "animes", AnimeId.toString());
+        return await getDoc(QAnimeRef);
+      })
+    );
+
+    const AnimesDatas = QAnimesDocs.map(postToJSON) as AnimeShape[];
+    const NewGlobalAnimesDatas = [...(GlobalAnimesDatas || []), ...AnimesDatas];
+
+    setGlobalAnimes(NewGlobalAnimesDatas);
+    await CacheDatasToIDB(NewGlobalAnimesDatas);
+
+    GlobalAnimesFecthFB.current++;
+  };
+
+  const SyncCacheDatas = async (UserAnimes: UserAnimeShape[]) => {
+    if (!GlobalAnimesDatas) return;
+    const filteredUserAnime = [...UserAnimes];
+
+    const CacheMissingAnime =
+      filteredUserAnime.length > GlobalAnimesDatas.length;
+
+    if (CacheMissingAnime) {
+      const MissingDependencies = SpotDifferenciesBetweenArrays(
+        filteredUserAnime,
+        GlobalAnimesDatas,
+        "AnimeId",
+        "malId"
+      ) as number[];
+
+      return await GetAnimesDatasByIds(MissingDependencies);
+    }
+
+    const CacheNotSync = filteredUserAnime.length < GlobalAnimesDatas.length;
+    if (CacheNotSync) {
+      const OverflowDependencies = SpotDifferenciesBetweenArrays(
+        GlobalAnimesDatas,
+        filteredUserAnime,
+        "malId",
+        "AnimeId"
       );
-      const GlobalUserAnimeDatas = GlobalUserAnimeDocs.map(
-        postToJSON
-      ) as AnimeShape[];
+      const NewGlobalAnimesDatas = [...GlobalAnimesDatas].filter(
+        ({ malId }) => !OverflowDependencies.includes(malId)
+      );
 
-      // Save
-      setGlobalAnime(GlobalUserAnimeDatas);
+      setGlobalAnimes(NewGlobalAnimesDatas);
+    }
+  };
 
-      const IDBObject: IDBShape = {
-        AnimesStored: GlobalUserAnimeDatas,
-        expire: Date.now() + 259200000, // 3J --> Force Refresh for AnimesDatas Updates (Like Season)
-      };
-      WriteIDB(IDBObject);
-
-      GlobalAnimeFecthFB.current++;
-    },
-    [UserAnimesData]
-  );
-
-  const GetAnimesDatas = useCallback(async () => {
+  const GetAnimesDatas = async () => {
     const CachedAnimesDatas = await GetIDBAnimes();
 
     if (!CachedAnimesDatas || CachedAnimesDatas.length <= 0)
-      return GetAnimesDatasFB(); // FB query
+      return GetAnimesDatasByIds(
+        filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
+      );
 
     if (
       CachedAnimesDatas[0]?.expire < Date.now() ||
       !CachedAnimesDatas[0]?.AnimesStored ||
       CachedAnimesDatas[0]?.AnimesStored.length <= 0
     )
-      return GetAnimesDatasFB(); // FB query
+      return GetAnimesDatasByIds(
+        filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
+      );
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
-    setGlobalAnime(GlobalUserAnimeDatas);
-  }, [GetAnimesDatasFB]);
+    setGlobalAnimes(GlobalUserAnimeDatas);
+  };
 
   useEffect(() => {
-    if (!UserAnimesData || GlobalAnimeData || GlobalAnimeFecthFB.current >= 20)
-      return null;
-    // Get User Animes Datas
-    GetAnimesDatas();
-  }, [GetAnimesDatas, GlobalAnimeData, UserAnimesData]);
+    if (!UserAnimesData || GlobalAnimesDatas) return null;
+    GetAnimesDatas(); // Get User Animes Datas
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [GlobalAnimesDatas, UserAnimesData]);
 
   useEffect(() => {
-    if (!userUid) {
-      setUserAnimesData(undefined);
-      setGlobalAnime(undefined);
-      return null;
-    }
+    if (!userUid) return ResetDatas();
 
     const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
     let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
@@ -148,46 +182,17 @@ export function useGlobalAnimeData(userUid: string) {
         (Snapdocs?.docs?.map(postToJSON) as UserAnimeShape[]) || [];
       setUserAnimesData(UserAnimes);
 
-      // Scalability: Do array of missing animesDatas, and query only them from DB (--> Limiting queries numbers)
       const filteredUserAnime = filterUserAnime(UserAnimes);
       if (filteredUserAnime?.length === 0) return;
-
-      const FBQueryCacheAndVar = () => {
-        CountOfRefreshFromFB.current++;
-        SyncCache.current = false;
-
-        GetAnimesDatasFB(filteredUserAnime); // FB query
-      };
-
-      const RequestCountOK = CountOfRefreshFromFB.current <= 5;
-      const RefreshIfNew =
-        !!GlobalAnimeData &&
-        RequestCountOK &&
-        filteredUserAnime.length > GlobalAnimeData.length;
-      if (RefreshIfNew) return FBQueryCacheAndVar();
-
-      const RefreshIfOld =
-        !!GlobalAnimeData && filteredUserAnime.length < GlobalAnimeData.length;
-      if (RefreshIfOld && RequestCountOK && !!SyncCache.current)
-        return FBQueryCacheAndVar();
-
-      if (RefreshIfOld) {
-        SyncCache.current = true;
-        return GetAnimesDatas(); // Cache Query
-      }
-
-      SyncCache.current = false; // Nor RefreshIfNew Nor RefreshIfOld
+      SyncCacheDatas(filteredUserAnime);
     });
 
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userUid, GlobalAnimeData]);
+  }, [userUid]);
 
   useEffect(() => {
-    if (!userUid) {
-      setUserGroupsData(undefined);
-      return null;
-    }
+    if (!userUid) return null;
 
     const UserGroupsRef = collection(doc(db, "users", userUid), "groups");
     let unsub = onSnapshot(UserGroupsRef, (Snapdocs) => {
@@ -200,7 +205,7 @@ export function useGlobalAnimeData(userUid: string) {
   }, [userUid]);
 
   return {
-    GlobalAnimeData,
+    GlobalAnimesDatas,
     UserAnimesData,
     UserGroupsData,
   };
