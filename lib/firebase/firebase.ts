@@ -2,7 +2,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Init
 const firebaseConfig = {
@@ -15,14 +14,7 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-if (!getApps().length) {
-  const app = initializeApp(firebaseConfig);
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(
-      process.env.NEXT_PUBLIC_FIREBASE_APP_CHECK_PUBLIC_KEY
-    ),
-  });
-}
+if (!getApps().length) initializeApp(firebaseConfig);
 
 // Export FB Func
 
