@@ -52,12 +52,15 @@ const UserProfilePage: NextPage<UserProfilePageProps> = ({
   const UserStats: UserStatsShape[] = useMemo(
     (): UserStatsShape[] =>
       UserData && [
-        { data: UserData.NoOfAnimes, desc: "💥 Animes" },
+        { data: UserData?.NoOfAnimes, desc: "💥 Animes" },
         {
-          data: UserData.NoOfWatchAnimes,
+          data: UserData?.NoOfWatchAnimes,
           desc: "🎥 Watched Anime",
         },
-        { data: "🦺 Under Contruction", desc: "❤ Favorite Anime" },
+        {
+          data: UserData?.UserFavoriteAnime || "BSD!",
+          desc: "❤ Favorite Anime",
+        },
         {
           data: new Date(
             UserData.User?.metadata.lastSignInTime

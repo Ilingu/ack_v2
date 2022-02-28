@@ -68,6 +68,10 @@ const DeletUserHandler = async (
       .doc(uid)
       .collection("animes")
       .get();
+    const UserFavoriteAnime =
+      ((await db.collection("users").doc(uid).get()).data()
+        ?.FavoriteAnime as string) || "BSD!";
+
     let NoOfAnimes = 0;
     let NoOfWatchAnimes = 0;
 
@@ -86,6 +90,7 @@ const DeletUserHandler = async (
         User: UserRes.toJSON(),
         NoOfAnimes,
         NoOfWatchAnimes,
+        UserFavoriteAnime,
       })
     );
   } catch (err) {

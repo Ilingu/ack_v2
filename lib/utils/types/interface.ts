@@ -38,6 +38,7 @@ export interface ResDataUser {
   User: User;
   NoOfAnimes: number;
   NoOfWatchAnimes: number;
+  UserFavoriteAnime: string;
 }
 // Algolia
 export interface AlgoliaResShape {
@@ -71,6 +72,7 @@ export interface NetworkInformationShape {
 export interface UserStatsShape {
   data: string | number;
   desc: string;
+  Modifiable?: boolean;
 }
 /* LastEpReleased */
 export interface AdkamiLastReleasedEpisodeShape {

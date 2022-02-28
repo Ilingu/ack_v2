@@ -1,4 +1,4 @@
-import React, { FC, Fragment } from "react";
+import React, { FC, Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 // Types
@@ -7,18 +7,30 @@ import { UserStatsShape } from "../../lib/utils/types/interface";
 // UI
 import Divider from "../Design/Divider";
 import { AiFillMail } from "react-icons/ai";
-import { FaClock } from "react-icons/fa";
+import { FaCheck, FaClock } from "react-icons/fa";
 import { BiStats } from "react-icons/bi";
 
 interface UserProfilProps {
   UserStats: UserStatsShape[];
   UserData: { user: User; username: string };
+  NewFavAnime?: (FavAnime: string) => Promise<void>;
 }
 
 const UserProfil: FC<UserProfilProps> = ({
   UserData: { user, username },
   UserStats,
+  NewFavAnime,
 }) => {
+  const [FavAnimeInput, setFavAnimeInput] = useState(() =>
+    UserStats[2].data.toString()
+  );
+
+  useEffect(() => {
+    const UserNewAnimeFav = UserStats[2].data;
+    if (UserNewAnimeFav !== "BSD!")
+      setFavAnimeInput(UserNewAnimeFav.toString());
+  }, [UserStats]);
+
   return (
     <Fragment>
       {/* Basic User Data */}
@@ -63,13 +75,41 @@ const UserProfil: FC<UserProfilProps> = ({
         </header>
         <div className="mt-5 grid justify-items-center gap-y-3 md:grid-cols-2">
           {UserStats &&
-            UserStats?.map(({ data, desc }, i) => (
+            UserStats?.map(({ data, desc, Modifiable }, i) => (
               <div
                 key={i}
                 className="ring-description bg-bgi-whiter flex h-20 w-80 flex-col items-center justify-center
               rounded-lg text-lg font-semibold ring-2"
               >
-                <span className="text-primary-whitest">{data}</span>
+                {Modifiable ? (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      NewFavAnime && NewFavAnime(FavAnimeInput.trim());
+                    }}
+                  >
+                    <input
+                      type="text"
+                      value={FavAnimeInput}
+                      onChange={({ target: { value } }) =>
+                        setFavAnimeInput(value)
+                      }
+                      className={`bg-bgi-whitest text-headline text-center font-semibold outline-none transition-all ${
+                        data !== FavAnimeInput ? "rounded-l-md" : "rounded-md"
+                      }`}
+                    />
+                    {data !== FavAnimeInput && (
+                      <button
+                        className="bg-primary-main text-headline rounded-r-md px-1"
+                        type="submit"
+                      >
+                        <FaCheck className="icon" />
+                      </button>
+                    )}
+                  </form>
+                ) : (
+                  <span className="text-primary-whitest">{data}</span>
+                )}
                 {desc}
               </div>
             ))}

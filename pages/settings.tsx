@@ -34,7 +34,7 @@ import {
   FaSync,
   FaTrashAlt,
 } from "react-icons/fa";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { callApi } from "../lib/utils/UtilsFunc";
 import { ClearIDB } from "../lib/utils/IDB";
 
@@ -43,6 +43,7 @@ const Settings: NextPage = () => {
   const { user, username, UserAnimes } = useContext(GlobalAppContext);
   const deferredPrompt = useRef<BeforeInstallPromptEvent>(null);
   const deleteAccountTimeout = useRef<NodeJS.Timeout>(null);
+  const [UserFavAnime, setUserFavAnime] = useState("");
 
   const [DAConfirmation, setDeleteAccount] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -57,6 +58,10 @@ const Settings: NextPage = () => {
     );
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    GetUserFavoriteAnime();
+  }, [user]);
 
   useEffect(() => {
     if (DAConfirmation >= 2 && !deleteAccountTimeout.current) {
@@ -81,13 +86,45 @@ const Settings: NextPage = () => {
           ).length,
           desc: "🎥 Watched Anime",
         },
-        { data: "🦺 Under Contruction", desc: "❤ Favorite Anime" },
+        {
+          data: UserFavAnime || "BSD!",
+          desc: "❤ Favorite Anime",
+          Modifiable: true,
+        },
         {
           data: new Date(user?.metadata.lastSignInTime).toLocaleDateString(),
           desc: `🔥 Last time ${user?.displayName} was Online`,
         },
       ],
-    [user, UserAnimes]
+    [user, UserAnimes, UserFavAnime]
+  );
+
+  const GetUserFavoriteAnime = async () => {
+    if (!user) return;
+    const UserRef = doc(db, "users", user?.uid);
+    const UserFavAnimeData = (await getDoc(UserRef)).data()
+      ?.FavoriteAnime as unknown as string;
+
+    setUserFavAnime(UserFavAnimeData);
+  };
+
+  const AddNewFavoriteAnime = useCallback(
+    async (FavAnime: string) => {
+      if (FavAnime.length < 2 || FavAnime.length > 200) return;
+      try {
+        const UserRef = doc(db, "users", user?.uid);
+        await updateDoc(UserRef, {
+          FavoriteAnime: FavAnime,
+        });
+        toast.success("Favorite Anime Updated!");
+
+        await GetUserFavoriteAnime();
+      } catch (err) {
+        console.error(err);
+        toast.error("Cannot Update Your Favorite Anime");
+      }
+    },
+    [user]
   );
 
   const DeleteAccount = async () => {
@@ -131,7 +168,11 @@ const Settings: NextPage = () => {
         <MetaTags title="User's Settings" description="Settings of ACK User" />
         <div className="w-11/12 sm:w-5/6 md:w-11/12 lg:w-2/3 2xl:w-1/2">
           {/* User's Profile */}
-          <UserProfil UserData={{ user, username }} UserStats={UserStats} />
+          <UserProfil
+            UserData={{ user, username }}
+            UserStats={UserStats}
+            NewFavAnime={AddNewFavoriteAnime}
+          />
           {/* User's Settings */}
           <Divider />
           <section className="my-5 px-3">
