@@ -16,6 +16,13 @@ interface UserProfilProps {
   NewFavAnime?: (FavAnime: string) => Promise<void>;
 }
 
+interface UserFavoriteAnimeInputProps {
+  NewFavAnime: (FavAnime: string) => Promise<void>;
+  FavAnimeInput: string;
+  setFavAnimeInput: React.Dispatch<React.SetStateAction<string>>;
+  data: string | number;
+}
+
 const UserProfil: FC<UserProfilProps> = ({
   UserData: { user, username },
   UserStats,
@@ -82,31 +89,12 @@ const UserProfil: FC<UserProfilProps> = ({
               rounded-lg text-lg font-semibold ring-2"
               >
                 {Modifiable ? (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      NewFavAnime && NewFavAnime(FavAnimeInput.trim());
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={FavAnimeInput}
-                      onChange={({ target: { value } }) =>
-                        setFavAnimeInput(value)
-                      }
-                      className={`bg-bgi-whitest text-headline text-center font-semibold outline-none transition-all ${
-                        data !== FavAnimeInput ? "rounded-l-md" : "rounded-md"
-                      }`}
-                    />
-                    {data !== FavAnimeInput && (
-                      <button
-                        className="bg-primary-main text-headline rounded-r-md px-1"
-                        type="submit"
-                      >
-                        <FaCheck className="icon" />
-                      </button>
-                    )}
-                  </form>
+                  <UserFavoriteAnimeInput
+                    data={data}
+                    FavAnimeInput={FavAnimeInput}
+                    NewFavAnime={NewFavAnime}
+                    setFavAnimeInput={setFavAnimeInput}
+                  />
                 ) : (
                   <span className="text-primary-whitest">{data}</span>
                 )}
@@ -118,5 +106,38 @@ const UserProfil: FC<UserProfilProps> = ({
     </Fragment>
   );
 };
+
+function UserFavoriteAnimeInput({
+  NewFavAnime,
+  FavAnimeInput,
+  setFavAnimeInput,
+  data,
+}: UserFavoriteAnimeInputProps) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        NewFavAnime && NewFavAnime(FavAnimeInput.trim());
+      }}
+    >
+      <input
+        type="text"
+        value={FavAnimeInput}
+        onChange={({ target: { value } }) => setFavAnimeInput(value)}
+        className={`bg-bgi-whitest text-headline text-center font-semibold outline-none transition-all ${
+          data !== FavAnimeInput ? "rounded-l-md" : "rounded-md"
+        }`}
+      />
+      {data !== FavAnimeInput && (
+        <button
+          className="bg-primary-main text-headline rounded-r-md px-1"
+          type="submit"
+        >
+          <FaCheck className="icon" />
+        </button>
+      )}
+    </form>
+  );
+}
 
 export default UserProfil;

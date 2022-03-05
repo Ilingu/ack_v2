@@ -97,6 +97,8 @@ export const GetAnimeData = async (
       }
     } else AnimeEpsDatas = animeEpsRes;
 
+    console.log(AnimeEpsDatas, animeEpsRes);
+
     const AnimeDatas: AnimeDatasShape = [
       animeRes,
       AnimeEpsDatas,

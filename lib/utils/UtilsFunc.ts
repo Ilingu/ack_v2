@@ -116,6 +116,7 @@ export async function callApi(
     return await req.json();
   } catch (err) {
     console.error(err);
+    return false;
   }
 }
 
@@ -313,7 +314,11 @@ export function JikanApiToAnimeShape(
             recom?.entry?.images?.jpg?.image_url
           ),
         })) || [],
-      EpisodesData: AnimeData?.type === "TV" && EpsData,
+      EpisodesData:
+        (AnimeData?.type === "TV" ||
+          AnimeData?.type === "OVA" ||
+          AnimeData?.type === "ONA") &&
+        EpsData,
       broadcast:
         AnimeData?.broadcast?.string &&
         AnimeData?.broadcast?.string !== "Unknown"

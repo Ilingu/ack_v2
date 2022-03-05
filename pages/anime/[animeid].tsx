@@ -46,6 +46,7 @@ import {
 // DATA
 import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
 import { GetAnimeData } from "../../lib/utils/ApiFunc";
+import toast from "react-hot-toast";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -171,7 +172,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     NextRefresh,
   } = animeData?.AnimeData || {};
 
-  // Functionality Disabled
   useEffect(() => {
     if (!NextRefresh || NextRefresh > Date.now()) return;
 
@@ -179,13 +179,17 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     const ProdMode = process.env.NODE_ENV === "production";
     if (ProdMode)
       (async () => {
-        await callApi(
+        const Succeed = await callApi(
           `https://ack.vercel.app/api/revalidate/${malId}`,
           true,
           {},
           undefined,
           true
         );
+
+        if (!Succeed || !Succeed?.succeed)
+          toast.error("Cannot Revalidate Anime");
+        else toast.success("Anime Revalidated!");
       })();
   }, [NextRefresh, malId]);
 
@@ -303,7 +307,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 )}{" "}
                 <a href={MalPage} target="_blank" rel="noreferrer">
                   <FaInfo
-                    onClick={() => router.push(MalPage)}
                     className="left-info-bubble text-headline bg-primary-main absolute -top-3 h-12 w-12 cursor-pointer rounded-full 
                     py-2 px-2 font-bold transition hover:scale-110 lg:-left-3"
                   />

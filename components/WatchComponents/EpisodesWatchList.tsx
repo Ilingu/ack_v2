@@ -149,10 +149,12 @@ const EpsPoster: FC<EpsPosterProps> = ({
   /* FUNC */
   const GenerateExtraEp = useMemo(
     (): UserExtraEpisodesShape[] =>
-      Array.apply(null, Array(ExtraEpisodes || 0)).map((_: null, i) => ({
-        mal_id: i + 1 + EpisodesData.length,
-        isExtra: true,
-      })),
+      Array(ExtraEpisodes || 0)
+        .fill(null)
+        .map((_: null, i) => ({
+          mal_id: i + 1 + EpisodesData.length,
+          isExtra: true,
+        })),
     [EpisodesData.length, ExtraEpisodes]
   );
 
