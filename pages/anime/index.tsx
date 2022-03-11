@@ -86,9 +86,9 @@ const SearchPage: NextPage = () => {
             })
           );
         // Request to api
-        const { data: animesRes }: JikanApiResSearchRoot = await callApi(
-          `https://api.jikan.moe/v4/anime?q=${title}&limit=16`
-        );
+        const { data: animesRes }: JikanApiResSearchRoot = await callApi({
+          url: `https://api.jikan.moe/v4/anime?q=${title}&limit=16`,
+        });
 
         // Format
         const ToPosterShape = JikanDataToPosterData(animesRes);

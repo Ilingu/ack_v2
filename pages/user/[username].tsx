@@ -32,12 +32,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const ProdMode = process.env.NODE_ENV === "production";
 
   const Username = username.toString().trim().toLocaleLowerCase();
-  const UserData: ResApiRoutes = await callApi(
-    `http${ProdMode ? "s" : ""}://${host}/api/user/${Username}`,
-    true,
-    {},
-    cookies.UsT
-  );
+  const UserData: ResApiRoutes = await callApi({
+    url: `http${ProdMode ? "s" : ""}://${host}/api/user/${Username}`,
+    internalCall: true,
+    AccessToken: cookies.UsT,
+  });
 
   if (!UserData.succeed || !UserData.data) return { notFound: true };
   return {

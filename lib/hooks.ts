@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // Auth
 import { auth, db } from "./firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { Unsubscribe, User } from "@firebase/auth";
-import { doc, onSnapshot, collection, getDoc } from "@firebase/firestore";
+import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
 import {
   AnimeShape,
@@ -16,6 +16,7 @@ import {
 import {
   encryptDatas,
   filterUserAnime,
+  GetAnimesDatasByIds,
   postToJSON,
   SpotDifferenciesBetweenArrays,
 } from "./utils/UtilsFunc";
@@ -86,64 +87,26 @@ export function useGlobalAnimeData(userUid: string) {
   const [UserAnimesData, setUserAnimesData] = useState<UserAnimeShape[]>();
   const [UserGroupsData, setUserGroupsData] = useState<UserGroupShape[]>();
   const GlobalAnimesFecthFB = useRef(0);
+  const NewRenderOfEffect = useRef(true);
 
   const ResetDatas = () => {
     setUserAnimesData(undefined);
     setGlobalAnimes(undefined);
   };
 
-  const GetAnimesDatasByIds = async (AnimesIds: number[]) => {
-    if (GlobalAnimesFecthFB.current >= 50)
-      return console.warn("Fetch Quotas Exceeded For This Session: Reload");
-
-    const QAnimesDocs = await Promise.all(
-      AnimesIds.map(async (AnimeId) => {
-        const QAnimeRef = doc(db, "animes", AnimeId.toString());
-        return await getDoc(QAnimeRef);
-      })
-    );
-
-    const AnimesDatas = QAnimesDocs.map(postToJSON) as AnimeShape[];
-    const NewGlobalAnimesDatas = [...(GlobalAnimesDatas || []), ...AnimesDatas];
-
-    setGlobalAnimes(NewGlobalAnimesDatas);
-    await CacheDatasToIDB(NewGlobalAnimesDatas);
-
-    GlobalAnimesFecthFB.current++;
+  const RenderAnimes = async (DatasToRender: AnimeShape[]) => {
+    setGlobalAnimes(DatasToRender);
+    await CacheDatasToIDB(DatasToRender);
   };
 
-  const SyncCacheDatas = async (UserAnimes: UserAnimeShape[]) => {
-    if (!GlobalAnimesDatas) return;
-    const filteredUserAnime = [...UserAnimes];
+  const CallFB = async (DependenciesArray: number[]) => {
+    if (GlobalAnimesFecthFB.current >= 10000)
+      return console.warn(
+        "Fetch Quotas Exceeded For This Session: Reload"
+      ) as unknown as AnimeShape[];
+    GlobalAnimesFecthFB.current += DependenciesArray.length;
 
-    const CacheMissingAnime =
-      filteredUserAnime.length > GlobalAnimesDatas.length;
-
-    if (CacheMissingAnime) {
-      const MissingDependencies = SpotDifferenciesBetweenArrays(
-        filteredUserAnime,
-        GlobalAnimesDatas,
-        "AnimeId",
-        "malId"
-      ) as number[];
-
-      return await GetAnimesDatasByIds(MissingDependencies);
-    }
-
-    const CacheNotSync = filteredUserAnime.length < GlobalAnimesDatas.length;
-    if (CacheNotSync) {
-      const OverflowDependencies = SpotDifferenciesBetweenArrays(
-        GlobalAnimesDatas,
-        filteredUserAnime,
-        "malId",
-        "AnimeId"
-      );
-      const NewGlobalAnimesDatas = [...GlobalAnimesDatas].filter(
-        ({ malId }) => !OverflowDependencies.includes(malId)
-      );
-
-      setGlobalAnimes(NewGlobalAnimesDatas);
-    }
+    return await GetAnimesDatasByIds(DependenciesArray);
   };
 
   const GetAnimesDatas = async () => {
@@ -164,7 +127,7 @@ export function useGlobalAnimeData(userUid: string) {
       );
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
-    setGlobalAnimes(GlobalUserAnimeDatas);
+    return RenderAnimes(GlobalUserAnimeDatas);
   };
 
   useEffect(() => {
@@ -175,21 +138,69 @@ export function useGlobalAnimeData(userUid: string) {
 
   useEffect(() => {
     if (!userUid) return ResetDatas();
+    NewRenderOfEffect.current = true;
 
     const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
-    let unsub = onSnapshot(UserAnimesRef, (Snapdocs) => {
+    let unsub = onSnapshot(UserAnimesRef, async (Snapdocs) => {
       const UserAnimes =
         (Snapdocs?.docs?.map(postToJSON) as UserAnimeShape[]) || [];
       setUserAnimesData(UserAnimes);
 
+      if (NewRenderOfEffect.current && UserAnimes.length <= 1) {
+        NewRenderOfEffect.current = false;
+        return;
+      }
+
+      /* SyncCacheDatas */
+      if (!GlobalAnimesDatas) return;
       const filteredUserAnime = filterUserAnime(UserAnimes);
-      if (filteredUserAnime?.length === 0) return;
-      SyncCacheDatas(filteredUserAnime);
+
+      // Missing Animes In IDB
+      const MissingDependencies = SpotDifferenciesBetweenArrays(
+        filteredUserAnime,
+        GlobalAnimesDatas,
+        "AnimeId",
+        "malId"
+      ) as number[];
+      let MissingAnimesDatas: AnimeShape[] = [];
+
+      if (MissingDependencies.length > 0)
+        MissingAnimesDatas = await CallFB(MissingDependencies);
+
+      // Animes in IDB but not in UserAnimes
+      const OverflowDependencies = SpotDifferenciesBetweenArrays(
+        GlobalAnimesDatas,
+        filteredUserAnime,
+        "malId",
+        "AnimeId"
+      );
+      let GlobalAnimesWithoutOverflow: AnimeShape[] = [];
+
+      if (OverflowDependencies.length > 0)
+        GlobalAnimesWithoutOverflow = [...GlobalAnimesDatas].filter(
+          ({ malId }) => !OverflowDependencies.includes(malId)
+        );
+
+      // Merge
+      if (
+        MissingAnimesDatas.length > 0 ||
+        GlobalAnimesWithoutOverflow.length > 0
+      ) {
+        const WithOverflow = GlobalAnimesWithoutOverflow.length > 0;
+
+        const NewDatasToRender = [
+          ...(WithOverflow
+            ? GlobalAnimesWithoutOverflow
+            : GlobalAnimesDatas || []),
+          ...(MissingAnimesDatas || []),
+        ];
+
+        RenderAnimes(NewDatasToRender);
+      }
     });
 
     return unsub;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userUid]);
+  }, [GlobalAnimesDatas, userUid]);
 
   useEffect(() => {
     if (!userUid) return null;

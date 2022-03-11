@@ -133,14 +133,16 @@ const Settings: NextPage = () => {
 
     try {
       const ProdMode = process.env.NODE_ENV === "production";
-      const res: ResApiRoutes = await callApi(
-        `http${ProdMode ? "s" : ""}://${window.location.host}/api/user/delete`,
-        true,
-        {
+      const res: ResApiRoutes = await callApi({
+        url: `http${ProdMode ? "s" : ""}://${
+          window.location.host
+        }/api/user/delete`,
+        internalCall: true,
+        reqParams: {
           method: "DELETE",
           body: JSON.stringify({ username }),
-        }
-      );
+        },
+      });
 
       if (res.succeed) {
         toast.success(`Your account has been deleted !`);
@@ -383,17 +385,19 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
 
     try {
       const ProdMode = process.env.NODE_ENV === "production";
-      const res: ResApiRoutes = await callApi(
-        `http${ProdMode ? "s" : ""}://${window.location.host}/api/user/rename`,
-        true,
-        {
+      const res: ResApiRoutes = await callApi({
+        url: `http${ProdMode ? "s" : ""}://${
+          window.location.host
+        }/api/user/rename`,
+        internalCall: true,
+        reqParams: {
           method: "PUT",
           body: JSON.stringify({
             "old-username": DefaultUsername,
             "new-username": Username,
           }),
-        }
-      );
+        },
+      });
 
       if (res.succeed) {
         toast.success(`Hello ${Username} !`);

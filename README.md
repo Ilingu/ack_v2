@@ -15,7 +15,7 @@
 
 ### Release
 
-[![SITE](https://img.shields.io/badge/ACK%20release-rc%209-blue?style=for-the-badge)](https://ack.vercel.app/)
+[![SITE](https://img.shields.io/badge/ACK%20release-rc%2010-blue?style=for-the-badge)](https://ack.vercel.app/)
 
 ## Technologies
 

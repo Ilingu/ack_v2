@@ -69,10 +69,12 @@ export const GetAnimeData = async (
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
-    const { data: animeRes }: JikanApiResAnimeRoot = await callApi(endpoint);
+    const { data: animeRes }: JikanApiResAnimeRoot = await callApi({
+      url: endpoint,
+    });
     let animeEpsRes = await getAllTheEpisodes(animeId);
     const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
-      await callApi(endpoint + "/recommendations");
+      await callApi({ url: endpoint + "/recommendations" });
 
     if (
       IsError(animeRes as unknown as JikanApiERROR) ||
@@ -96,8 +98,6 @@ export const GetAnimeData = async (
         AnimeEpsDatas = [...AnimeEpsDatas, EpToAdd];
       }
     } else AnimeEpsDatas = animeEpsRes;
-
-    console.log(AnimeEpsDatas, animeEpsRes);
 
     const AnimeDatas: AnimeDatasShape = [
       animeRes,
@@ -188,9 +188,9 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
 
     const fetchOtherEP = async () => {
       try {
-        let eps: JikanApiResEpisodesRoot = await callApi(
-          `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`
-        );
+        let eps: JikanApiResEpisodesRoot = await callApi({
+          url: `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`,
+        });
         if (
           IsError(eps as unknown as JikanApiERROR) ||
           !eps?.data ||

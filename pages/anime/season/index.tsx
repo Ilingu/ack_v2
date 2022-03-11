@@ -41,9 +41,9 @@ interface SeasonAnimeItemProps {
 /* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const seasonAnime: JikanApiResSeasonRoot = await callApi(
-      `https://api.jikan.moe/v4/seasons/upcoming`
-    );
+    const seasonAnime: JikanApiResSeasonRoot = await callApi({
+      url: `https://api.jikan.moe/v4/seasons/upcoming`,
+    });
 
     return {
       props: {
@@ -93,9 +93,9 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
   const GetSeason = async (year: string, season: TheFourSeason) => {
     try {
       UpComingAnime.current = false;
-      const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi(
-        `https://api.jikan.moe/v4/seasons/${year}/${season}`
-      );
+      const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi({
+        url: `https://api.jikan.moe/v4/seasons/${year}/${season}`,
+      });
       if (IsError(seasonAnimeFetch as unknown as JikanApiERROR)) return;
 
       setSeasonAnimes(seasonAnimeFetch.data.slice(0, 50));

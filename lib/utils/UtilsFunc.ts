@@ -29,6 +29,7 @@ import { auth, db } from "../firebase/firebase";
 // Toast
 import toast from "react-hot-toast";
 import { AnimeWatchType } from "./types/enums";
+import { getDoc } from "firebase/firestore";
 
 /* FUNC */
 
@@ -80,36 +81,50 @@ export const decryptDatas = (encryptedCookie: Buffer): string => {
 };
 
 /* UTILS */
+
+interface callApiArgs {
+  url: string;
+  internalCall?: boolean;
+  AccessToken?: string;
+  RequestProofOfCall?: boolean;
+  reqParams?: RequestInit;
+}
 /**
  * Fetch Data From Api
  * @param {URL} url
+ * @returns the response
  */
-export async function callApi(
-  url: string,
-  internalApi = false,
-  params?: RequestInit,
-  AccessToken?: string,
-  ProofTheCall = false
-) {
+export async function callApi({
+  url,
+  AccessToken,
+  RequestProofOfCall,
+  internalCall,
+  reqParams,
+}: callApiArgs) {
   if (!isValidUrl(url)) return;
 
   try {
     let req = null;
-    if (!internalApi) req = await fetch(url);
+
+    if (!internalCall) req = await fetch(url);
     else {
-      req = await fetch(url, {
-        ...params,
+      const Params = {
+        ...reqParams,
         headers: {
           authorization: AccessToken
             ? AccessToken
             : (await auth?.currentUser?.getIdToken()) || undefined,
 
-          proofofcall: ProofTheCall
+          proofofcall: RequestProofOfCall
             ? encryptDatas(Buffer.from(Date.now().toString())).toString(
                 "base64"
               )
             : undefined,
         },
+      };
+
+      req = await fetch(url, {
+        ...Params,
       });
     }
 
@@ -119,6 +134,28 @@ export async function callApi(
     return false;
   }
 }
+
+/**
+ * Fetch Data From Api
+ * @param {number[]} AnimesIds
+ */
+export const GetAnimesDatasByIds = async (AnimesIds: number[]) => {
+  if (AnimesIds.length <= 0) return null;
+  console.log("FB Query");
+
+  try {
+    const QAnimesDocs = await Promise.all(
+      AnimesIds.map(async (AnimeId) => {
+        const QAnimeRef = doc(db, "animes", AnimeId.toString());
+        return await getDoc(QAnimeRef);
+      })
+    );
+    const AnimesDatas = QAnimesDocs.map(postToJSON) as AnimeShape[];
+    return AnimesDatas;
+  } catch (err) {
+    return null;
+  }
+};
 
 /**
  * Is the string a valid url (https://www.example.com)
@@ -542,9 +579,9 @@ export const GetLastReleasedAnimeEp = (): Promise<
     try {
       const LastAnimeEp:
         | AdkamiLastReleasedEpisodeShape[]
-        | ADKamiScrapperApiERROR = await callApi(
-        `https://adkami-scapping-api.herokuapp.com/last`
-      );
+        | ADKamiScrapperApiERROR = await callApi({
+        url: `https://adkami-scapping-api.herokuapp.com/last`,
+      });
 
       if (!LastAnimeEp || (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode)
         return false;

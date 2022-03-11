@@ -179,13 +179,11 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     const ProdMode = process.env.NODE_ENV === "production";
     if (ProdMode)
       (async () => {
-        const Succeed = await callApi(
-          `https://ack.vercel.app/api/revalidate/${malId}`,
-          true,
-          {},
-          undefined,
-          true
-        );
+        const Succeed = await callApi({
+          url: `https://ack.vercel.app/api/revalidate/${malId}`,
+          internalCall: true,
+          RequestProofOfCall: true,
+        });
 
         if (!Succeed || !Succeed?.succeed)
           toast.error("Cannot Revalidate Anime");
@@ -194,7 +192,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   }, [NextRefresh, malId]);
 
   useEffect(() => {
-    if (UserAnimes) {
+    if (UserAnimes && animeData) {
       const { malId } = animeData.AnimeData;
       const CurrentAnime =
         UserAnimes.find(({ AnimeId }) => AnimeId === malId) || null;
@@ -345,7 +343,6 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
           src={trailer_url}
           title="YouTube video player"
           frameBorder="0"
-          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         ></iframe>
       </section>
