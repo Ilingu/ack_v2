@@ -111,20 +111,23 @@ export function useGlobalAnimeData(userUid: string) {
 
   const GetAnimesDatas = async () => {
     const CachedAnimesDatas = await GetIDBAnimes();
+    const CacheExpired = async () => {
+      RenderAnimes(
+        await CallFB(
+          filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
+        )
+      );
+    };
 
     if (!CachedAnimesDatas || CachedAnimesDatas.length <= 0)
-      return GetAnimesDatasByIds(
-        filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
-      );
+      return await CacheExpired();
 
     if (
       CachedAnimesDatas[0]?.expire < Date.now() ||
       !CachedAnimesDatas[0]?.AnimesStored ||
       CachedAnimesDatas[0]?.AnimesStored.length <= 0
     )
-      return GetAnimesDatasByIds(
-        filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
-      );
+      return await CacheExpired();
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
     return RenderAnimes(GlobalUserAnimeDatas);
