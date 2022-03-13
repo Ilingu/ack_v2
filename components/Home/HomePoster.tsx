@@ -42,7 +42,7 @@ import {
   shuffleArray,
   ToggleFav,
 } from "../../lib/utils/UtilsFunc";
-import { RevalidateAnime } from "../../lib/utils/ApiFunc";
+import { RevalidateAnime } from "../../lib/utils/UtilsFunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaCopy, FaMinus, FaPlus, FaSearch, FaTrashAlt } from "react-icons/fa";

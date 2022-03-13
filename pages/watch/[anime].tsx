@@ -11,8 +11,11 @@ import MetaTags from "../../components/Common/Metatags";
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
 // Func
-import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utils/UtilsFunc";
-import { RevalidateAnime } from "../../lib/utils/ApiFunc";
+import {
+  ConvertBroadcastTimeZone,
+  ToggleFav,
+  RevalidateAnime,
+} from "../../lib/utils/UtilsFunc";
 // Types
 import { AnimeShape, UserAnimeShape } from "../../lib/utils/types/interface";
 // UI

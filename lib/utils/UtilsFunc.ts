@@ -136,6 +136,20 @@ export async function callApi({
 }
 
 /**
+ * Revalidate Anime Via Internal API
+ * @param {number | string} AnimeID The Host To Test
+ */
+export const RevalidateAnime = async (AnimeID: number | string) => {
+  try {
+    await callApi({
+      url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,
+      internalCall: true,
+      RequestProofOfCall: true,
+    });
+  } catch (err) {}
+};
+
+/**
  * Fetch Data From Api
  * @param {number[]} AnimesIds
  */

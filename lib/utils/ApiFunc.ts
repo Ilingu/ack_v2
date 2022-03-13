@@ -24,6 +24,8 @@ type AnimeDatasShape = [
   JikanApiResRecommandations[]
 ];
 
+/* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
+
 /**
  * Return API Response Error Object
  * @param {number} code Code of error (4**)
@@ -56,20 +58,6 @@ export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
 export const IsBlacklistedHost = (host: string): boolean => {
   const WhiteListedHost = ["ack.vercel.app", "localhost:3000"];
   return !WhiteListedHost.includes(host);
-};
-
-/**
- * Revalidate Anime Via Internal API
- * @param {number | string} AnimeID The Host To Test
- */
-export const RevalidateAnime = async (AnimeID: number | string) => {
-  try {
-    await callApi({
-      url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,
-      internalCall: true,
-      RequestProofOfCall: true,
-    });
-  } catch (err) {}
 };
 
 /**

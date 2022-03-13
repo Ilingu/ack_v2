@@ -22,11 +22,11 @@ import {
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import {
-  callApi,
+  RevalidateAnime,
   ConvertBroadcastTimeZone,
   Return404,
 } from "../../lib/utils/UtilsFunc";
-import { GetAnimeData, RevalidateAnime } from "../../lib/utils/ApiFunc";
+import { GetAnimeData } from "../../lib/utils/ApiFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
 import { db as AdminDB } from "../../lib/firebase/firebase-admin";
