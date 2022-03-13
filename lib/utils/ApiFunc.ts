@@ -59,6 +59,20 @@ export const IsBlacklistedHost = (host: string): boolean => {
 };
 
 /**
+ * Revalidate Anime Via Internal API
+ * @param {number | string} AnimeID The Host To Test
+ */
+export const RevalidateAnime = async (AnimeID: number | string) => {
+  try {
+    await callApi({
+      url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,
+      internalCall: true,
+      RequestProofOfCall: true,
+    });
+  } catch (err) {}
+};
+
+/**
  * Fetch Anime Data
  * @param {string} animeId
  */

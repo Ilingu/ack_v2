@@ -26,6 +26,7 @@ import {
   ConvertBroadcastTimeZone,
   Return404,
 } from "../../lib/utils/UtilsFunc";
+import { GetAnimeData, RevalidateAnime } from "../../lib/utils/ApiFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
 import { db as AdminDB } from "../../lib/firebase/firebase-admin";
@@ -43,10 +44,8 @@ import {
   FaStar,
   FaTv,
 } from "react-icons/fa";
-// DATA
+// Ctx
 import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
-import { GetAnimeData } from "../../lib/utils/ApiFunc";
-import toast from "react-hot-toast";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -175,20 +174,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   useEffect(() => {
     if (!NextRefresh || NextRefresh > Date.now()) return;
 
-    // Revalidate If Anime Updated
-    const ProdMode = process.env.NODE_ENV === "production";
-    if (ProdMode)
-      (async () => {
-        const Succeed = await callApi({
-          url: `https://ack.vercel.app/api/revalidate/${malId}`,
-          internalCall: true,
-          RequestProofOfCall: true,
-        });
-
-        if (!Succeed || !Succeed?.succeed)
-          toast.error("Cannot Revalidate Anime");
-        else toast.success("Anime Revalidated!");
-      })();
+    // Revalidate If Anime Outdated
+    process.env.NODE_ENV === "production" && RevalidateAnime(malId);
   }, [NextRefresh, malId]);
 
   useEffect(() => {

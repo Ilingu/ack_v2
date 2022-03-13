@@ -42,6 +42,7 @@ import {
   shuffleArray,
   ToggleFav,
 } from "../../lib/utils/UtilsFunc";
+import { RevalidateAnime } from "../../lib/utils/ApiFunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaCopy, FaMinus, FaPlus, FaSearch, FaTrashAlt } from "react-icons/fa";
@@ -816,6 +817,7 @@ function AnimeItemPoster({
   NameOfGroup,
 }: HomeAnimeItemPosterProp) {
   const [CopyClicked, setCopyClicked] = useState(false);
+  const ImageAlreadyFetchedOnce = useRef(false);
   const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
   const Color =
     WatchType === WATCHING
@@ -902,7 +904,9 @@ function AnimeItemPoster({
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
             onError={() => {
               console.warn("Img Cannot be load");
-              // GetAnimeData(AnimeId.toString(), true);
+              if (ImageAlreadyFetchedOnce.current) return;
+              ImageAlreadyFetchedOnce.current = true;
+              RevalidateAnime(AnimeId);
             }}
           />
           <h1

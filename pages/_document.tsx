@@ -38,7 +38,7 @@ class MyDocument extends Document {
             name="twitter:image"
             content="https://ack.vercel.app/IconAck192.png"
           />
-          <meta name="twitter:creator" content="@IlinguDev" />
+          <meta name="twitter:creator" content="@DevIlingu" />
           <meta name="twitter:app:country" content="FR" />
           <meta name="twitter:app:name:iphone" content="ACK" />
           <meta property="og:type" content="website" />

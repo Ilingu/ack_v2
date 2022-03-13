@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
 // Func
 import { ConvertBroadcastTimeZone, ToggleFav } from "../../lib/utils/UtilsFunc";
+import { RevalidateAnime } from "../../lib/utils/ApiFunc";
 // Types
 import { AnimeShape, UserAnimeShape } from "../../lib/utils/types/interface";
 // UI
@@ -59,6 +60,8 @@ const NewEpReleased = async (AnimeId: string) => {
 /* COMPONENT */
 const WatchPage: NextPage = () => {
   const { query, push } = useRouter();
+  const ImageAlreadyFetchedOnce = useRef(false);
+
   const { GlobalAnime, UserAnimes } = useContext(GlobalAppContext);
   const [CurrentAnimeData, setCurrentAnimeData] = useState<AnimeShape>(null);
   const [UserAnimeData, setUserAnimeData] = useState<UserAnimeShape>(null);
@@ -90,7 +93,7 @@ const WatchPage: NextPage = () => {
       ({ malId }) => malId?.toString() === query.anime
     );
 
-    if (!UserAnimeData || !CurrentAnimeData) push("/404");
+    if (!UserAnimeData || !CurrentAnimeData) push(`/anime/${query.anime}`);
 
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
@@ -157,9 +160,11 @@ const WatchPage: NextPage = () => {
                       className="rounded-lg object-cover"
                       placeholder="blur"
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
-                      onError={() => {
+                      onError={async () => {
                         console.warn("Img Cannot be load");
-                        // GetAnimeData(malId.toString(), true);
+                        if (ImageAlreadyFetchedOnce.current) return;
+                        ImageAlreadyFetchedOnce.current = true;
+                        RevalidateAnime(malId);
                       }}
                     />
                     {!!NewEpisodeAvailable && (
