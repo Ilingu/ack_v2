@@ -94,9 +94,9 @@ export function useGlobalAnimeData(userUid: string) {
     setGlobalAnimes(undefined);
   };
 
-  const RenderAnimes = async (DatasToRender: AnimeShape[]) => {
+  const RenderAnimes = (DatasToRender: AnimeShape[], save = true) => {
     setGlobalAnimes(DatasToRender);
-    await CacheDatasToIDB(DatasToRender);
+    save && CacheDatasToIDB(DatasToRender);
   };
 
   const CallFB = async (DependenciesArray: number[]) => {
@@ -130,7 +130,7 @@ export function useGlobalAnimeData(userUid: string) {
     if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Rebuild in BG but display old version
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
-    return RenderAnimes(GlobalUserAnimeDatas);
+    return RenderAnimes(GlobalUserAnimeDatas, false);
   };
 
   useEffect(() => {
