@@ -259,7 +259,7 @@ export function JikanApiToRecommendationShape(
 ): RecommendationsShape[] {
   return JikanObj.map((recomData) => ({
     malId: recomData.entry.mal_id,
-    photoUrl: recomData.entry.images.jpg.image_url,
+    photoUrl: removeParamsFromPhotoUrl(recomData.entry.images.jpg.image_url),
     recommendationCount: recomData.votes,
     title: recomData.entry.title,
   }));
@@ -292,7 +292,7 @@ export function JikanApiToSeasonAnimeShape(
   return JikanObj.map((SeasonData) => ({
     title: SeasonData.title,
     type: SeasonData.type,
-    PhotoUrl: SeasonData.images.jpg.image_url,
+    PhotoUrl: removeParamsFromPhotoUrl(SeasonData.images.jpg.image_url),
     BeginAiring: new Date(SeasonData.aired.from).toLocaleDateString(),
     score: SeasonData.score,
     MalId: SeasonData.mal_id,
@@ -383,7 +383,7 @@ export function JikanApiToAnimeShape(
 
 /**
  * Remove ?s= from photoURL
- * @param {string} photoURL
+ * @param {string} photoUrl
  */
 export const removeParamsFromPhotoUrl = (photoUrl: string) =>
   photoUrl.split("?s=")[0];

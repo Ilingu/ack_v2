@@ -119,15 +119,15 @@ export function useGlobalAnimeData(userUid: string) {
       );
     };
 
-    if (!CachedAnimesDatas || CachedAnimesDatas.length <= 0)
-      return await CacheExpired();
-
     if (
-      CachedAnimesDatas[0]?.expire < Date.now() ||
+      !CachedAnimesDatas ||
+      CachedAnimesDatas.length <= 0 ||
       !CachedAnimesDatas[0]?.AnimesStored ||
       CachedAnimesDatas[0]?.AnimesStored.length <= 0
     )
       return await CacheExpired();
+
+    if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Rebuild in BG but display old version
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
     return RenderAnimes(GlobalUserAnimeDatas);
