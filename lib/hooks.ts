@@ -127,7 +127,7 @@ export function useGlobalAnimeData(userUid: string) {
     )
       return await CacheExpired();
 
-    if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Rebuild in BG but display old version
+    if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Refetch in BG but display old version
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
     return RenderAnimes(GlobalUserAnimeDatas, false);

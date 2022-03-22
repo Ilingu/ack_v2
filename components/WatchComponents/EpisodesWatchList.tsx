@@ -260,7 +260,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
       <div className="mb-1 flex flex-wrap gap-2">
         {!isNaN(Duration) && (
           <div className="text-primary-whiter text-xl font-bold tracking-wide">
-            {((Duration * (EpisodesLength - NoWatchedEp)) / 60).toFixed()} Hr{" "}
+            {Math.floor((Duration * (EpisodesLength - NoWatchedEp)) / 60)} Hr{" "}
             {(Duration * (EpisodesLength - NoWatchedEp)) % 60} min{" "}
             <span className="text-description text-lg font-semibold italic">
               Remaining
