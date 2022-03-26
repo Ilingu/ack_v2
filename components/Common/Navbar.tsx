@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { FC, useContext, useEffect, useState } from "react";
 import { install } from "@github/hotkey";
+import { DeviceCheckType } from "../../lib/utils/UtilsFunc";
 // Auth
 import AuthCheck from "./AuthCheck";
 // UI
@@ -18,7 +19,7 @@ const Navbar: FC = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!window.mobileAndTabletCheck())
+    if (DeviceCheckType() === "PC")
       for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
         install(el as HTMLElement);
       }

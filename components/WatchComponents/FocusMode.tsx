@@ -3,7 +3,11 @@ import { install } from "@github/hotkey";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
-import { ManageFullScreen, removeDuplicates } from "../../lib/utils/UtilsFunc";
+import {
+  DeviceCheckType,
+  ManageFullScreen,
+  removeDuplicates,
+} from "../../lib/utils/UtilsFunc";
 // Types
 import {
   JikanApiResEpisodes,
@@ -54,7 +58,7 @@ const FocusMode: FC<FocusModeProps> = ({
     ManageFullScreen("activate");
 
     // HotKeys
-    if (!window.mobileAndTabletCheck())
+    if (DeviceCheckType() === "PC")
       for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
         install(el as HTMLElement);
       }

@@ -35,7 +35,7 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { callApi } from "../lib/utils/UtilsFunc";
+import { callApi, DeviceCheckType } from "../lib/utils/UtilsFunc";
 import { ClearIDB } from "../lib/utils/IDB";
 
 /* Components */
@@ -224,7 +224,10 @@ const Settings: NextPage = () => {
                 )}
               </section>
               <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
-                <h1 className="text-description-whiter mb-1 text-xl font-bold">
+                <h1
+                  className="text-description-whiter mb-1 text-xl font-bold"
+                  title="Nothing is stored"
+                >
                   Session Data:
                 </h1>
                 <ul className="text-headline xs:grid-cols-2 grid text-lg">
@@ -250,7 +253,7 @@ const Settings: NextPage = () => {
                     Mobile:{" "}
                     <span className="text-primary-whitest">
                       [{navigator?.userAgentData?.mobile ? "True" : "False"},{" "}
-                      {window.mobileAndTabletCheck() ? "True" : "False"}]
+                      {DeviceCheckType() === "Mobile" ? "True" : "False"}]
                     </span>
                   </li>
                   <li>

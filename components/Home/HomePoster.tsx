@@ -37,6 +37,7 @@ import { db } from "../../lib/firebase/firebase";
 // Func
 import {
   copyToClipboard,
+  DeviceCheckType,
   filterUserAnime,
   removeDuplicates,
   shuffleArray,
@@ -571,7 +572,7 @@ function HomeHeader({
             <FaSearch
               onClick={() => setAnimeSearchMode((prev) => !prev)}
               className={`icon text-primary-whitest text-xl${
-                window.mobileAndTabletCheck() ? "" : " hidden"
+                DeviceCheckType() === "Mobile" ? "" : " hidden"
               } group-hover:inline`}
             />{" "}
           </Fragment>

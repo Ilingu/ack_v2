@@ -10,7 +10,6 @@ import {
 declare global {
   interface Window {
     opera: any;
-    mobileAndTabletCheck: () => boolean;
     appVersion: () => "Web" | "PWA";
   }
   interface Navigator {
