@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
+import { install } from "@github/hotkey";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
@@ -51,6 +52,12 @@ const FocusMode: FC<FocusModeProps> = ({
     scrollTo(0, 0); // UX
     document.body.style.overflow = "hidden";
     ManageFullScreen("activate");
+
+    // HotKeys
+    if (!window.mobileAndTabletCheck())
+      for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
+        install(el as HTMLElement);
+      }
 
     // UnMounted UX
     return () => {
@@ -158,6 +165,7 @@ const FocusMode: FC<FocusModeProps> = ({
       <div className="flex gap-3">
         <button
           onClick={CancelModeFocus}
+          data-hotkey="Escape"
           className="text-headline bg-bgi-black rounded-full p-4 text-5xl transition-all hover:text-red-400 
         hover:ring-2 hover:ring-red-500"
         >
@@ -165,6 +173,7 @@ const FocusMode: FC<FocusModeProps> = ({
         </button>
         <button
           onClick={UpdateUserAnimeProgress}
+          data-hotkey="ArrowRight"
           className="text-headline bg-bgi-black hover:text-primary-whiter hover:ring-primary-main rounded-full p-4 text-5xl 
         transition-all hover:ring-2"
         >

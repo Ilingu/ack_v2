@@ -18,9 +18,10 @@ const Navbar: FC = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
-      install(el as HTMLElement);
-    }
+    if (!window.mobileAndTabletCheck())
+      for (const el of Array.from(document.querySelectorAll("[data-hotkey]"))) {
+        install(el as HTMLElement);
+      }
     setMounted(true);
   }, []);
 
