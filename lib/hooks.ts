@@ -22,10 +22,20 @@ import {
 } from "./utils/UtilsFunc";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
-const CacheDatasToIDB = async (NewGlobalAnimesDatas: AnimeShape[]) => {
+interface SaveShape {
+  save: boolean;
+  Expire?: boolean;
+}
+
+const CacheDatasToIDB = async (
+  NewGlobalAnimesDatas: AnimeShape[],
+  NewExpire: boolean
+) => {
   const IDBObject: IDBShape = {
     AnimesStored: NewGlobalAnimesDatas,
-    expire: Date.now() + 259200000, // 3J --> Force Refresh for AnimesDatas Updates (Like Season)
+    expire: NewExpire
+      ? Date.now() + 259200000
+      : (await GetIDBAnimes())[0]?.expire || Date.now(), // 3J --> Force Refresh for AnimesDatas Updates
   };
   await WriteIDB(IDBObject);
 };
@@ -94,9 +104,12 @@ export function useGlobalAnimeData(userUid: string) {
     setGlobalAnimes(undefined);
   };
 
-  const RenderAnimes = (DatasToRender: AnimeShape[], save = true) => {
+  const RenderAnimes = (
+    DatasToRender: AnimeShape[],
+    { save, Expire }: SaveShape
+  ) => {
     setGlobalAnimes(DatasToRender);
-    save && CacheDatasToIDB(DatasToRender);
+    if (save) CacheDatasToIDB(DatasToRender, Expire);
   };
 
   const CallFB = async (DependenciesArray: number[]) => {
@@ -115,7 +128,8 @@ export function useGlobalAnimeData(userUid: string) {
       RenderAnimes(
         await CallFB(
           filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
-        )
+        ),
+        { save: true, Expire: true }
       );
     };
 
@@ -130,7 +144,7 @@ export function useGlobalAnimeData(userUid: string) {
     if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Refetch in BG but display old version
 
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
-    return RenderAnimes(GlobalUserAnimeDatas, false);
+    return RenderAnimes(GlobalUserAnimeDatas, { save: false });
   };
 
   useEffect(() => {
@@ -198,7 +212,7 @@ export function useGlobalAnimeData(userUid: string) {
           ...(MissingAnimesDatas || []),
         ];
 
-        RenderAnimes(NewDatasToRender);
+        RenderAnimes(NewDatasToRender, { save: true, Expire: false });
       }
     });
 
