@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tailwind */
+@layer components {
+  .icon {
+    @apply inline -translate-y-0.5;
+  }
+  .btn-navbar {
+    @apply hover:bg-bgi-whiter flex flex-col items-center px-4 py-4 text-xl font-bold transition;
+  }
+}
+
+/* Var */
+$PrimaryDark: #4e44ce;
+$PrimaryMain: rgb(99, 102, 241);
+$PrimaryWhite: rgb(153, 155, 255);
+$PrimaryWhiter: rgb(179, 180, 255);
+$SelectionBg: rgb(236, 236, 255);
+$SelectionColor: rgb(10, 10, 10);
+$BgScroll: rgb(18, 18, 18);
+$BgScrollDarker: rgb(22, 22, 22);
+$BgDark: rgb(34, 34, 34);
+$BgMain: rgb(44, 45, 48);
+$BgWhite: rgb(53, 54, 58);
+$Secondary: rgb(59, 130, 246);
+
+/* GENERAL */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 13px;
+}
+
+// Track
+::-webkit-scrollbar-track {
+  background-color: $BgDark;
+  border-radius: 10px;
+}
+// Handle
+::-webkit-scrollbar-thumb {
+  background-color: $BgScroll;
+  border-radius: 10px;
+}
+// Handle on hover
+::-webkit-scrollbar-thumb:hover {
+  background-color: $BgScrollDarker;
+}
+
+/* OnPrint */
+@media print {
+  html {
+    display: none;
+  }
+}
+
+/* HoverHoverit */
+::selection {
+  background-color: $SelectionBg;
+  color: $SelectionColor;
+}
+
+/* GENERAL */
+
+.watch-container {
+  display: grid;
+  grid-template-areas:
+    "img title title"
+    "buttons buttons buttons"
+    "content content content";
+  gap: 2rem;
+
+  .gta-img {
+    grid-area: img;
+    display: grid;
+    justify-items: center;
+  }
+  .gta-title {
+    grid-area: title;
+    display: grid;
+  }
+  .gta-buttons {
+    grid-area: buttons;
+  }
+  .gta-content {
+    grid-area: content;
+  }
+
+  @media screen and (max-width: 1024px) {
+    grid-template-areas:
+      "img"
+      "title"
+      "buttons"
+      "content";
+    .gta-title {
+      justify-items: center;
+    }
+  }
+}
+
+// Input Add Eps, /watch
+#DigitAddEpsInput {
+  -moz-appearance: textfield;
+}
+#DigitAddEpsInput::-webkit-outer-spin-button,
+#DigitAddEpsInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+// Title /watch
+#WatchBigTitle {
+  text-shadow: 1px 1px 1px $BgDark;
+}

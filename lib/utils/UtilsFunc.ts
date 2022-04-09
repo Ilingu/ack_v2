@@ -140,6 +140,7 @@ export async function callApi({
  * @param {number | string} AnimeID The Host To Test
  */
 export const RevalidateAnime = async (AnimeID: number | string) => {
+  console.warn(`Revalidating ${AnimeID}...`);
   try {
     await callApi({
       url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,

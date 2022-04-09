@@ -43,7 +43,6 @@ yarn-error.log*
 /public/fallback-*.js
 
 #Styles
-/styles/globals.scss
 /styles/globals.css.map
 
 #Template

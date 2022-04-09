@@ -44,8 +44,10 @@ const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
     if (isNaN(TimeOfCall))
       return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
 
-    if (Date.now() - TimeOfCall > 1000)
+    if (Date.now() - TimeOfCall > 1000) {
+      console.log(Date.now() - TimeOfCall);
       return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
+    }
 
     const isValid = isValidUrl(
       encodeURI(`https://ack.vercel.app/anime/${RevalidateID}`)
