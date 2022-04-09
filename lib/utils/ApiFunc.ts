@@ -32,11 +32,10 @@ type AnimeDatasShape = [
  * @param {string} reason Reason of error/failure
  * @returns {ResApiRoutes} ResApiRoutes interface
  */
-export const ErrorHandling = (code: number, reason?: string): ResApiRoutes => ({
-  succeed: false,
-  code,
-  message: reason,
-});
+export const ErrorHandling = (code: number, reason?: string): ResApiRoutes => {
+  console.error(reason);
+  return { succeed: false, code, message: reason };
+};
 
 /**
  * Return API Response Success Object
@@ -44,11 +43,9 @@ export const ErrorHandling = (code: number, reason?: string): ResApiRoutes => ({
  * @param {object} data Data to send back to the client
  * @returns {ResApiRoutes} ResApiRoutes interface
  */
-export const SuccessHandling = (code: number, data?: object): ResApiRoutes => ({
-  succeed: true,
-  code,
-  data,
-});
+export const SuccessHandling = (code: number, data?: object): ResApiRoutes => {
+  return { succeed: true, code, data };
+};
 
 /**
  * Return Is The Host Is BlackListed

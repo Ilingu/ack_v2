@@ -4,8 +4,9 @@ import {
   IsBlacklistedHost,
   SuccessHandling,
 } from "../../../lib/utils/ApiFunc";
-import { ResApiRoutes } from "../../../lib/utils/types/interface";
-import { decryptDatas, isValidUrl } from "../../../lib/utils/UtilsFunc";
+import { auth, db } from "../../../lib/firebase/firebase-admin";
+import { AnimeShape, ResApiRoutes } from "../../../lib/utils/types/interface";
+import { isValidUrl } from "../../../lib/utils/UtilsFunc";
 
 const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   // Utils Func
@@ -30,24 +31,11 @@ const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   if (method !== "GET")
     return Respond(ErrorHandling(400, "Only accept GET req")); // ❌
 
-  if (!headers || !headers.proofofcall)
-    return Respond(ErrorHandling(400, "Missing proofofcall Token")); // ❌
+  if (!headers || !headers.authorization)
+    return Respond(ErrorHandling(400, "Missing Auth Token")); // ❌
 
   try {
-    const EncryptedToken = Buffer.from(
-      headers.proofofcall.toString(),
-      "base64"
-    );
-    const decryptedToken = decryptDatas(EncryptedToken);
-    const TimeOfCall = parseInt(decryptedToken);
-
-    if (isNaN(TimeOfCall))
-      return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
-
-    if (Date.now() - TimeOfCall > 1000) {
-      console.log(Date.now() - TimeOfCall);
-      return Respond(ErrorHandling(400, "Proof Of Call Invalid")); // ❌
-    }
+    await auth.verifyIdToken(headers.authorization); // Auth
 
     const isValid = isValidUrl(
       encodeURI(`https://ack.vercel.app/anime/${RevalidateID}`)
@@ -55,6 +43,18 @@ const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {
     const SecureId = parseInt(RevalidateID);
     if (!isValid || isNaN(SecureId))
       return Respond(ErrorHandling(400, "Path To Revalidate Is Not Valid")); // ❌
+
+    const RevalidateDoc = await db
+      .collection("animes")
+      .doc(SecureId.toString())
+      .get();
+
+    if (!RevalidateDoc.exists)
+      return Respond(ErrorHandling(400, "ID is not found")); // ❌
+
+    const AnimeData = RevalidateDoc.data() as AnimeShape;
+    if ((AnimeData?.NextRefresh || 0) > Date.now())
+      return Respond(ErrorHandling(400, "Anime is not expire")); // ❌
 
     await res.unstable_revalidate(`/anime/${SecureId.toString()}`);
     Respond(SuccessHandling(200));

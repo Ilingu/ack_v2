@@ -145,7 +145,6 @@ export const RevalidateAnime = async (AnimeID: number | string) => {
     await callApi({
       url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,
       internalCall: true,
-      RequestProofOfCall: true,
     });
   } catch (err) {}
 };
