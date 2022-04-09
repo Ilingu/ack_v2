@@ -26,7 +26,12 @@ import {
 import { TheFourSeason } from "../../../lib/utils/types/types";
 import { TheFourSeasonEnum } from "../../../lib/utils/types/enums";
 // UI
-import { FaCalendarAlt, FaExternalLinkAlt, FaStar } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaExternalLinkAlt,
+  FaStar,
+  FaSync,
+} from "react-icons/fa";
 import Divider from "../../../components/Design/Divider";
 import MetaTags from "../../../components/Common/Metatags";
 
@@ -73,6 +78,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     if (season === "winter" && m === 12) y++;
     return y.toString();
   });
+  const [Loading, setLoading] = useState(false);
   const SkipFirstCallbackInstance = useRef(true);
   const UpComingAnime = useRef(true);
 
@@ -92,6 +98,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
 
   const GetSeason = async (year: string, season: TheFourSeason) => {
     try {
+      setLoading(true);
       UpComingAnime.current = false;
       const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi({
         url: `https://api.jikan.moe/v4/seasons/${year}/${season}`,
@@ -99,6 +106,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
       if (IsError(seasonAnimeFetch as unknown as JikanApiERROR)) return;
 
       setSeasonAnimes(seasonAnimeFetch.data.slice(0, 50));
+      setLoading(false);
     } catch (err) {
       console.error(err);
     }
@@ -145,7 +153,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         </h1>
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="mt-2 mb-4 flex justify-center"
+          className="mt-2 mb-4 flex items-center justify-center"
         >
           <input
             type="number"
@@ -164,7 +172,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
             value={Season}
             onChange={(e) => setSeason(e.target.value as TheFourSeason)}
             placeholder="Season"
-            className="bg-bgi-black text-headline focus:ring-primary-main w-52 rounded-md py-2 px-1 text-center font-semibold capitalize shadow-lg outline-none
+            className="bg-bgi-black text-headline focus:ring-primary-main mr-2 w-52 rounded-md py-2 px-1 text-center font-semibold capitalize shadow-lg outline-none
              transition focus:ring-2"
           >
             <option value={TheFourSeasonEnum.SPRING}>
@@ -180,6 +188,12 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
               {TheFourSeasonEnum.WINTER}
             </option>
           </select>
+          <button
+            className="bg-primary-whiter text-headline focus:ring-primary-darker flex h-9 w-9 items-center justify-center rounded-lg py-2 px-1 outline-none transition-all focus:ring-2"
+            onClick={() => GetSeason(Year, Season)}
+          >
+            <FaSync className={`${Loading ? "animate-spin" : ""}`} />
+          </button>
         </form>
         <Divider />
       </header>
