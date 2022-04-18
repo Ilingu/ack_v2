@@ -84,7 +84,7 @@ export function useUserData() {
     });
 
     return () => {
-      unsubscribe();
+      unsubscribe && unsubscribe();
       unSub();
     };
   }, []);
@@ -148,13 +148,13 @@ export function useGlobalAnimeData(userUid: string) {
   };
 
   useEffect(() => {
-    if (!UserAnimesData || GlobalAnimesDatas) return null;
+    if (!UserAnimesData || GlobalAnimesDatas) return;
     GetAnimesDatas(); // Get User Animes Datas
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnimesDatas, UserAnimesData]);
 
   useEffect(() => {
-    if (!userUid) return ResetDatas();
+    if (!userUid) return ResetDatas;
     NewRenderOfEffect.current = true;
 
     const UserAnimesRef = collection(doc(db, "users", userUid), "animes");
@@ -220,7 +220,7 @@ export function useGlobalAnimeData(userUid: string) {
   }, [GlobalAnimesDatas, userUid]);
 
   useEffect(() => {
-    if (!userUid) return null;
+    if (!userUid) return () => undefined;
 
     const UserGroupsRef = collection(doc(db, "users", userUid), "groups");
     let unsub = onSnapshot(UserGroupsRef, (Snapdocs) => {
