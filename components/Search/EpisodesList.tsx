@@ -2,7 +2,7 @@ import React, { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { EpisodesSearchContext } from "../../lib/context";
 // Types
-import {
+import type {
   EpisodesShape,
   JikanApiResEpisodes,
 } from "../../lib/utils/types/interface";

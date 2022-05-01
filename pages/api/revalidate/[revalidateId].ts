@@ -5,7 +5,10 @@ import {
   SuccessHandling,
 } from "../../../lib/utils/ApiFunc";
 import { auth, db } from "../../../lib/firebase/firebase-admin";
-import { AnimeShape, ResApiRoutes } from "../../../lib/utils/types/interface";
+import type {
+  AnimeShape,
+  ResApiRoutes,
+} from "../../../lib/utils/types/interface";
 import { isValidUrl } from "../../../lib/utils/UtilsFunc";
 
 const ApiRoute = async (req: NextApiRequest, res: NextApiResponse) => {

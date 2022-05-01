@@ -20,7 +20,7 @@ import {
 } from "../../lib/utils/UtilsFunc";
 import { SearchAnimeInAlgolia } from "../../lib/algolia/algolia";
 // Types
-import {
+import type {
   AlgoliaDatasShape,
   AnimeShape,
   JikanApiResSearch,

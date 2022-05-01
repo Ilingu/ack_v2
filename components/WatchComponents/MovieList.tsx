@@ -13,8 +13,6 @@ const MovieList: FC<MovieListProps> = ({ Duration }) => {
   const DurationToMin =
     HoursToMin + (!isNaN(MinutesRemaining) ? MinutesRemaining : 0);
 
-  console.log(DurationToMin);
-
   return (
     <div className="relative w-full">
       <h1 className="text-headline mb-3 flex flex-col text-center text-4xl font-bold">

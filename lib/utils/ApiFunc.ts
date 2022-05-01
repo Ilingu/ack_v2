@@ -1,7 +1,7 @@
 import { db } from "../firebase/firebase-admin";
 import { IndexAnimeInAlgolia } from "../algolia/algolia-admin";
 // Types
-import {
+import type {
   AnimeConfigPathsIdShape,
   AnimeShape,
   InternalApiResError,

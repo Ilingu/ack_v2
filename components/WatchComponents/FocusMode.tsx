@@ -9,7 +9,7 @@ import {
   removeDuplicates,
 } from "../../lib/utils/UtilsFunc";
 // Types
-import {
+import type {
   JikanApiResEpisodes,
   UserAnimeShape,
   UserAnimeTimestampDate,

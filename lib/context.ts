@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { User } from "@firebase/auth";
-import {
+import type { User } from "@firebase/auth";
+import type {
   AnimeShape,
   UserAnimeShape,
   UserGroupShape,

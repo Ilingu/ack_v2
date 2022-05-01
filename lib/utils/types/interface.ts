@@ -1,6 +1,6 @@
 import { User } from "firebase/auth";
 import { AnimeWatchType } from "./enums";
-import {
+import type {
   AnimeStatusType,
   AnimeType,
   NetworkEffectiveType,

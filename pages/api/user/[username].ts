@@ -6,7 +6,7 @@ import {
   SuccessHandling,
 } from "../../../lib/utils/ApiFunc";
 import { AnimeWatchType } from "../../../lib/utils/types/enums";
-import {
+import type {
   ResApiRoutes,
   UserAnimeShape,
 } from "../../../lib/utils/types/interface";

@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Unsubscribe, User } from "@firebase/auth";
 import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
-import {
+import type {
   AnimeShape,
   IDBShape,
   UserAnimeShape,

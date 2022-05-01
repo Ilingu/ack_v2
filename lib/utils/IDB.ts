@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { IDBShape } from "./types/interface";
+import type { IDBShape } from "./types/interface";
 
 const GetIDB = async () =>
   await openDB("ACK_IDB", 1, {

@@ -10,7 +10,7 @@ import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 // Type
-import {
+import type {
   AnimeShape,
   AnimeConfigPathsIdShape,
   Studio as StudioShape,

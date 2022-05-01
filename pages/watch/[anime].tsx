@@ -17,7 +17,10 @@ import {
   RevalidateAnime,
 } from "../../lib/utils/UtilsFunc";
 // Types
-import { AnimeShape, UserAnimeShape } from "../../lib/utils/types/interface";
+import type {
+  AnimeShape,
+  UserAnimeShape,
+} from "../../lib/utils/types/interface";
 // UI
 import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
@@ -228,6 +231,7 @@ const WatchPage: NextPage = () => {
                   <EpsPoster
                     EpisodesData={EpisodesData}
                     UserAnimeData={UserAnimeData}
+                    setFocusMode={setFocusMode}
                     Duration={parseInt(duration.split(" ")[0])}
                   />
                 )}

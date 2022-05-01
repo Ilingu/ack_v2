@@ -1,6 +1,6 @@
 import crypto from "crypto";
 // Types
-import {
+import type {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiERROR,
   AlgoliaDatasShape,
@@ -17,19 +17,19 @@ import {
   SeasonAnimesShape,
   UserAnimeShape,
 } from "./types/interface";
-import {
+import type {
   AnimeStatusType,
   DateOfWeek,
   DayOfWeek,
   TheFourSeason,
 } from "./types/types";
+import { AnimeWatchType } from "./types/enums";
 // DB
 import { doc, updateDoc, DocumentSnapshot } from "@firebase/firestore";
 import { auth, db } from "../firebase/firebase";
-// Toast
-import toast from "react-hot-toast";
-import { AnimeWatchType } from "./types/enums";
 import { getDoc } from "firebase/firestore";
+// UI
+import toast from "react-hot-toast";
 
 /* FUNC */
 

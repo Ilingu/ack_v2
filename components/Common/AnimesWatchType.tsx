@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 // DB
 import { auth, db } from "../../lib/firebase/firebase";
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { DeleteAnimeIDB } from "../../lib/utils/IDB";
 // Types
 import { AnimeWatchType } from "../../lib/utils/types/enums";
@@ -56,9 +56,12 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
     }
     if (newType === AnimeWatchType.WONT_WATCH) await DeleteAnimeIDB(malId);
 
+    const IsExist = (await getDoc(UserAnimeRef)).exists();
+    const UserAnimeMetaData = { AnimeId: malId, WatchType: newType };
+
+    if (IsExist) return await updateDoc(UserAnimeRef, UserAnimeMetaData);
     await setDoc(UserAnimeRef, {
-      AnimeId: malId,
-      WatchType: newType,
+      ...UserAnimeMetaData,
       Fav: false,
     });
   };

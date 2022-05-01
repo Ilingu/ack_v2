@@ -2,7 +2,7 @@ import { FC, Fragment, useContext } from "react";
 import Image from "next/image";
 import { SearchPosterContext } from "../../lib/context";
 // Types
-import { PosterSearchData } from "../../lib/utils/types/interface";
+import type { PosterSearchData } from "../../lib/utils/types/interface";
 // Icon
 import { FaInfo, FaStar } from "react-icons/fa";
 import Link from "next/link";

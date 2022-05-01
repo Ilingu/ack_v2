@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import MetaTags from "../../components/Common/Metatags";
 import UserProfil from "../../components/User/UserProfil";
 // Types
-import {
+import type {
   ResApiRoutes,
   ResDataUser,
   UserStatsShape,

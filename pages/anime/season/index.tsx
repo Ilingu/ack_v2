@@ -17,13 +17,13 @@ import {
   Return404,
   WhitchSeason,
 } from "../../../lib/utils/UtilsFunc";
-import {
+import type {
   JikanApiERROR,
   JikanApiResSeason,
   JikanApiResSeasonRoot,
   SeasonAnimesShape,
 } from "../../../lib/utils/types/interface";
-import { TheFourSeason } from "../../../lib/utils/types/types";
+import type { TheFourSeason } from "../../../lib/utils/types/types";
 import { TheFourSeasonEnum } from "../../../lib/utils/types/enums";
 // UI
 import {

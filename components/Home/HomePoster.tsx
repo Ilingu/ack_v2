@@ -19,7 +19,7 @@ import {
   AnimeWatchTypeDisplayable,
   HomeDisplayTypeEnum,
 } from "../../lib/utils/types/enums";
-import {
+import type {
   UserAnimePosterShape,
   UserGroupPosterShape,
   UserGroupShape,

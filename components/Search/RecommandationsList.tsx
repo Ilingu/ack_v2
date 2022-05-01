@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { FC, Fragment, useEffect, useState } from "react";
 // Types
-import {
+import type {
   JikanApiResRecommandations,
   RecommendationsShape,
 } from "../../lib/utils/types/interface";

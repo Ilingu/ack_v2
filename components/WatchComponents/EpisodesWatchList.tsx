@@ -1,6 +1,8 @@
 import React, {
+  Dispatch,
   FC,
   Fragment,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
@@ -13,12 +15,13 @@ import { auth, db } from "../../lib/firebase/firebase";
 import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 import toast from "react-hot-toast";
 // Types
-import {
+import type {
   JikanApiResEpisodes,
   UserAnimeShape,
   UserAnimeTimestampDate,
   UserExtraEpisodesShape,
 } from "../../lib/utils/types/interface";
+import { AnimeWatchType } from "../../lib/utils/types/enums";
 // UI
 import {
   AiFillPlaySquare,
@@ -26,13 +29,13 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { AnimeWatchType } from "../../lib/utils/types/enums";
 
 /* INTERFACES */
 interface EpsPosterProps {
   EpisodesData: JikanApiResEpisodes[];
   UserAnimeData: UserAnimeShape;
   Duration: number;
+  setFocusMode: Dispatch<SetStateAction<boolean>>;
 }
 interface EpsPosterItemProps {
   EpisodeData: UserExtraEpisodesShape;
@@ -68,6 +71,7 @@ const DecrementExtraEpisode = async () => {
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
   Duration,
+  setFocusMode,
   UserAnimeData: {
     Progress,
     WatchType,
@@ -202,6 +206,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
               ? NewEpisodeAvailable
               : deleteField()
             : deleteField(),
+          NextEpisodeReleaseDate: IsFinished
+            ? deleteField()
+            : NextEpisodeReleaseDate,
         });
 
         toast.success(`Marked as ${remove ? "un" : ""}watched !`);
@@ -211,18 +218,25 @@ const EpsPoster: FC<EpsPosterProps> = ({
       }
     },
     [
-      EpisodesLength,
-      GetAnimeRef,
       Progress,
-      TimestampDate?.BeganDate,
+      EpisodesLength,
+      TimestampDate.BeganDate,
       TimestampDate?.EndedDate,
+      GetAnimeRef,
       WatchType,
       NewEpisodeAvailable,
+      NextEpisodeReleaseDate,
     ]
   );
 
-  const MarkAllEpWatched = async () => {
+  const ToggleEpState = async () => {
     try {
+      if (Progress && Progress[0] === -2811) {
+        return await updateDoc(GetAnimeRef, {
+          WatchType: AnimeWatchType.WATCHING,
+          Progress: Progress.slice(1),
+        });
+      }
       await updateDoc(GetAnimeRef, {
         WatchType: AnimeWatchType.WATCHED,
         Progress: Progress ? [-2811, ...Progress] : [-2811],
@@ -267,7 +281,10 @@ const EpsPoster: FC<EpsPosterProps> = ({
             </span>
           </div>
         )}
-        <div className="text-headline mr-auto text-xl font-bold">
+        <div
+          className="text-headline mr-auto cursor-pointer text-xl font-bold"
+          onClick={() => setFocusMode(true)}
+        >
           {NextEP && (
             <Fragment>
               <AiFillPlaySquare className="icon text-primary-main" /> Ep.{" "}
@@ -327,10 +344,10 @@ const EpsPoster: FC<EpsPosterProps> = ({
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </div>
         <div
-          onClick={MarkAllEpWatched}
+          onClick={ToggleEpState}
           className="text-headline bg-bgi-whitest mr-auto cursor-pointer rounded-md p-1 font-semibold"
         >
-          Mark as &quot;Watched&quot;
+          Mark as &quot;{Progress && Progress[0] === -2811 && "Un"}watched&quot;
         </div>
         <button
           onClick={(event) => {

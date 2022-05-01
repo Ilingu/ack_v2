@@ -20,7 +20,7 @@ import Divider from "../components/Design/Divider";
 import { FiSettings } from "react-icons/fi";
 import UserProfil from "../components/User/UserProfil";
 // Types
-import {
+import type {
   BeforeInstallPromptEvent,
   ResApiRoutes,
   UserStatsShape,

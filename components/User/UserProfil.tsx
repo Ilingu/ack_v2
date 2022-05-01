@@ -2,8 +2,8 @@ import React, { FC, Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 // Types
-import { User } from "firebase/auth";
-import { UserStatsShape } from "../../lib/utils/types/interface";
+import type { User } from "firebase/auth";
+import type { UserStatsShape } from "../../lib/utils/types/interface";
 // UI
 import Divider from "../Design/Divider";
 import { AiFillMail } from "react-icons/ai";
