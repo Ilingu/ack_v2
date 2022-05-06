@@ -220,7 +220,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
     [
       Progress,
       EpisodesLength,
-      TimestampDate.BeganDate,
+      TimestampDate?.BeganDate,
       TimestampDate?.EndedDate,
       GetAnimeRef,
       WatchType,
