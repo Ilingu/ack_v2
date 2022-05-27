@@ -545,8 +545,8 @@ export const ConvertBroadcastTimeZone = (
  * @param {Array} ArrayToShuffle
  * @returns The randomly shuffled array
  */
-export const shuffleArray = <T>(array: T[]): T[] =>
-  array.sort(() => Math.random() - 0.5);
+export const shuffleArray = <T>(ArrayToShuffle: T[]): T[] =>
+  ArrayToShuffle.sort(() => Math.random() - 0.5);
 
 /**
  * Copy Text To User Clipbord

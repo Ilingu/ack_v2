@@ -202,13 +202,11 @@ const EpsPoster: FC<EpsPosterProps> = ({
           Progress: NewProgress.length <= 0 ? deleteField() : NewProgress,
           TimestampDate: NewTimestampDate || deleteField(),
           NewEpisodeAvailable: remove
-            ? NewEpisodeAvailable
-              ? NewEpisodeAvailable
-              : deleteField()
+            ? NewEpisodeAvailable || deleteField()
             : deleteField(),
           NextEpisodeReleaseDate: IsFinished
             ? deleteField()
-            : NextEpisodeReleaseDate,
+            : NextEpisodeReleaseDate || deleteField(),
         });
 
         toast.success(`Marked as ${remove ? "un" : ""}watched !`);
