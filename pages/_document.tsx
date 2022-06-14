@@ -5,7 +5,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en" className="scroll-smooth">
         <Head>
-          <meta charSet="utf-8" />
+          <meta charSet="UTF-8" />
           {/* Config */}
           <link rel="manifest" href="/manifest.json" />
           <link rel="apple-touch-icon" sizes="192x192" href="/IconAck192.png" />
