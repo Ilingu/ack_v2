@@ -409,7 +409,7 @@ function SpecialInfo({
 }: SpecialInfoProps) {
   const TagsSpecialInfoData = [
     ...OtherInfos,
-    duration && `${duration.split(" ")[0]} Min/Eps`,
+    duration && `${duration?.split(" ")[0]} Min/Eps`,
     ...Object.keys(AlternativeTitle)
       .map(
         (key) =>
@@ -419,7 +419,7 @@ function SpecialInfo({
       )
       .filter((data) => data),
     studios && <StudiosComponent studio={studios[0]} />,
-    AgeRating.split("-").join("").replace(" ", "").replace(" ", ""),
+    AgeRating?.split("-").join("").replace(" ", "").replace(" ", ""),
   ].filter((d) => d);
   const TagsSpecialInfo = TagsSpecialInfoData.map((data, i) => (
     <SpecialInfoItem key={i} dataToShow={data} />

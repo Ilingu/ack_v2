@@ -62,28 +62,27 @@ export const GetAnimeData = async (
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
-    const {
-      success: suc1,
-      data: { data: animeRes },
-    } = await callApi<JikanApiResAnimeRoot>({
-      url: endpoint,
-    });
+    const { success: suc1, data: animeResData } =
+      await callApi<JikanApiResAnimeRoot>({
+        url: endpoint,
+      });
+
     let animeEpsRes = await getAllTheEpisodes(animeId);
-    const {
-      success: suc2,
-      data: { data: animeRecommendationsRes },
-    } = await callApi<JikanApiResRecommandationsRoot>({
-      url: endpoint + "/recommendations",
-    });
+    const { success: suc2, data: animeRecommendationsResData } =
+      await callApi<JikanApiResRecommandationsRoot>({
+        url: endpoint + "/recommendations",
+      });
 
     if (
       !suc1 ||
       !suc2 ||
-      IsError(animeRes as unknown as JikanApiERROR) ||
-      IsError(animeRecommendationsRes as unknown as JikanApiERROR)
-    ) {
+      IsError(animeResData?.data as unknown as JikanApiERROR) ||
+      IsError(animeRecommendationsResData?.data as unknown as JikanApiERROR)
+    )
       return { message: `Error when fetching: ${animeId}.`, err: true };
-    }
+
+    const { data: animeRes } = animeResData;
+    const { data: animeRecommendationsRes } = animeRecommendationsResData;
 
     // Episodes Generation
     const EpisodesLength = animeEpsRes?.length || 0;

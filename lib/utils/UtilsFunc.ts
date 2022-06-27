@@ -416,7 +416,7 @@ export const removeParamsFromPhotoUrl = (photoUrl: string) =>
  * @returns {boolean} true | false
  */
 export const IsError = (api_response: JikanApiERROR): boolean => {
-  if (!!api_response?.error) return true;
+  if (!api_response || !!api_response?.error) return true;
   return false;
 };
 
