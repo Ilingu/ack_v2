@@ -10,6 +10,7 @@ const ApiRoute = async (
     ? `Access <span style="color: #f00;">DENIED</span>`
     : `Access <span style="color: green;">ACCEPTED</span>`;
 
+  res.setHeader("Content-Type", "text/html");
   res.status(AccessDenied ? 400 : 200).send(
     `<!DOCTYPE html>
       <html lang="en">

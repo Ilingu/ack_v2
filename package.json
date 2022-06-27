@@ -1,7 +1,7 @@
 {
   "name": "ack_v2",
   "private": true,
-  "version": "1.0.2-rc.14",
+  "version": "1.0.0-canary",
   "description": "Make yout animes lists!",
   "keywords": [
     "Anime",
@@ -25,12 +25,13 @@
   "dependencies": {
     "@github/hotkey": "^2.0.0",
     "algoliasearch": "^4.12.1",
+    "cheerio": "^1.0.0-rc.12",
     "firebase": "^9.6.4",
     "firebase-admin": "^10.0.2",
     "idb": "^7.0.0",
     "lodash.debounce": "^4.0.8",
     "lodash.kebabcase": "^4.1.1",
-    "next": "^12.1.5",
+    "next": "^12.1.6",
     "next-pwa": "^5.5.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

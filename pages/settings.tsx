@@ -133,7 +133,7 @@ const Settings: NextPage = () => {
 
     try {
       const ProdMode = process.env.NODE_ENV === "production";
-      const res: ResApiRoutes = await callApi({
+      const { success, data: res } = await callApi<ResApiRoutes>({
         url: `http${ProdMode ? "s" : ""}://${
           window.location.host
         }/api/user/delete`,
@@ -144,7 +144,7 @@ const Settings: NextPage = () => {
         },
       });
 
-      if (res.succeed) {
+      if (success && res.succeed) {
         toast.success(`Your account has been deleted !`);
         await auth.signOut();
         return;
@@ -388,7 +388,7 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
 
     try {
       const ProdMode = process.env.NODE_ENV === "production";
-      const res: ResApiRoutes = await callApi({
+      const { success, data: res } = await callApi<ResApiRoutes>({
         url: `http${ProdMode ? "s" : ""}://${
           window.location.host
         }/api/user/rename`,
@@ -402,7 +402,7 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
         },
       });
 
-      if (res.succeed) {
+      if (success && res.succeed) {
         toast.success(`Hello ${Username} !`);
         return;
       }

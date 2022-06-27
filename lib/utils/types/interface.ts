@@ -17,6 +17,18 @@ declare global {
   }
 }
 
+export interface FunctionJob<T = any> {
+  success: boolean;
+  data?: T;
+}
+// WebWorkers
+export interface WebWorkerRequest<T = any> {
+  data: T;
+}
+export interface DifferenceWWShapeReq {
+  CachedValues: AnimeShape[];
+  NewValues: UserAnimeShape[];
+}
 // Api routes
 export interface ResApiRoutes {
   succeed: boolean;
@@ -182,6 +194,7 @@ export interface AnimeShape {
   duration: string;
   malId: number;
   NextRefresh: number;
+  NineAnimeUrl?: string;
 }
 export interface AlternativeTitleShape {
   title_english: string;

@@ -7,10 +7,13 @@ import { doc, onSnapshot, collection } from "@firebase/firestore";
 // Types
 import type {
   AnimeShape,
+  DifferenceWWShapeReq,
+  FunctionJob,
   IDBShape,
   UserAnimeShape,
   UserGroupShape,
   UserShape,
+  WebWorkerRequest,
 } from "./utils/types/interface";
 // Func
 import {
@@ -19,6 +22,7 @@ import {
   GetAnimesDatasByIds,
   postToJSON,
   SpotDifferenciesBetweenArrays,
+  ThrowInAppError,
 } from "./utils/UtilsFunc";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
@@ -170,50 +174,29 @@ export function useGlobalAnimeData(userUid: string) {
 
       /* SyncCacheDatas */
       if (!GlobalAnimesDatas) return;
-      const filteredUserAnime = filterUserAnime(UserAnimes);
+      if (!window?.Worker) return ThrowInAppError();
 
-      // Missing Animes In IDB
-      const MissingDependencies = SpotDifferenciesBetweenArrays(
-        filteredUserAnime,
-        GlobalAnimesDatas,
-        "AnimeId",
-        "malId"
-      ) as number[];
-      let MissingAnimesDatas: AnimeShape[] = [];
-
-      if (MissingDependencies.length > 0)
-        MissingAnimesDatas = await CallFB(MissingDependencies);
-
-      // Animes in IDB but not in UserAnimes
-      const OverflowDependencies = SpotDifferenciesBetweenArrays(
-        GlobalAnimesDatas,
-        filteredUserAnime,
-        "malId",
-        "AnimeId"
+      const DiffWebWorker = new Worker(
+        new URL("./workers/difference.worker", import.meta.url)
       );
-      let GlobalAnimesWithoutOverflow: AnimeShape[] = [];
 
-      if (OverflowDependencies.length > 0)
-        GlobalAnimesWithoutOverflow = [...GlobalAnimesDatas].filter(
-          ({ malId }) => !OverflowDependencies.includes(malId)
-        );
+      const Payload: WebWorkerRequest<DifferenceWWShapeReq> = {
+        data: { CachedValues: GlobalAnimesDatas, NewValues: UserAnimes },
+      };
+      DiffWebWorker.postMessage(Payload);
+      DiffWebWorker.onmessage = (
+        e: MessageEvent<FunctionJob<AnimeShape[]>>
+      ) => {
+        const { success, data: NewDatasToRender } = e.data;
+        if (!success) return;
 
-      // Merge
-      if (
-        MissingAnimesDatas.length > 0 ||
-        GlobalAnimesWithoutOverflow.length > 0
-      ) {
-        const WithOverflow = GlobalAnimesWithoutOverflow.length > 0;
-
-        const NewDatasToRender = [
-          ...(WithOverflow
-            ? GlobalAnimesWithoutOverflow
-            : GlobalAnimesDatas || []),
-          ...(MissingAnimesDatas || []),
-        ];
-
-        RenderAnimes(NewDatasToRender, { save: true, Expire: false });
-      }
+        if (NewDatasToRender)
+          RenderAnimes(NewDatasToRender, {
+            save: true,
+            Expire: false,
+          });
+        DiffWebWorker.terminate();
+      };
     });
 
     return unsub;

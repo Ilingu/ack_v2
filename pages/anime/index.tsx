@@ -30,6 +30,7 @@ import type {
 // Icon
 import { FaSearch, FaGlobe, FaAlgolia } from "react-icons/fa";
 import { GlobalAppContext, SearchPosterContext } from "../../lib/context";
+import toast from "react-hot-toast";
 
 /* Interface */
 interface FormInputProps {
@@ -86,9 +87,17 @@ const SearchPage: NextPage = () => {
             })
           );
         // Request to api
-        const { data: animesRes }: JikanApiResSearchRoot = await callApi({
+        const {
+          success,
+          data: { data: animesRes },
+        } = await callApi<JikanApiResSearchRoot>({
           url: encodeURI(`https://api.jikan.moe/v4/anime?q=${title}&limit=16`),
         });
+
+        if (!success || animesRes.length <= 0)
+          return toast.error("Cannot Find Anime", {
+            duration: 4500,
+          }) as unknown as void;
 
         // Format
         const ToPosterShape = JikanDataToPosterData(animesRes);

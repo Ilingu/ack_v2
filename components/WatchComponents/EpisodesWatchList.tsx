@@ -29,17 +29,20 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
+import Image from "next/image";
 
 /* INTERFACES */
 interface EpsPosterProps {
   EpisodesData: JikanApiResEpisodes[];
   UserAnimeData: UserAnimeShape;
   Duration: number;
+  NineAnimeUrl: string;
   setFocusMode: Dispatch<SetStateAction<boolean>>;
 }
 interface EpsPosterItemProps {
   EpisodeData: UserExtraEpisodesShape;
   watched: boolean;
+  NineAnimeEpUrl: string;
   UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
 }
 type SortOrderType = "descending" | "ascending";
@@ -72,6 +75,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
   Duration,
   setFocusMode,
+  NineAnimeUrl,
   UserAnimeData: {
     Progress,
     WatchType,
@@ -133,6 +137,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
         return (
           <EpsPosterItem
             key={i}
+            NineAnimeEpUrl={
+              NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`
+            }
             EpisodeData={epData}
             watched={watched}
             UpdateUserAnimeProgress={UpdateUserAnimeProgress}
@@ -391,6 +398,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
 function EpsPosterItem({
   EpisodeData,
   watched,
+  NineAnimeEpUrl,
   UpdateUserAnimeProgress,
 }: EpsPosterItemProps) {
   const { title, mal_id, filler, recap, aired, isExtra } = EpisodeData || {};
@@ -402,7 +410,7 @@ function EpsPosterItem({
           .target;
         if (
           target.classList[0] === "DeleteExtraEp" ||
-          target.classList[0] === "M32"
+          target.classList[0] === "9AnimeLink"
         )
           return;
         UpdateUserAnimeProgress(mal_id, watched);
@@ -439,19 +447,21 @@ function EpsPosterItem({
         {title}
       </p>
       <div className="xs:col-span-4 text-headline col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider lg:col-span-3">
-        <div
-          className={`w-24 rounded-lg ${
-            !filler && !recap
-              ? "bg-green-500"
-              : `bg-${filler ? "red" : recap ? "gray" : "green"}-${
-                  filler ? "500" : recap ? "400" : "500"
-                }`
-          }`}
+        <a
+          href={NineAnimeEpUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="9AnimeLink flex w-24 items-center justify-center gap-1 rounded-lg bg-[#5a2e98]"
         >
-          {filler && "Filler"}
-          {recap && "Recap"}
-          {!filler && !recap && "Canon"}
-        </div>
+          <Image
+            src="/Assets/9animeLogo.png"
+            width={16}
+            height={16}
+            alt="9anime Logo"
+            className="rounded-md bg-white"
+          />{" "}
+          9anime
+        </a>
       </div>
       <p className="text-headline col-span-3 hidden justify-items-end font-semibold lg:grid">
         {aired && new Date(aired).toLocaleDateString()}

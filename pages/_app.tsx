@@ -7,7 +7,7 @@ import { AppProps } from "next/app";
 import "../styles/globals.css";
 import Navbar from "../components/Common/Navbar";
 import { GlobalAppContext } from "../lib/context";
-import { NetworkCheck } from "../lib/utils/UtilsFunc";
+import { NetworkCheck, ThrowInAppError } from "../lib/utils/UtilsFunc";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
@@ -25,17 +25,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     /* Network Connection */
     NetworkCheck();
     /* ERROR DETECTION */
-    window.onerror = async () => {
-      if (
-        process?.env?.NODE_ENV === "development" ||
-        window.location.pathname === "/error"
-      )
-        return;
-      history.pushState("", "", "/error");
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.reload();
-    };
+    window.onerror = ThrowInAppError;
   }, []);
 
   return (

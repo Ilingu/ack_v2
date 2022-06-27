@@ -1,4 +1,9 @@
 import { ReactNode } from "react";
+import type {
+  JikanApiResAnime,
+  JikanApiResEpisodes,
+  JikanApiResRecommandations,
+} from "./interface";
 
 export type PropsChildren = ReactNode | ReactNode[];
 
@@ -31,3 +36,10 @@ export type DayOfWeek =
   | "saturdays"
   | "sundays";
 export type DateOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export type AnimeDatasShape = [
+  JikanApiResAnime,
+  JikanApiResEpisodes[],
+  JikanApiResRecommandations[],
+  string
+];

@@ -853,7 +853,7 @@ function AnimeItemPoster({
   );
 
   return (
-    <div className="group xl:min-h-80 min-h-72 bg-bgi-whiter relative w-52 cursor-pointer rounded-lg p-1 xl:w-56">
+    <div className="group xl:min-h-80 min-h-72 bg-bgi-whiter relative w-52 cursor-pointer rounded-lg p-1 transition-all delay-150 hover:scale-[1.025] xl:w-56">
       <div>
         <div
           className={`absolute top-1 ${

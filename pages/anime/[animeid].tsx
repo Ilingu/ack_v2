@@ -81,7 +81,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists) {
     const animeData = animeFB.data() as AnimeShape;
 
-    if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
+    if (
+      animeData?.NineAnimeUrl !== undefined && // Temporary Check, Until all anime have their NineAnimeUrl
+      (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
+    )
       return ReturnProps({
         AddedToDB: false,
         AnimeUpdated: false,
@@ -139,10 +142,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 /* Components */
 const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
   const router = useRouter();
+  const { UserAnimes, GlobalAnime } = useContext(GlobalAppContext);
   const [CurrentAnimeWatchType, setAnimeWatchType] = useState<AnimeWatchType>(
     () => AnimeWatchType.UNWATCHED
   );
-  const { UserAnimes, GlobalAnime } = useContext(GlobalAppContext);
 
   const {
     title,

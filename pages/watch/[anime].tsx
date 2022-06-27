@@ -87,6 +87,7 @@ const WatchPage: NextPage = () => {
     Airing,
     NextEpisodeReleaseDate,
     NewEpisodeAvailable,
+    NineAnimeUrl,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
@@ -223,7 +224,7 @@ const WatchPage: NextPage = () => {
                 />
               </div>
 
-              {/* Anime Content/Focus Mode */}
+              {/* Anime Content */}
               <div className="gta-content">
                 {type === "Movie" || type === "Music" ? (
                   <MovieList Duration={duration.replace("hr", "Hr")} />
@@ -232,6 +233,7 @@ const WatchPage: NextPage = () => {
                     EpisodesData={EpisodesData}
                     UserAnimeData={UserAnimeData}
                     setFocusMode={setFocusMode}
+                    NineAnimeUrl={NineAnimeUrl}
                     Duration={parseInt(duration.split(" ")[0])}
                   />
                 )}

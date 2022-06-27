@@ -46,15 +46,18 @@ interface SeasonAnimeItemProps {
 /* ISR */
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const seasonAnime: JikanApiResSeasonRoot = await callApi({
-      url: `https://api.jikan.moe/v4/seasons/upcoming`,
-    });
+    const { success, data: seasonAnime } = await callApi<JikanApiResSeasonRoot>(
+      {
+        url: `https://api.jikan.moe/v4/seasons/upcoming`,
+      }
+    );
 
     return {
       props: {
-        seasonAnimesISR: IsError(seasonAnime as unknown as JikanApiERROR)
-          ? []
-          : seasonAnime.data.slice(0, 50),
+        seasonAnimesISR:
+          !success || IsError(seasonAnime as unknown as JikanApiERROR)
+            ? []
+            : seasonAnime.data.slice(0, 50),
       },
       revalidate: IsError(seasonAnime as unknown as JikanApiERROR) ? 60 : 900,
     };
@@ -100,10 +103,12 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     try {
       setLoading(true);
       UpComingAnime.current = false;
-      const seasonAnimeFetch: JikanApiResSeasonRoot = await callApi({
-        url: `https://api.jikan.moe/v4/seasons/${year}/${season}`,
-      });
-      if (IsError(seasonAnimeFetch as unknown as JikanApiERROR)) return;
+      const { success, data: seasonAnimeFetch } =
+        await callApi<JikanApiResSeasonRoot>({
+          url: `https://api.jikan.moe/v4/seasons/${year}/${season}`,
+        });
+      if (!success || IsError(seasonAnimeFetch as unknown as JikanApiERROR))
+        return;
 
       setSeasonAnimes(seasonAnimeFetch.data.slice(0, 50));
       setLoading(false);

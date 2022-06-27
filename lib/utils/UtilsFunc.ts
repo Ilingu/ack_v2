@@ -6,8 +6,8 @@ import type {
   AlgoliaDatasShape,
   AnimeShape,
   EpisodesShape,
+  FunctionJob,
   JikanApiERROR,
-  JikanApiResAnime,
   JikanApiResEpisodes,
   JikanApiResRecommandations,
   JikanApiResSeason,
@@ -18,6 +18,7 @@ import type {
   UserAnimeShape,
 } from "./types/interface";
 import type {
+  AnimeDatasShape,
   AnimeStatusType,
   DateOfWeek,
   DayOfWeek,
@@ -31,8 +32,12 @@ import { getDoc } from "firebase/firestore";
 // UI
 import toast from "react-hot-toast";
 
-/* FUNC */
+/* UTILS FUNC */
 
+/**
+ * Encrypt data
+ * @param {Buffer} cookie
+ */
 export const encryptDatas = (cookie: Buffer) => {
   try {
     const iv = crypto.randomBytes(12);
@@ -55,6 +60,10 @@ export const encryptDatas = (cookie: Buffer) => {
   }
 };
 
+/**
+ * Decrypt data
+ * @param {Buffer} encryptedCookie
+ */
 export const decryptDatas = (encryptedCookie: Buffer): string => {
   try {
     const iv = encryptedCookie.slice(3, 3 + 12);
@@ -80,8 +89,6 @@ export const decryptDatas = (encryptedCookie: Buffer): string => {
   }
 };
 
-/* UTILS */
-
 interface callApiArgs {
   url: string;
   internalCall?: boolean;
@@ -94,17 +101,17 @@ interface callApiArgs {
  * @param {URL} url
  * @returns the response
  */
-export async function callApi({
+export async function callApi<T = any>({
   url,
   AccessToken,
   RequestProofOfCall,
   internalCall,
   reqParams,
-}: callApiArgs) {
-  if (!isValidUrl(url)) return;
+}: callApiArgs): Promise<FunctionJob<T>> {
+  if (!isValidUrl(url)) return { success: false };
 
   try {
-    let req = null;
+    let req: Response;
 
     if (!internalCall) req = await fetch(url);
     else {
@@ -128,10 +135,13 @@ export async function callApi({
       });
     }
 
-    return await req.json();
+    if (!req.ok) return { success: false };
+
+    const data = await req.json();
+    return { success: true, data };
   } catch (err) {
     console.error(err);
-    return false;
+    return { success: false, data: err };
   }
 }
 
@@ -155,7 +165,7 @@ export const RevalidateAnime = async (AnimeID: number | string) => {
  */
 export const GetAnimesDatasByIds = async (AnimesIds: number[]) => {
   if (AnimesIds.length <= 0) return null;
-  console.log("FB Query");
+  console.log("FB Query, Elements length:", AnimesIds.length);
 
   try {
     const QAnimesDocs = await Promise.all(
@@ -219,7 +229,22 @@ export function removeDuplicates<T>(ary: T[]) {
   return [...Array.from(new Set(ary))];
 }
 
-export function SpotDifferenciesBetweenArrays<T>(
+/**
+ * Check If object a and b are equals
+ * @param {object} x
+ * @param {object} y
+ * @returns {boolean} `true` if objects are equals
+export function deepEqual(x: object, y: object): boolean {
+  const ok = Object.keys,
+    tx = typeof x,
+    ty = typeof y;
+  return x && y && tx === "object" && tx === ty
+    ? ok(x).length === ok(y).length &&
+        ok(x).every((key) => deepEqual(x[key], y[key]))
+    : x === y;
+} */
+
+export function SpotDifferenciesBetweenArrays<T = number>(
   BaseArray: any[],
   ArrayToCompare: any[],
   BaseArrayKeyToExport: string,
@@ -305,16 +330,12 @@ interface SpecialAnimeShape {
 }
 /**
  * Transform JikanApi obj to AnimeShape obj
- * @param {any[]} ary
+ * @param {AnimeDatasShape} JikanObj
  */
 export function JikanApiToAnimeShape(
-  JikanObj: [
-    JikanApiResAnime,
-    JikanApiResEpisodes[],
-    JikanApiResRecommandations[]
-  ]
+  JikanObj: AnimeDatasShape
 ): SpecialAnimeShape {
-  const [AnimeData, EpsData, Recommendations] = JikanObj;
+  const [AnimeData, EpsData, Recommendations, NineAnimeUrl] = JikanObj;
   let NextRefresh = null;
   let IsAddableToDB = true;
 
@@ -376,6 +397,7 @@ export function JikanApiToAnimeShape(
           ? AnimeData.broadcast.string
           : null,
       NextRefresh,
+      NineAnimeUrl,
     },
     IsAddableToDB,
   };
@@ -398,15 +420,23 @@ export const IsError = (api_response: JikanApiERROR): boolean => {
   return false;
 };
 
+export const ThrowInAppError = () => {
+  if (
+    process?.env?.NODE_ENV === "production" &&
+    window.location.pathname !== "/error"
+  ) {
+    history.pushState("", "", "/error");
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.reload();
+  }
+};
+
+type Return404Shape = { notFound: true; revalidate?: number };
 /**
  * @returns 404's Page
  */
-export const Return404 = (
-  revalidate = 0
-): {
-  notFound: true;
-  revalidate?: number;
-} => ({
+export const Return404 = (revalidate = 0): Return404Shape => ({
   notFound: true,
   revalidate: revalidate !== 0 ? revalidate : undefined,
 });
@@ -477,7 +507,9 @@ export const WhitchDay = (date: DateOfWeek): DayOfWeek => {
 };
 
 /**
- * @param {string} JST_Broadcast
+ * Convert Time Between Two Timezone
+ * @param {string} broadcast
+ * @param ReturnType
  * @returns The Converted To UTC+1 Timezone Broadcast
  */
 export const ConvertBroadcastTimeZone = (
@@ -591,13 +623,17 @@ export const GetLastReleasedAnimeEp = (): Promise<
     AdkamiLastReleasedEpisodeShape[] | false
   > => {
     try {
-      const LastAnimeEp:
-        | AdkamiLastReleasedEpisodeShape[]
-        | ADKamiScrapperApiERROR = await callApi({
+      const { success, data: LastAnimeEp } = await callApi<
+        AdkamiLastReleasedEpisodeShape[] | ADKamiScrapperApiERROR
+      >({
         url: `https://adkami-scapping-api.herokuapp.com/last`,
       });
 
-      if (!LastAnimeEp || (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode)
+      if (
+        !success ||
+        !LastAnimeEp ||
+        (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode
+      )
         return false;
 
       return LastAnimeEp as AdkamiLastReleasedEpisodeShape[];
@@ -638,6 +674,15 @@ export const NetworkCheck = () => {
   const onChangeNetwork = (e: Event) =>
     CheckConn(e.currentTarget as unknown as NetworkInformationShape);
 
+  const Offline = () => {
+    toast.error(`You are offline`, {
+      position: "bottom-right",
+    });
+    if (window.location.pathname === "/_offline") return;
+    history.pushState("", "", "/_offline");
+    window.location.reload();
+  };
+
   const CheckConn = (ConnInfo: NetworkInformationShape) => {
     if (
       ConnInfo?.effectiveType === "slow-2g" ||
@@ -648,20 +693,15 @@ export const NetworkCheck = () => {
       });
     }
 
-    if (ConnInfo?.downlink === 0) {
-      toast.error(`You are offline`, {
-        position: "bottom-right",
-      });
-      if (window.location.pathname === "/_offline") return;
-      history.pushState("", "", "/_offline");
-      window.location.reload();
-    }
+    if (ConnInfo?.downlink === 0) Offline();
   };
   // Main
+  if (!navigator.onLine) return Offline();
   const connectionInfo =
     navigator.connection as unknown as NetworkInformationShape;
   if (connectionInfo?.onchange) connectionInfo.onchange = onChangeNetwork;
   CheckConn(connectionInfo);
+  window.addEventListener("offline", Offline);
 };
 
 /**

@@ -11,18 +11,12 @@ import type {
   JikanApiResAnimeRoot,
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
-  JikanApiResRecommandations,
   JikanApiResRecommandationsRoot,
   ResApiRoutes,
 } from "./types/interface";
+import type { AnimeDatasShape } from "./types/types";
 // Func
 import { callApi, IsError, JikanApiToAnimeShape } from "./UtilsFunc";
-
-type AnimeDatasShape = [
-  JikanApiResAnime,
-  JikanApiResEpisodes[],
-  JikanApiResRecommandations[]
-];
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
@@ -68,14 +62,23 @@ export const GetAnimeData = async (
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
-    const { data: animeRes }: JikanApiResAnimeRoot = await callApi({
+    const {
+      success: suc1,
+      data: { data: animeRes },
+    } = await callApi<JikanApiResAnimeRoot>({
       url: endpoint,
     });
     let animeEpsRes = await getAllTheEpisodes(animeId);
-    const { data: animeRecommendationsRes }: JikanApiResRecommandationsRoot =
-      await callApi({ url: endpoint + "/recommendations" });
+    const {
+      success: suc2,
+      data: { data: animeRecommendationsRes },
+    } = await callApi<JikanApiResRecommandationsRoot>({
+      url: endpoint + "/recommendations",
+    });
 
     if (
+      !suc1 ||
+      !suc2 ||
       IsError(animeRes as unknown as JikanApiERROR) ||
       IsError(animeRecommendationsRes as unknown as JikanApiERROR)
     ) {
@@ -98,14 +101,18 @@ export const GetAnimeData = async (
       }
     } else AnimeEpsDatas = animeEpsRes;
 
+    // 9anime url link
+    const NineAnimeLink = await Fetch9AnimeLink(animeRes);
+
     const AnimeDatas: AnimeDatasShape = [
       animeRes,
       AnimeEpsDatas,
       animeRecommendationsRes,
+      NineAnimeLink,
     ];
 
     let IsGood = true;
-    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length !== 3)
+    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length !== 4)
       IsGood = false;
 
     if (IsGood) {
@@ -132,6 +139,38 @@ export const GetAnimeData = async (
   } catch (err) {
     console.error(err);
     return { message: err, err: true };
+  }
+};
+
+const Fetch9AnimeLink = async (
+  data: JikanApiResAnime
+): Promise<string | null> => {
+  try {
+    // Filter Data
+    const { title, type, year, season } = data;
+    const TemplateURL = encodeURI(
+      `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${title}`
+    );
+
+    const response = await fetch(TemplateURL);
+    if (!response.ok) return null;
+    const HTMLDoc = await response.text();
+
+    const cheerio = await import("cheerio");
+    const $ = cheerio.load(HTMLDoc);
+    const UrlLink = $(".anime-list:first-child > li > a").attr("href");
+
+    if (
+      !UrlLink ||
+      UrlLink.trim().length <= 0 ||
+      !UrlLink.startsWith("/watch/")
+    )
+      return null;
+
+    return UrlLink;
+  } catch (err) {
+    console.error(err);
+    return null;
   }
 };
 
@@ -177,7 +216,7 @@ const AddNewGlobalAnime = async (
 
 /**
  * Fetch All Ep Of An Anime
- * @param {string} animeId
+ * @param {string} id
  * @returns {Promise<JikanApiResEpisodes[]>} Promise Array with all anime eps
  */
 export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
@@ -187,10 +226,11 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
 
     const fetchOtherEP = async () => {
       try {
-        let eps: JikanApiResEpisodesRoot = await callApi({
+        let { success, data: eps } = await callApi<JikanApiResEpisodesRoot>({
           url: `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`,
         });
         if (
+          !success ||
           IsError(eps as unknown as JikanApiERROR) ||
           !eps?.data ||
           eps?.data?.length <= 0 ||
