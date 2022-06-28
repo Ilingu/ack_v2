@@ -31,6 +31,17 @@ function MyApp({ Component, pageProps }: AppProps) {
     window.onerror = ThrowInAppError;
   }, []);
 
+  /* If one day I want to be able to use the preview site */
+  // useEffect(() => {
+  //   if (
+  //     (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview" ||
+  //       process.env.NEXT_PUBLIC_VERCEL_ENV === "development") &&
+  //     userData?.user &&
+  //     userData?.user?.uid !== "LmzgtZRtU2YEfnELpPjRtkjK4GH2"
+  //   )
+  //     document.documentElement.innerHTML = "";
+  // }, [userData?.user]);
+
   return (
     <GlobalAppContext.Provider
       value={{
@@ -49,8 +60,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 export default withTRPC<AppRouter>({
   config() {
-    const url = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}/api/trpc`
+    const url = process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
       : "http://localhost:3000/api/trpc";
 
     return {
