@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 // DB
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
@@ -29,7 +30,6 @@ import {
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
 import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
-import Image from "next/image";
 
 /* INTERFACES */
 interface EpsPosterProps {

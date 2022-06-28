@@ -111,7 +111,7 @@ export const GetAnimeData = async (
     ];
 
     let IsGood = true;
-    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length !== 4)
+    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length < 3)
       IsGood = false;
 
     if (IsGood) {
@@ -146,27 +146,64 @@ const Fetch9AnimeLink = async (
 ): Promise<string | null> => {
   try {
     // Filter Data
-    const { title, type, year, season } = data;
-    const TemplateURL = encodeURI(
-      `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${title}`
+    const {
+      title,
+      type,
+      year,
+      season,
+      title_japanese,
+      title_english,
+      title_synonyms,
+    } = data;
+
+    const TemplateURLs = [];
+    const TitlesItarable = [
+      title,
+      title_japanese,
+      title_english,
+      ...title_synonyms,
+    ];
+    for (const name of TitlesItarable) {
+      const url = encodeURI(
+        `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${name}`
+      );
+      TemplateURLs.push(url);
+    }
+
+    const MaybyUrlLinks = await Promise.allSettled(
+      TemplateURLs.map(async (url) => {
+        return new Promise<string>(async (res, rej) => {
+          const response = await fetch(url);
+          if (!response.ok) return rej();
+
+          const HTMLDoc = await response.text();
+
+          const cheerio = await import("cheerio");
+          const $ = cheerio.load(HTMLDoc);
+          const UrlLink = $(".anime-list:first-child > li > a").attr("href");
+
+          if (
+            !UrlLink ||
+            UrlLink.trim().length <= 0 ||
+            !UrlLink.startsWith("/watch/")
+          )
+            return rej();
+
+          return res(UrlLink);
+        });
+      })
     );
 
-    const response = await fetch(TemplateURL);
-    if (!response.ok) return null;
-    const HTMLDoc = await response.text();
+    for (const UrlLinkRes of MaybyUrlLinks) {
+      if (UrlLinkRes.status === "rejected") continue;
 
-    const cheerio = await import("cheerio");
-    const $ = cheerio.load(HTMLDoc);
-    const UrlLink = $(".anime-list:first-child > li > a").attr("href");
+      const UrlLink = UrlLinkRes?.value;
+      if (!UrlLink || !UrlLink || UrlLink.trim().length <= 0) continue;
 
-    if (
-      !UrlLink ||
-      UrlLink.trim().length <= 0 ||
-      !UrlLink.startsWith("/watch/")
-    )
-      return null;
+      return UrlLinkRes?.value;
+    }
 
-    return UrlLink;
+    return null;
   } catch (err) {
     console.error(err);
     return null;

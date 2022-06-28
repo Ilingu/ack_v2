@@ -51,6 +51,7 @@ import { FcOk } from "react-icons/fc";
 import toast from "react-hot-toast";
 import VerticalDivider from "../Design/VerticalDivider";
 import HandleInput from "./HandleInput";
+import Dropdown from "../Design/Dropdown";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
@@ -70,7 +71,6 @@ interface HomeHeaderProps {
   setAnimeSearchMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface SortByWatchTypeProps {
-  IsModeGroup: boolean;
   ActiveWatchType: AnimeWatchTypeDisplayable;
   setActiveWatchType: React.Dispatch<
     React.SetStateAction<AnimeWatchTypeDisplayable>
@@ -514,7 +514,6 @@ const HomePoster: FC = () => {
       />
       {HomeDisplayType !== HomeDisplayTypeEnum.GROUP && (
         <SortByWatchType
-          IsModeGroup={!!(AnimesToAdd.length > 0)}
           ActiveWatchType={ActiveWatchType}
           setActiveWatchType={setActiveWatchType}
         />
@@ -584,9 +583,8 @@ function HomeHeader({
               : ""
           }
         >
-          Animes
-        </span>{" "}
-        Folder
+          Bookmark
+        </span>
       </h1>
       <VerticalDivider />
       <h1
@@ -608,16 +606,14 @@ function HomeHeader({
               : ""
           }
         >
-          Group
-        </span>{" "}
-        Folder
+          Collection
+        </span>
       </h1>
     </header>
   );
 }
 
 function SortByWatchType({
-  IsModeGroup,
   ActiveWatchType,
   setActiveWatchType,
 }: SortByWatchTypeProps) {
@@ -625,32 +621,27 @@ function SortByWatchType({
     AnimeWatchTypeDisplayable;
 
   return (
-    <div
-      className={`text-headline flex cursor-pointer flex-wrap justify-center gap-4 text-lg font-semibold capitalize ${
-        IsModeGroup ? "mb-2" : "mb-4"
-      }`}
-    >
+    <Dropdown className="mb-4">
       {[WATCHING, WATCHED, WANT_TO_WATCH, FAV, DROPPED, ALL].map(
         (CurrentActiveWatch, i) => (
-          <Fragment key={i}>
-            <span
-              onClick={() =>
-                ActiveWatchType !== CurrentActiveWatch &&
-                setActiveWatchType(CurrentActiveWatch)
-              }
-              className={`hover:text-primary-main transition-all${
-                ActiveWatchType === CurrentActiveWatch
-                  ? " text-primary-whiter"
-                  : ""
-              }`}
-            >
-              {CurrentActiveWatch.replaceAll("_", " ")}
-            </span>
-            {i !== 5 && <VerticalDivider />}
-          </Fragment>
+          <a
+            key={i}
+            className={`hover:text-primary-main block cursor-pointer px-4 py-2 text-base transition-all${
+              ActiveWatchType === CurrentActiveWatch ? " text-primary-main" : ""
+            }`}
+            role="menuitem"
+            tabIndex={-1}
+            id={`menu-item-${i}`}
+            onClick={() =>
+              ActiveWatchType !== CurrentActiveWatch &&
+              setActiveWatchType(CurrentActiveWatch)
+            }
+          >
+            {CurrentActiveWatch.replaceAll("_", " ")}
+          </a>
         )
       )}
-    </div>
+    </Dropdown>
   );
 }
 
@@ -833,6 +824,7 @@ function AnimeItemPoster({
     <div
       onClick={() => ToggleGroup(AnimeId.toString(), "ADD")}
       className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-green-400"
+      title="Add to collection"
     >
       <FaPlus className="icon" />
     </div>
@@ -853,7 +845,10 @@ function AnimeItemPoster({
   );
 
   return (
-    <div className="group xl:min-h-80 min-h-72 bg-bgi-whiter relative w-52 cursor-pointer rounded-lg p-1 transition-all delay-150 hover:scale-[1.025] xl:w-56">
+    <div
+      className="group xl:min-h-80 min-h-72 bg-bgi-whiter shadow-bgi-whitest relative w-52 cursor-pointer rounded-lg 
+    p-1 shadow transition-all delay-150 hover:scale-[1.025] xl:w-56"
+    >
       <div>
         <div
           className={`absolute top-1 ${

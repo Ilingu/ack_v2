@@ -131,7 +131,7 @@ const WatchPage: NextPage = () => {
     return (
       <div className="flex h-screen items-center justify-center">
         <h1 className="text-headline text-semibold text-4xl">
-          <FaSpinner className="icon" /> Load...
+          <FaSpinner className="icon" /> Loading...
         </h1>
       </div>
     );

@@ -25,7 +25,7 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}
       />
-      <h1 className="text-headline rounded-md bg-gray-700 py-4 px-4 text-xl font-bold">
+      <h1 className="text-headline bg-bgi-whiter rounded-md py-4 px-4 text-xl font-bold">
         <Loader show />
         <span className="text-primary-main hover:text-secondary transition">
           Connecting

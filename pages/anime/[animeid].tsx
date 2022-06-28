@@ -9,6 +9,7 @@ import React, {
 import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 // Type
 import type {
   AnimeShape,
@@ -81,10 +82,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (animeFB.exists) {
     const animeData = animeFB.data() as AnimeShape;
 
-    if (
-      animeData?.NineAnimeUrl !== undefined && // Temporary Check, Until all anime have their NineAnimeUrl
-      (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
-    )
+    if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
       return ReturnProps({
         AddedToDB: false,
         AnimeUpdated: false,
@@ -275,7 +273,8 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
             </div>
             <div className="lg:grid lg:grid-cols-6">
               <div className="relative flex justify-center lg:col-span-1 lg:block">
-                {CurrentAnimeWatchType &&
+                {UserAnimes &&
+                CurrentAnimeWatchType &&
                 CurrentAnimeWatchType !== AnimeWatchType.WONT_WATCH ? (
                   <Link href={`/watch/${malId}`} passHref>
                     <a>
@@ -315,6 +314,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 (Airing && broadcast) || type === "Movie" ? Studios : null
               }
               OtherInfos={[
+                animeData?.AnimeData?.NineAnimeUrl || null,
                 Airing && broadcast,
                 Airing ? "Ongoing" : "Finished",
               ]}
@@ -437,11 +437,37 @@ function SpecialInfo({
   );
 }
 
-function SpecialInfoItem({ dataToShow }: { dataToShow: string }) {
+function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
+  const Is9AnimeLink =
+    typeof dataToShow === "string" && dataToShow?.startsWith("/watch/");
   return (
-    <div className="text-headline bg-bgi-black hover:text-primary-whiter hover:bg-bgi-darker mr-2 mb-2 cursor-default rounded-lg py-2 px-2 font-bold transition">
-      {dataToShow}
+    <div
+      className={`text-headline ${
+        Is9AnimeLink ? "bg-[#5a2e98]" : "bg-bgi-black"
+      } hover:text-primary-whiter hover:bg-bgi-darker mr-2 mb-2 cursor-default rounded-lg py-2 px-2 font-bold transition`}
+    >
+      {Is9AnimeLink ? <NineAnimeBadge path={dataToShow} /> : dataToShow}
     </div>
+  );
+}
+
+function NineAnimeBadge({ path }: { path: string }) {
+  return (
+    <a
+      href={`https://9anime.id${path}`}
+      target="_blank"
+      rel="noreferrer"
+      className="flex items-center justify-center gap-1"
+    >
+      <Image
+        src="/Assets/9animeLogo.png"
+        width={16}
+        height={16}
+        alt="9anime Logo"
+        className="rounded-md bg-white"
+      />
+      9Anime
+    </a>
   );
 }
 
