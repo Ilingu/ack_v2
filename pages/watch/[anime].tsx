@@ -14,7 +14,6 @@ import { auth, db } from "../../lib/firebase/firebase";
 import {
   ConvertBroadcastTimeZone,
   ToggleFav,
-  RevalidateAnime,
 } from "../../lib/client/ClientFuncs";
 // Types
 import type {
@@ -66,7 +65,6 @@ const NewEpReleased = async (AnimeId: string) => {
 /* COMPONENT */
 const WatchPage: NextPage = () => {
   const { query, push } = useRouter();
-  const ImageAlreadyFetchedOnce = useRef(false);
 
   const { GlobalAnime, UserAnimes } = useContext(GlobalAppContext);
   const [CurrentAnimeData, setCurrentAnimeData] = useState<AnimeShape>(null);
@@ -167,16 +165,6 @@ const WatchPage: NextPage = () => {
                       className="rounded-lg object-cover"
                       placeholder="blur"
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
-                      onError={async () => {
-                        console.warn("Img Cannot be load");
-                        if (
-                          ImageAlreadyFetchedOnce.current ||
-                          process.env.NODE_ENV === "development"
-                        )
-                          return;
-                        ImageAlreadyFetchedOnce.current = true;
-                        RevalidateAnime(malId);
-                      }}
                     />
                     {!!NewEpisodeAvailable && (
                       <div className="text-headline bg-primary-darker  absolute top-0 rounded-md px-3 py-1 text-lg font-bold tracking-wide">
