@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   //     (process.env.NEXT_PUBLIC_VERCEL_ENV === "preview" ||
   //       process.env.NEXT_PUBLIC_VERCEL_ENV === "development") &&
   //     userData?.user &&
-  //     userData?.user?.uid !== "LmzgtZRtU2YEfnELpPjRtkjK4GH2"
+  //     userData?.user?.uid !== "<uid_developper_account>"
   //   )
   //     document.documentElement.innerHTML = "";
   // }, [userData?.user]);
@@ -60,9 +60,10 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 export default withTRPC<AppRouter>({
   config() {
-    const url = process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/trpc`
-      : "http://localhost:3000/api/trpc";
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `https://ack.vercel.app/api/trpc`
+        : "http://localhost:3000/api/trpc";
 
     return {
       url,
