@@ -4,7 +4,7 @@ import {
   ErrorHandling,
   IsBlacklistedHost,
   SuccessHandling,
-} from "../../../lib/utils/ApiFunc";
+} from "../../../lib/server/ApiFunc";
 import type { ResApiRoutes } from "../../../lib/utils/types/interface";
 
 const DeletUserHandler = async (

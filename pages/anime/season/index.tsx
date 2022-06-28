@@ -10,13 +10,12 @@ import Link from "next/link";
 import debounce from "lodash.debounce";
 import { GetStaticProps, NextPage } from "next";
 // Types
+import { IsError, Return404 } from "../../../lib/utils/UtilsFunc";
 import {
   callApi,
-  IsError,
   JikanApiToSeasonAnimeShape,
-  Return404,
   WhitchSeason,
-} from "../../../lib/utils/UtilsFunc";
+} from "../../../lib/client/ClientFuncs";
 import type {
   JikanApiERROR,
   JikanApiResSeason,

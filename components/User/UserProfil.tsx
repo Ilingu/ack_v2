@@ -140,4 +140,50 @@ function UserFavoriteAnimeInput({
   );
 }
 
+export const SkeletonUserProfil = () => (
+  <>
+    {/* Basic User Data */}
+    <section className="mt-10 mb-2 flex gap-2 px-3 sm:gap-5">
+      <div>
+        <div className="bg-bgi-whiter h-[180px] w-[180px] rounded-3xl"></div>
+      </div>
+      <div>
+        <div className="flex flex-col gap-y-2 rounded">
+          <div className="bg-bgi-whiter h-10 w-28 rounded-md"></div>
+          <div className="bg-bgi-whiter h-10 w-28 rounded-md"></div>
+        </div>
+        <div className="text-headline mt-2 font-semibold">
+          <FaClock className="icon" /> Member since{" "}
+          <span className="text-primary-whitest">xx/xx/xxxx</span>
+        </div>
+        <div className="text-headline mt-2 font-semibold">
+          <AiFillMail className="icon" /> Email -{" "}
+          <span className="text-primary-whitest">xx@xxx.xxx</span>
+        </div>
+      </div>
+    </section>
+    <Divider />
+    {/* User's Stats */}
+    <section className="text-description-whiter my-5 px-3">
+      <header>
+        <h1 className="text-description-whiter flex items-center text-2xl font-bold capitalize">
+          <BiStats className="icon" />{" "}
+          <div className="bg-bgi-whiter h-10 w-28 rounded-md"></div>
+        </h1>
+      </header>
+      <div className="mt-5 grid justify-items-center gap-y-3 md:grid-cols-2">
+        {Array(4)
+          .fill(null)
+          ?.map((_, i) => (
+            <div
+              key={i}
+              className="ring-description bg-bgi-whiter flex h-20 w-80 flex-col items-center justify-center
+              rounded-lg text-lg font-semibold ring-2"
+            ></div>
+          ))}
+      </div>
+    </section>
+  </>
+);
+
 export default UserProfil;

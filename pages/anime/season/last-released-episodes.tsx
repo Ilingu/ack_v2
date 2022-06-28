@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
 // Types/Func
 import type { AdkamiLastReleasedEpisodeShape } from "../../../lib/utils/types/interface";
-import { GetLastReleasedAnimeEp } from "../../../lib/utils/UtilsFunc";
+import { GetLastReleasedAnimeEp } from "../../../lib/client/ClientFuncs";
 // UI
 import MetaTags from "../../../components/Common/Metatags";
 import Divider from "../../../components/Design/Divider";

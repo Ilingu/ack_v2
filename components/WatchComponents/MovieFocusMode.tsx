@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from "react";
-import { ManageFullScreen } from "../../lib/utils/UtilsFunc";
+import { ManageFullScreen } from "../../lib/client/ClientFuncs";
 // DB
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";

@@ -37,13 +37,11 @@ import { db } from "../../lib/firebase/firebase";
 // Func
 import {
   copyToClipboard,
-  DeviceCheckType,
   filterUserAnime,
   removeDuplicates,
   shuffleArray,
-  ToggleFav,
 } from "../../lib/utils/UtilsFunc";
-import { RevalidateAnime } from "../../lib/utils/UtilsFunc";
+import { ToggleFav, RevalidateAnime } from "../../lib/client/ClientFuncs";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {

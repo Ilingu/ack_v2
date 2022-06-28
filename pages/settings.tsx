@@ -35,8 +35,9 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { callApi, DeviceCheckType } from "../lib/utils/UtilsFunc";
 import { ClearIDB } from "../lib/utils/IDB";
+// Funcs
+import { callApi, DeviceCheckType } from "../lib/client/ClientFuncs";
 
 /* Components */
 const Settings: NextPage = () => {

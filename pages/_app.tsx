@@ -1,15 +1,22 @@
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { useGlobalAnimeData, useUserData } from "../lib/hooks";
+// Server tRPC
+import { withTRPC } from "@trpc/next";
+import { AppRouter } from "./api/trpc/[trpc]";
 // TS
 import { AppProps } from "next/app";
 // UI
 import "../styles/globals.css";
 import Navbar from "../components/Common/Navbar";
 import { GlobalAppContext } from "../lib/context";
-import { NetworkCheck, ThrowInAppError } from "../lib/utils/UtilsFunc";
+import {
+  getAuthToken,
+  NetworkCheck,
+  ThrowInAppError,
+} from "../lib/client/ClientFuncs";
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();
   const {
     GlobalAnimesDatas: GlobalAnime,
@@ -43,3 +50,16 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     </GlobalAppContext.Provider>
   );
 }
+
+export default withTRPC<AppRouter>({
+  config() {
+    const url = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}/api/trpc`
+      : "http://localhost:3000/api/trpc";
+
+    return {
+      url,
+      queryClientConfig: { defaultOptions: { queries: { staleTime: 60_000 } } },
+    };
+  },
+})(MyApp);

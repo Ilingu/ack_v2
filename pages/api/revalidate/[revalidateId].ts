@@ -3,7 +3,7 @@ import {
   ErrorHandling,
   IsBlacklistedHost,
   SuccessHandling,
-} from "../../../lib/utils/ApiFunc";
+} from "../../../lib/server/ApiFunc";
 import { auth, db } from "../../../lib/firebase/firebase-admin";
 import type {
   AnimeShape,

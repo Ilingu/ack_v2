@@ -1,9 +1,10 @@
-import { db } from "../firebase/firebase-admin";
+import { auth, db } from "../firebase/firebase-admin";
 import { IndexAnimeInAlgolia } from "../algolia/algolia-admin";
 // Types
 import type {
   AnimeConfigPathsIdShape,
   AnimeShape,
+  FunctionJob,
   InternalApiResError,
   InternalApiResSuccess,
   JikanApiERROR,
@@ -13,10 +14,11 @@ import type {
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
   ResApiRoutes,
-} from "./types/interface";
-import type { AnimeDatasShape } from "./types/types";
+} from "../utils/types/interface";
+import type { AnimeDatasShape } from "../utils/types/types";
 // Func
-import { callApi, IsError, JikanApiToAnimeShape } from "./UtilsFunc";
+import { IsError, decryptDatas } from "../utils/UtilsFunc";
+import { callApi, JikanApiToAnimeShape } from "../client/ClientFuncs";
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
@@ -247,6 +249,19 @@ const AddNewGlobalAnime = async (
   } catch (err) {
     console.error(err);
     return [false, false];
+  }
+};
+
+export const FbAuthentificate = async (
+  AuthToken: string
+): Promise<FunctionJob> => {
+  try {
+    const EncryptedToken = Buffer.from(AuthToken, "base64");
+    const decryptedToken = decryptDatas(EncryptedToken);
+    await auth.verifyIdToken(decryptedToken);
+    return { success: true };
+  } catch (error) {
+    return { success: false };
   }
 };
 

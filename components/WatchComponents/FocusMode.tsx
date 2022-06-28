@@ -3,11 +3,12 @@ import { install } from "@github/hotkey";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
+// Funcs
 import {
   DeviceCheckType,
   ManageFullScreen,
-  removeDuplicates,
-} from "../../lib/utils/UtilsFunc";
+} from "../../lib/client/ClientFuncs";
+import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 // Types
 import type {
   JikanApiResEpisodes,

@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { NextPage } from "next";
-import { Fragment, useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import Image from "next/image";
 // Auth
 import {
@@ -143,10 +149,10 @@ function UsernameForm() {
     checkUsername(formValue);
   }, [formValue]);
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.toLowerCase();
     const re = /^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
-    if (val.length < 3) {
+    if (val.length < 3 || val.length > 15) {
       setFormValue(val);
       setLoading(false);
       setIsValid(false);
@@ -159,7 +165,7 @@ function UsernameForm() {
     }
   };
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValid) return;
 
@@ -185,7 +191,7 @@ function UsernameForm() {
 
   const checkUsername = useCallback(
     debounce(async (username: string) => {
-      if (username.length >= 3) {
+      if (username.length >= 3 && username.length <= 15) {
         const UsernamesRef = doc(db, "usernames", username);
         const docSnap = await getDoc(UsernamesRef);
         setIsValid(!docSnap.exists());

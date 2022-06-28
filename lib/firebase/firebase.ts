@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -17,6 +16,5 @@ const firebaseConfig = {
 if (!getApps().length) initializeApp(firebaseConfig);
 
 // Export FB Func
-
 export const auth = getAuth();
 export const db = getFirestore();

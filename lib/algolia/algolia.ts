@@ -1,9 +1,5 @@
 import algoliasearch from "algoliasearch/lite";
-import {
-  AlgoliaDatasShape,
-  AlgoliaResShape,
-  AnimeShape,
-} from "../utils/types/interface";
+import { AlgoliaDatasShape, AlgoliaResShape } from "../utils/types/interface";
 
 const AlgoliaClient = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,

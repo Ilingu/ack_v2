@@ -1,56 +1,42 @@
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import { useMemo } from "react";
 // UI
 import MetaTags from "../../components/Common/Metatags";
-import UserProfil from "../../components/User/UserProfil";
+import UserProfil, {
+  SkeletonUserProfil,
+} from "../../components/User/UserProfil";
+// tRPC
+import { useQuery } from "../../lib/client/trpc";
 // Types
 import type {
-  ResApiRoutes,
   ResDataUser,
   UserStatsShape,
 } from "../../lib/utils/types/interface";
 // Func
-import { callApi } from "../../lib/utils/UtilsFunc";
+import Loader from "../../components/Design/Loader";
+import { useRouter } from "next/router";
 
 interface UserProfilePageProps {
   UserData: ResDataUser;
   Username: string;
 }
 
-/* SSR */
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+const UserProfilePage: NextPage<UserProfilePageProps> = ({}) => {
   const {
     query: { username },
-    req: {
-      headers: { host },
-      cookies,
-    },
-  } = ctx;
-
-  if (!cookies.UsT) return { notFound: true };
-
-  const isProd = process.env.NODE_ENV === "production";
-
-  const Username = username.toString().trim().toLocaleLowerCase();
-  const { success, data: UserData } = await callApi<ResApiRoutes>({
-    url: `http${isProd ? "s" : ""}://${host}/api/user/${Username}`,
-    internalCall: true,
-    AccessToken: cookies.UsT,
+    push,
+  } = useRouter();
+  const {
+    data: UserData,
+    isError,
+    isLoading,
+  } = useQuery(["users.getUser", username?.toString()], {
+    refetchOnWindowFocus: true,
   });
 
-  if (!success || !UserData.succeed || !UserData.data)
-    return { notFound: true };
-  return {
-    props: { UserData: UserData.data, Username },
-  };
-};
-
-const UserProfilePage: NextPage<UserProfilePageProps> = ({
-  UserData,
-  Username,
-}) => {
   const UserStats: UserStatsShape[] = useMemo(
     (): UserStatsShape[] =>
+      !isError &&
       UserData && [
         { data: UserData?.NoOfAnimes, desc: "💥 Animes" },
         {
@@ -68,20 +54,29 @@ const UserProfilePage: NextPage<UserProfilePageProps> = ({
           desc: `🔥 Last time ${UserData.User?.displayName} was Online`,
         },
       ],
-    [UserData]
+    [UserData, isError]
   );
+
+  if (isError) {
+    push("/404");
+    return <div>Error, Redirection...</div>;
+  }
 
   return (
     <main className="flex h-screen flex-col items-center">
       <MetaTags
-        title={`${UserData.User?.displayName}'s profile`}
+        title={`${username?.toString()}'s profile`}
         description="ACK User Profile"
       />
       <div className="w-11/12 sm:w-5/6 md:w-11/12 lg:w-2/3 2xl:w-1/2">
-        <UserProfil
-          UserData={{ user: UserData.User, username: Username }}
-          UserStats={UserStats}
-        />
+        {isLoading ? (
+          <SkeletonUserProfil />
+        ) : (
+          <UserProfil
+            UserData={{ user: UserData?.User, username: username.toString() }}
+            UserStats={UserStats}
+          />
+        )}
       </div>
     </main>
   );

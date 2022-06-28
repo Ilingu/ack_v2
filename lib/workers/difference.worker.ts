@@ -4,11 +4,12 @@ import type {
   FunctionJob,
   WebWorkerRequest,
 } from "../utils/types/interface";
+// Funcs
 import {
   filterUserAnime,
-  GetAnimesDatasByIds,
   SpotDifferenciesBetweenArrays,
 } from "../utils/UtilsFunc";
+import { GetAnimesDatasByIds } from "../client/ClientFuncs";
 
 onmessage = async (e: MessageEvent<WebWorkerRequest<DifferenceWWShapeReq>>) => {
   const { CachedValues, NewValues: NonFilteredNewVals } = e.data.data;

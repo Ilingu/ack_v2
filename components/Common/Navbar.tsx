@@ -1,8 +1,9 @@
+import { FC, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { FC, useContext, useEffect, useState } from "react";
 import { install } from "@github/hotkey";
-import { DeviceCheckType } from "../../lib/utils/UtilsFunc";
+// Funcs
+import { DeviceCheckType } from "../../lib/client/ClientFuncs";
 // Auth
 import AuthCheck from "./AuthCheck";
 // UI

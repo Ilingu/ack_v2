@@ -15,7 +15,7 @@ import {
   ConvertBroadcastTimeZone,
   ToggleFav,
   RevalidateAnime,
-} from "../../lib/utils/UtilsFunc";
+} from "../../lib/client/ClientFuncs";
 // Types
 import type {
   AnimeShape,
@@ -169,7 +169,11 @@ const WatchPage: NextPage = () => {
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
                       onError={async () => {
                         console.warn("Img Cannot be load");
-                        if (ImageAlreadyFetchedOnce.current) return;
+                        if (
+                          ImageAlreadyFetchedOnce.current ||
+                          process.env.NODE_ENV === "development"
+                        )
+                          return;
                         ImageAlreadyFetchedOnce.current = true;
                         RevalidateAnime(malId);
                       }}

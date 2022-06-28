@@ -4,13 +4,14 @@ import {
   ErrorHandling,
   IsBlacklistedHost,
   SuccessHandling,
-} from "../../../lib/utils/ApiFunc";
+} from "../../../lib/server/ApiFunc";
 import { AnimeWatchType } from "../../../lib/utils/types/enums";
 import type {
   ResApiRoutes,
   UserAnimeShape,
 } from "../../../lib/utils/types/interface";
-import { decryptDatas, postToJSON } from "../../../lib/utils/UtilsFunc";
+// Funcs
+import { postToJSON, decryptDatas } from "../../../lib/utils/UtilsFunc";
 
 const DeletUserHandler = async (
   req: NextApiRequest,

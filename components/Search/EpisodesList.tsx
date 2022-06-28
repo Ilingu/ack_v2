@@ -6,8 +6,8 @@ import type {
   EpisodesShape,
   JikanApiResEpisodes,
 } from "../../lib/utils/types/interface";
-// Imp
-import { JikanApiToEpisodesShape } from "../../lib/utils/UtilsFunc";
+// Funcs
+import { JikanApiToEpisodesShape } from "../../lib/client/ClientFuncs";
 // UI
 import { FaEye } from "react-icons/fa";
 

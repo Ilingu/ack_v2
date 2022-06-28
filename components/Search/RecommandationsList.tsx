@@ -1,12 +1,13 @@
+import React, { FC, Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { FC, Fragment, useEffect, useState } from "react";
 // Types
 import type {
   JikanApiResRecommandations,
   RecommendationsShape,
 } from "../../lib/utils/types/interface";
-import { JikanApiToRecommendationShape } from "../../lib/utils/UtilsFunc";
+// Funcs
+import { JikanApiToRecommendationShape } from "../../lib/client/ClientFuncs";
 
 interface RecommandationsListProps {
   RecommandationsData: JikanApiResRecommandations[];

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { IsBlacklistedHost } from "../../lib/utils/ApiFunc";
+import { IsBlacklistedHost } from "../../lib/server/ApiFunc";
 
 const ApiRoute = async (
   { headers: { host } }: NextApiRequest,

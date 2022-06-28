@@ -16,14 +16,8 @@ import type {
   WebWorkerRequest,
 } from "./utils/types/interface";
 // Func
-import {
-  encryptDatas,
-  filterUserAnime,
-  GetAnimesDatasByIds,
-  postToJSON,
-  SpotDifferenciesBetweenArrays,
-  ThrowInAppError,
-} from "./utils/UtilsFunc";
+import { filterUserAnime, postToJSON, encryptDatas } from "./utils/UtilsFunc";
+import { GetAnimesDatasByIds, ThrowInAppError } from "./client/ClientFuncs";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 
 interface SaveShape {

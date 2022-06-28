@@ -15,9 +15,9 @@ import AnimePoster from "../../components/Search/SearchPoster";
 import {
   AnimeShapeToPosterData,
   callApi,
-  removeDuplicates,
   removeParamsFromPhotoUrl,
-} from "../../lib/utils/UtilsFunc";
+} from "../../lib/client/ClientFuncs";
+import { removeDuplicates } from "../../lib/utils/UtilsFunc";
 import { SearchAnimeInAlgolia } from "../../lib/algolia/algolia";
 // Types
 import type {
