@@ -46,12 +46,19 @@ import {
 import { RevalidateAnime } from "../../lib/utils/UtilsFunc";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { FaCopy, FaMinus, FaPlus, FaSearch, FaTrashAlt } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaCopy,
+  FaMinus,
+  FaPlus,
+  FaTrashAlt,
+} from "react-icons/fa";
 import { FcOk } from "react-icons/fc";
+import { BsFillCollectionFill } from "react-icons/bs";
 import toast from "react-hot-toast";
+import Dropdown from "../Design/Dropdown";
 import VerticalDivider from "../Design/VerticalDivider";
 import HandleInput from "./HandleInput";
-import Dropdown from "../Design/Dropdown";
 
 /* INTERFACE */
 interface HomeAnimeItemPosterProp {
@@ -68,7 +75,6 @@ interface HomeAnimeItemPosterProp {
 interface HomeHeaderProps {
   HomeDisplayType: HomeDisplayTypeEnum;
   setHomeDisplayType: React.Dispatch<React.SetStateAction<HomeDisplayTypeEnum>>;
-  setAnimeSearchMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface SortByWatchTypeProps {
   ActiveWatchType: AnimeWatchTypeDisplayable;
@@ -81,6 +87,7 @@ interface GroupFormInputProps {
   HomeDisplayType: HomeDisplayTypeEnum;
   AddGroup: (GrName: string) => void;
   SearchGroup: (GrName: string) => string[];
+  Reset: () => void;
 }
 interface HomeGroupItemPosterProp {
   GroupData: UserGroupPosterShape;
@@ -133,7 +140,6 @@ const HomePoster: FC = () => {
       AnimeWatchTypeDisplayable.WATCHING
   );
 
-  const [AnimeSearchMode, setAnimeSearchMode] = useState(false);
   const [AnimeSearchScope, setAnimeSearchScope] = useState<string[]>([]);
 
   const [AnimesToAdd, setAnimeToAdd] = useState<string[]>([]);
@@ -406,13 +412,8 @@ const HomePoster: FC = () => {
       GrName?: string
     ) => {
       if (method === "ADD") setAnimeToAdd((prev) => [...prev, id]);
-      if (method === "DELETE") {
-        const CopyArr = [...AnimesToAdd];
-        const indexToDel = CopyArr.indexOf(id);
-        if (indexToDel === -1) return;
-        CopyArr.splice(indexToDel, 1);
-        setAnimeToAdd(CopyArr);
-      }
+      if (method === "DELETE")
+        setAnimeToAdd(AnimesToAdd.filter((data) => data !== id));
       if (method === "DELETE_DB") {
         try {
           const { GroupAnimesId: CurrentGroup } = {
@@ -498,7 +499,6 @@ const HomePoster: FC = () => {
         const AnimeTitle = title.trim().toLowerCase();
         return AnimeTitle.includes(AnimeNameToSearch);
       }).map(({ AnimeId }) => AnimeId.toString());
-
       setAnimeSearchScope(ResultScope);
     },
     [AnimesHomePostersData]
@@ -510,24 +510,26 @@ const HomePoster: FC = () => {
       <HomeHeader
         HomeDisplayType={HomeDisplayType}
         setHomeDisplayType={setHomeDisplayType}
-        setAnimeSearchMode={setAnimeSearchMode}
       />
-      {HomeDisplayType !== HomeDisplayTypeEnum.GROUP && (
-        <SortByWatchType
-          ActiveWatchType={ActiveWatchType}
-          setActiveWatchType={setActiveWatchType}
-        />
-      )}
 
-      {!AnimeSearchMode ? (
-        <GroupFormInput
-          IsModeGroup={!!(AnimesToAdd.length > 0)}
-          AddGroup={AddGroup}
-          HomeDisplayType={HomeDisplayType}
-          SearchGroup={SearchGroup}
-        />
-      ) : undefined}
-      {AnimeSearchMode && <AnimeSearchFormInput SearchAnime={SearchAnime} />}
+      {!!(AnimesToAdd.length <= 0) &&
+        HomeDisplayType !== HomeDisplayTypeEnum.GROUP && (
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-4">
+            <AnimeSearchFormInput SearchAnime={SearchAnime} />
+            <SortByWatchType
+              ActiveWatchType={ActiveWatchType}
+              setActiveWatchType={setActiveWatchType}
+            />
+          </div>
+        )}
+
+      <GroupFormInput
+        IsModeGroup={!!(AnimesToAdd.length > 0)}
+        AddGroup={AddGroup}
+        Reset={() => setAnimeToAdd([])}
+        HomeDisplayType={HomeDisplayType}
+        SearchGroup={SearchGroup}
+      />
 
       <div className="relative w-10/12">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
@@ -547,11 +549,7 @@ const HomePoster: FC = () => {
 };
 
 // [SUB-COMPONENTS]
-function HomeHeader({
-  HomeDisplayType,
-  setHomeDisplayType,
-  setAnimeSearchMode,
-}: HomeHeaderProps) {
+function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
   return (
     <header className="mb-3 flex">
       <h1
@@ -559,23 +557,13 @@ function HomeHeader({
           HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
         } group hover:text-headline mr-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-          " decoration-primary-darker text-headline underline"
+          " decoration-primary-darker text-headline"
         }`}
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
           setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
         }
       >
-        {HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
-          <Fragment>
-            <FaSearch
-              onClick={() => setAnimeSearchMode((prev) => !prev)}
-              className={`icon text-primary-whitest text-xl${
-                DeviceCheckType() === "Mobile" ? "" : " hidden"
-              } group-hover:inline`}
-            />{" "}
-          </Fragment>
-        )}
         <span
           className={
             HomeDisplayType === HomeDisplayTypeEnum.ANIMES
@@ -583,6 +571,9 @@ function HomeHeader({
               : ""
           }
         >
+          {HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
+            <FaBookmark className="icon animate-fadeIn" />
+          )}{" "}
           Bookmark
         </span>
       </h1>
@@ -592,7 +583,7 @@ function HomeHeader({
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
         } hover:text-headline ml-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-          " decoration-primary-darker text-headline underline"
+          " decoration-primary-darker text-headline"
         }`}
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
@@ -606,6 +597,9 @@ function HomeHeader({
               : ""
           }
         >
+          {HomeDisplayType === HomeDisplayTypeEnum.GROUP && (
+            <BsFillCollectionFill className="icon animate-fadeIn" />
+          )}{" "}
           Collection
         </span>
       </h1>
@@ -621,7 +615,7 @@ function SortByWatchType({
     AnimeWatchTypeDisplayable;
 
   return (
-    <Dropdown className="mb-4">
+    <Dropdown ActiveElem={ActiveWatchType}>
       {[WATCHING, WATCHED, WANT_TO_WATCH, FAV, DROPPED, ALL].map(
         (CurrentActiveWatch, i) => (
           <a
@@ -650,6 +644,7 @@ function GroupFormInput({
   HomeDisplayType,
   AddGroup,
   SearchGroup,
+  Reset,
 }: GroupFormInputProps) {
   const [InputGroupName, setInputGroupName] = useState("");
   const [GroupsMatch, setGroupMatch] = useState<string[]>(null);
@@ -663,8 +658,7 @@ function GroupFormInput({
     e.preventDefault();
     InputGroupName.trim().length >= 3 && AddGroup(InputGroupName);
     InputGroupName.trim().length >= 3 && setInputGroupName("");
-    InputGroupName.trim().length >= 3 ||
-      toast.error("The Group Name must be minimum 3 characters long !");
+    InputGroupName.trim().length >= 3 || Reset();
   };
 
   return (
@@ -675,7 +669,10 @@ function GroupFormInput({
           Value={InputGroupName}
           setValue={setInputGroupName}
           HandleSubmit={HandleSubmit}
-          placeholder="Name of group (Already existing or not)"
+          className={`h-10 w-80 xl:absolute xl:-top-5 xl:left-2${
+            GroupsMatch ? "" : " mb-2"
+          }${InputGroupName.trim().length < 3 ? " reset" : ""}`}
+          placeholder="Name of group"
         />
         {GroupsMatch && (
           <div
@@ -697,12 +694,9 @@ function GroupFormInput({
     )
   );
 }
+
 function AnimeSearchFormInput({ SearchAnime }: AnimeSearchFormInputProps) {
   const [InputAnimeName, setInputAnimeName] = useState("");
-
-  useEffect(() => {
-    return () => SearchAnime(null);
-  }, [SearchAnime]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => DebounceAndSearch(), [InputAnimeName, SearchAnime]);
@@ -725,7 +719,8 @@ function AnimeSearchFormInput({ SearchAnime }: AnimeSearchFormInputProps) {
       Value={InputAnimeName}
       setValue={setInputAnimeName}
       HandleSubmit={HandleSubmit}
-      placeholder="Name of anime 👀"
+      placeholder="Search anime 👀"
+      className="search h-10 w-80"
     />
   );
 }

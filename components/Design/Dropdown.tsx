@@ -1,16 +1,16 @@
 import { FC, useState } from "react";
-import { FaFilter } from "react-icons/fa";
 
 interface Props {
+  ActiveElem: string;
   className?: string;
 }
 
-const Dropdown: FC<Props> = ({ children, className }) => {
+const Dropdown: FC<Props> = ({ children, ActiveElem, className }) => {
   const [Show, setShow] = useState(false);
 
   return (
     <div
-      className={`relative inline-block text-left ${className}`}
+      className={`relative inline-block h-10 text-center ${className}`}
       onClick={() => setShow((prev) => !prev)}
     >
       <div>
@@ -21,7 +21,10 @@ const Dropdown: FC<Props> = ({ children, className }) => {
           aria-expanded="true"
           aria-haspopup="true"
         >
-          <FaFilter className="icon mr-2 translate-y-1" /> Sort By
+          Sort By{" "}
+          <span className="text-primary-whiter ml-1 border-b border-dashed capitalize">
+            {ActiveElem.replaceAll("_", " ")}
+          </span>
           <svg
             className={`${
               Show ? "rotate-180" : ""

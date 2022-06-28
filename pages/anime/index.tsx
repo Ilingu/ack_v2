@@ -157,7 +157,7 @@ const SearchPage: NextPage = () => {
   );
 
   return (
-    <main className="py-2 px-2">
+    <main className="mt-3 py-2 px-2">
       <MetaTags
         title="🪐 World Anime"
         description="Find the data anime that you wanted"
