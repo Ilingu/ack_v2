@@ -41,7 +41,7 @@ import {
   removeDuplicates,
   shuffleArray,
 } from "../../lib/utils/UtilsFunc";
-import { ToggleFav, RevalidateAnime } from "../../lib/client/ClientFuncs";
+import { ToggleFav } from "../../lib/client/ClientFuncs";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {
@@ -802,7 +802,6 @@ function AnimeItemPoster({
   NameOfGroup,
 }: HomeAnimeItemPosterProp) {
   const [CopyClicked, setCopyClicked] = useState(false);
-  const ImageAlreadyFetchedOnce = useRef(false);
   const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
   const Color =
     WatchType === WATCHING
@@ -891,12 +890,6 @@ function AnimeItemPoster({
             className="rounded-lg object-cover"
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
-            onError={() => {
-              console.warn("Img Cannot be load");
-              if (ImageAlreadyFetchedOnce.current) return;
-              ImageAlreadyFetchedOnce.current = true;
-              RevalidateAnime(AnimeId);
-            }}
           />
           <h1
             className={`${Color} items-center truncate text-center text-xl font-bold capitalize`}

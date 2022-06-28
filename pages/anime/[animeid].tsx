@@ -23,10 +23,7 @@ import type {
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import { Return404 } from "../../lib/utils/UtilsFunc";
-import {
-  RevalidateAnime,
-  ConvertBroadcastTimeZone,
-} from "../../lib/client/ClientFuncs";
+import { ConvertBroadcastTimeZone } from "../../lib/client/ClientFuncs";
 import { GetAnimeData } from "../../lib/server/ApiFunc";
 // FB
 import AuthCheck from "../../components/Common/AuthCheck";
@@ -47,6 +44,7 @@ import {
 } from "react-icons/fa";
 // Ctx
 import { EpisodesSearchContext, GlobalAppContext } from "../../lib/context";
+import { useMutation } from "../../lib/client/trpc";
 
 /* Interface */
 interface AnimeInfoProps {
@@ -145,6 +143,9 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     () => AnimeWatchType.UNWATCHED
   );
 
+  // Mutation
+  const RevalidateAnimeMut = useMutation("animes.revalidate");
+
   const {
     title,
     photoPath,
@@ -177,6 +178,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
 
     // Revalidate If Anime Outdated
     process.env.NODE_ENV === "production" && RevalidateAnime(malId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [NextRefresh, malId]);
 
   useEffect(() => {
@@ -193,6 +195,22 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     if (ScoredBy / 1000 >= 1) return `${(ScoredBy / 1000).toFixed(0)}K`;
     return ScoredBy?.toString();
   }, [ScoredBy]);
+
+  const RevalidateAnime = async (AnimeID: number | string) => {
+    console.warn(`Revalidating ${AnimeID}...`);
+
+    AnimeID = parseInt(AnimeID.toString());
+    if (isNaN(AnimeID)) return console.error(`Cannot Revalidate ${AnimeID}`);
+
+    try {
+      const success = await RevalidateAnimeMut.mutateAsync(AnimeID);
+
+      if (!success) console.error(`Cannot Revalidate ${AnimeID}`);
+      else console.log(`${AnimeID} revalidated with success`);
+    } catch (err) {
+      console.error(`Cannot Revalidate ${AnimeID}`);
+    }
+  };
 
   if (router.isFallback)
     return (
@@ -340,7 +358,10 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       {EpisodesData && (
         <section className="mt-2 w-5/6 py-4">
           <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
-            <EpisodesList Eps={EpisodesData} />
+            <EpisodesList
+              Eps={EpisodesData}
+              NineAnimeBaseUrl={animeData?.AnimeData?.NineAnimeUrl}
+            />
           </EpisodesSearchContext.Provider>
         </section>
       )}

@@ -10,11 +10,7 @@ import { AppProps } from "next/app";
 import "../styles/globals.css";
 import Navbar from "../components/Common/Navbar";
 import { GlobalAppContext } from "../lib/context";
-import {
-  getAuthToken,
-  NetworkCheck,
-  ThrowInAppError,
-} from "../lib/client/ClientFuncs";
+import { NetworkCheck, ThrowInAppError } from "../lib/client/ClientFuncs";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();

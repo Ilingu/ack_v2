@@ -38,6 +38,9 @@ interface FocusEpisodeShape {
   LastEp: boolean;
 }
 
+const HandleFullScreen = () =>
+  document.documentElement.scrollTop === 0 && ManageFullScreen("activate");
+
 const FocusMode: FC<FocusModeProps> = ({
   EpisodesData,
   UserAnimeData: { Progress, ExtraEpisodes, AnimeId, TimestampDate, WatchType },
@@ -56,7 +59,7 @@ const FocusMode: FC<FocusModeProps> = ({
   useEffect(() => {
     scrollTo(0, 0); // UX
     document.body.style.overflow = "hidden";
-    ManageFullScreen("activate");
+    document.addEventListener("scroll", HandleFullScreen, true);
 
     // HotKeys
     if (DeviceCheckType() === "PC")
@@ -66,8 +69,9 @@ const FocusMode: FC<FocusModeProps> = ({
 
     // UnMounted UX
     return () => {
-      document.body.style.overflow = null;
+      document.removeEventListener("scroll", HandleFullScreen, true);
       ManageFullScreen("desactivate");
+      document.body.style.overflow = null;
     };
   }, []);
 

@@ -30,6 +30,8 @@
 
 This is a [Next.js/React](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) and deployed with [`Vercel`](https://vercel.com/).
 
+Uses Firebase as a DB and [`tRPC`](https://trpc.io/) for API request
+
 This App use [ADKami](https://www.adkami.com/) data for [This Page](https://ack.vercel.app/anime/season/last-released-episodes). \*These Data are extracted with a [nestJS](https://nestjs.com/) Scrapping API --> [Github Repo](https://github.com/Ilingu/adkami-scrapping-api)
 
 2022 [Ilingu](https://github.com/Ilingu)  

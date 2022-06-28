@@ -29,78 +29,35 @@ import { getDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 // Funcs
 import { encryptDatas, isValidUrl, postToJSON } from "../utils/UtilsFunc";
+import { useMutation } from "./trpc";
 
 /* CLIENT FUNC */
 
-interface callApiArgs {
-  url: string;
-  internalCall?: boolean;
-  AccessToken?: string;
-  RequestProofOfCall?: boolean;
-  reqParams?: RequestInit;
-}
 /**
  * Fetch Data From Api
- * @param {URL} url
+ * @param url
  * @returns the response
  */
-export async function callApi<T = any>({
-  url,
-  AccessToken,
-  RequestProofOfCall,
-  internalCall,
-  reqParams,
-}: callApiArgs): Promise<FunctionJob<T>> {
+export async function callApi<T = any>(
+  url: string,
+  reqParams?: RequestInit
+): Promise<FunctionJob<T>> {
   if (!isValidUrl(url)) return { success: false };
 
   try {
-    let req: Response;
+    const res = await fetch(url, {
+      ...reqParams,
+    });
 
-    if (!internalCall) req = await fetch(url);
-    else {
-      const Params = {
-        ...reqParams,
-        headers: {
-          authorization: AccessToken
-            ? AccessToken
-            : (await auth?.currentUser?.getIdToken()) || undefined,
+    if (!res.ok) return { success: false };
 
-          proofofcall: RequestProofOfCall
-            ? encryptDatas(Buffer.from(Date.now().toString())).toString(
-                "base64"
-              )
-            : undefined,
-        },
-      };
-
-      req = await fetch(url, {
-        ...Params,
-      });
-    }
-
-    if (!req.ok) return { success: false };
-
-    const data = await req.json();
+    const data = await res.json();
     return { success: true, data };
   } catch (err) {
     console.error(err);
     return { success: false, data: err };
   }
 }
-
-/**
- * Revalidate Anime Via Internal API
- * @param {number | string} AnimeID The Host To Test
- */
-export const RevalidateAnime = async (AnimeID: number | string) => {
-  console.warn(`Revalidating ${AnimeID}...`);
-  try {
-    await callApi({
-      url: `https://ack.vercel.app/api/revalidate/${AnimeID}`,
-      internalCall: true,
-    });
-  } catch (err) {}
-};
 
 /**
  * Fetch Data From Api
@@ -460,9 +417,7 @@ export const GetLastReleasedAnimeEp = (): Promise<
     try {
       const { success, data: LastAnimeEp } = await callApi<
         AdkamiLastReleasedEpisodeShape[] | ADKamiScrapperApiERROR
-      >({
-        url: `https://adkami-scapping-api.herokuapp.com/last`,
-      });
+      >(`https://adkami-scapping-api.herokuapp.com/last`);
 
       if (
         !success ||

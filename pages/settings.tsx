@@ -13,6 +13,7 @@ import debounce from "lodash.debounce";
 import AuthCheck from "../components/Common/AuthCheck";
 import { GlobalAppContext } from "../lib/context";
 import { auth, db } from "../lib/firebase/firebase";
+import { useMutation } from "../lib/client/trpc";
 // UI
 import MetaTags from "../components/Common/Metatags";
 import toast from "react-hot-toast";
@@ -26,7 +27,7 @@ import type {
   UserStatsShape,
 } from "../lib/utils/types/interface";
 import { AnimeWatchType } from "../lib/utils/types/enums";
-// Auth
+// Icon
 import {
   FaBan,
   FaHome,
@@ -37,7 +38,7 @@ import {
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ClearIDB } from "../lib/utils/IDB";
 // Funcs
-import { callApi, DeviceCheckType } from "../lib/client/ClientFuncs";
+import { DeviceCheckType } from "../lib/client/ClientFuncs";
 
 /* Components */
 const Settings: NextPage = () => {
@@ -49,6 +50,10 @@ const Settings: NextPage = () => {
   const [DAConfirmation, setDeleteAccount] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  // Mutation
+  const DeleteUserMut = useMutation("users.deleteUser");
+
+  // Effetc
   useEffect(() => {
     /* PWA */
     window.addEventListener(
@@ -133,19 +138,9 @@ const Settings: NextPage = () => {
     if (DAConfirmation < 2) return;
 
     try {
-      const ProdMode = process.env.NODE_ENV === "production";
-      const { success, data: res } = await callApi<ResApiRoutes>({
-        url: `http${ProdMode ? "s" : ""}://${
-          window.location.host
-        }/api/user/delete`,
-        internalCall: true,
-        reqParams: {
-          method: "DELETE",
-          body: JSON.stringify({ username }),
-        },
-      });
+      const success = await DeleteUserMut.mutateAsync(username);
 
-      if (success && res.succeed) {
+      if (success) {
         toast.success(`Your account has been deleted !`);
         await auth.signOut();
         return;
@@ -374,6 +369,10 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
   const [IsValid, setIsValid] = useState(false);
   const [Loading, setLoading] = useState(false);
 
+  // Mutation
+  const RenameUserMut = useMutation("users.renameUser");
+
+  // Effect
   useEffect(() => {
     checkUsername(Username);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -388,22 +387,12 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
     }
 
     try {
-      const ProdMode = process.env.NODE_ENV === "production";
-      const { success, data: res } = await callApi<ResApiRoutes>({
-        url: `http${ProdMode ? "s" : ""}://${
-          window.location.host
-        }/api/user/rename`,
-        internalCall: true,
-        reqParams: {
-          method: "PUT",
-          body: JSON.stringify({
-            "old-username": DefaultUsername,
-            "new-username": Username,
-          }),
-        },
-      });
+      const success = await RenameUserMut.mutateAsync({
+        OldUsername: DefaultUsername,
+        NewUsername: Username,
+      } as unknown as void);
 
-      if (success && res.succeed) {
+      if (success) {
         toast.success(`Hello ${Username} !`);
         return;
       }

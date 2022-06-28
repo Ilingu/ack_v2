@@ -90,9 +90,9 @@ const SearchPage: NextPage = () => {
         const {
           success,
           data: { data: animesRes },
-        } = await callApi<JikanApiResSearchRoot>({
-          url: encodeURI(`https://api.jikan.moe/v4/anime?q=${title}&limit=16`),
-        });
+        } = await callApi<JikanApiResSearchRoot>(
+          encodeURI(`https://api.jikan.moe/v4/anime?q=${title}&limit=16`)
+        );
 
         if (!success || animesRes.length <= 0)
           return toast.error("Cannot Find Anime", {

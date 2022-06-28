@@ -14,14 +14,21 @@ import { FaEye } from "react-icons/fa";
 /* Interface */
 interface EpisodesListProps {
   Eps: JikanApiResEpisodes[];
+  NineAnimeBaseUrl?: string;
 }
 interface EpisodeItemProps {
   EpisodeData: EpisodesShape;
 }
 
+let NineAnimeUrl: string;
+
 // JSX
-const EpisodesList: FC<EpisodesListProps> = ({ Eps }) => {
+const EpisodesList: FC<EpisodesListProps> = ({ Eps, NineAnimeBaseUrl }) => {
   const [RenderElements, setNewRender] = useState<JSX.Element[]>();
+
+  NineAnimeUrl = NineAnimeBaseUrl
+    ? `https://9anime.id${NineAnimeBaseUrl}`
+    : null;
 
   useEffect(
     () => LoadEps(),
@@ -83,7 +90,11 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
           RECAP
         </div>
       )}
-      <a href={ForumURL} target="_blank" rel="noreferrer">
+      <a
+        href={NineAnimeUrl ? NineAnimeUrl + `/ep-${epsId}` : ForumURL}
+        target="_blank"
+        rel="noreferrer"
+      >
         <Image
           src={photoLink}
           alt="cover"

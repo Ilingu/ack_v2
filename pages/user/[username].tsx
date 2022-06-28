@@ -13,7 +13,6 @@ import type {
   UserStatsShape,
 } from "../../lib/utils/types/interface";
 // Func
-import Loader from "../../components/Design/Loader";
 import { useRouter } from "next/router";
 
 interface UserProfilePageProps {

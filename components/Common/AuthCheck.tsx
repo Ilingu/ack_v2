@@ -20,7 +20,7 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
   return user && username ? (
     children
   ) : !reqFinished && !fallback ? (
-    <div className="flex h-screen flex-col items-center justify-center text-center">
+    <div className="flex h-[calc(100vh-80px)] flex-col items-center justify-center text-center">
       <MetaTags
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}
@@ -43,7 +43,7 @@ const AuthCheck = ({ children, fallback, PageMetaData }: AuthCheckProps) => {
       <span className="text-primary-main">Connecting</span> to your account
     </h1>
   ) : !fallback ? (
-    <div className="flex h-screen flex-col items-center justify-center text-center">
+    <div className="flex h-[calc(100vh-80px)] flex-col items-center justify-center text-center">
       <MetaTags
         title={PageMetaData && PageMetaData[0]}
         description={PageMetaData && PageMetaData[1]}

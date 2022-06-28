@@ -65,15 +65,13 @@ export const GetAnimeData = async (
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
     const { success: suc1, data: animeResData } =
-      await callApi<JikanApiResAnimeRoot>({
-        url: endpoint,
-      });
+      await callApi<JikanApiResAnimeRoot>(endpoint);
 
     let animeEpsRes = await getAllTheEpisodes(animeId);
     const { success: suc2, data: animeRecommendationsResData } =
-      await callApi<JikanApiResRecommandationsRoot>({
-        url: endpoint + "/recommendations",
-      });
+      await callApi<JikanApiResRecommandationsRoot>(
+        endpoint + "/recommendations"
+      );
 
     if (
       !suc1 ||
@@ -254,12 +252,13 @@ const AddNewGlobalAnime = async (
 
 export const FbAuthentificate = async (
   AuthToken: string
-): Promise<FunctionJob> => {
+): Promise<FunctionJob<string>> => {
   try {
     const EncryptedToken = Buffer.from(AuthToken, "base64");
     const decryptedToken = decryptDatas(EncryptedToken);
-    await auth.verifyIdToken(decryptedToken);
-    return { success: true };
+
+    const { uid } = await auth.verifyIdToken(decryptedToken);
+    return { success: true, data: uid };
   } catch (error) {
     return { success: false };
   }
@@ -277,9 +276,9 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
 
     const fetchOtherEP = async () => {
       try {
-        let { success, data: eps } = await callApi<JikanApiResEpisodesRoot>({
-          url: `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`,
-        });
+        let { success, data: eps } = await callApi<JikanApiResEpisodesRoot>(
+          `https://api.jikan.moe/v4/anime/${id}/episodes?page=${i}`
+        );
         if (
           !success ||
           IsError(eps as unknown as JikanApiERROR) ||
