@@ -23,7 +23,6 @@ import UserProfil from "../components/User/UserProfil";
 // Types
 import type {
   BeforeInstallPromptEvent,
-  ResApiRoutes,
   UserStatsShape,
 } from "../lib/utils/types/interface";
 import { AnimeWatchType } from "../lib/utils/types/enums";

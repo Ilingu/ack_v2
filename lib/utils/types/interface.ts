@@ -30,12 +30,6 @@ export interface DifferenceWWShapeReq {
   NewValues: UserAnimeShape[];
 }
 // Api routes
-export interface ResApiRoutes {
-  succeed: boolean;
-  code: number;
-  data?: object;
-  message?: string;
-}
 export interface InternalApiResError {
   message?: string;
   err: boolean;
