@@ -142,46 +142,43 @@ const Fetch9AnimeLink = async (
       ...title_synonyms,
     ];
     for (const name of TitlesItarable) {
-      const url = encodeURI(
+      const NineAnimeQuery = encodeURIComponent(
         `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${name}`
       );
-      TemplateURLs.push(url);
+      const URLQuery = `https://api.webscrapingapi.com/v1?api_key=${process.env.WEB_SCAPPING_API_KEY}&url=${NineAnimeQuery}&device=desktop&proxy_type=datacenter`;
+      TemplateURLs.push(URLQuery);
     }
 
-    const MaybyUrlLinks = await Promise.allSettled(
-      TemplateURLs.map(async (url) => {
-        return new Promise<string>(async (res, rej) => {
-          const response = await fetch(url);
-          if (!response.ok) return rej();
+    const cheerio = await import("cheerio");
+    const AttemptGettingNineAnimeUrl = (): Promise<string> =>
+      new Promise((res) => {
+        let i = 0;
+        const FetchingLink = async () => {
+          if (i > TemplateURLs.length - 1) return res(null);
+
+          const response = await fetch(TemplateURLs[i]);
+          if (!response.ok) {
+            i++;
+            return FetchingLink();
+          }
 
           const HTMLDoc = await response.text();
 
-          const cheerio = await import("cheerio");
           const $ = cheerio.load(HTMLDoc);
           const UrlLink = $(".anime-list:first-child > li > a").attr("href");
 
-          if (
-            !UrlLink ||
-            UrlLink.trim().length <= 0 ||
-            !UrlLink.startsWith("/watch/")
-          )
-            return rej();
+          if (IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/")) {
+            i++;
+            return FetchingLink();
+          }
 
           return res(UrlLink);
-        });
-      })
-    );
+        };
+        FetchingLink();
+      });
 
-    for (const UrlLinkRes of MaybyUrlLinks) {
-      if (UrlLinkRes.status === "rejected") continue;
-
-      const UrlLink = UrlLinkRes?.value;
-      if (!UrlLink || !UrlLink || UrlLink.trim().length <= 0) continue;
-
-      return UrlLinkRes?.value;
-    }
-
-    return null;
+    const UrlLink = await AttemptGettingNineAnimeUrl();
+    return UrlLink;
   } catch (err) {
     console.error(err);
     return null;
