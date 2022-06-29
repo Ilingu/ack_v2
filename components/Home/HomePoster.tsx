@@ -197,6 +197,7 @@ const HomePoster: FC = () => {
             Fav,
             WatchType,
             NewEpisodeAvailable,
+            Progress,
           }): UserAnimePosterShape => {
             if (!GlobalAnime) return null;
 
@@ -204,6 +205,14 @@ const HomePoster: FC = () => {
               ({ malId }) => malId === AnimeId
             );
             if (!AnimeData) return null;
+
+            // Check NewEp
+            if (AnimeData?.Airing && !NewEpisodeAvailable)
+              CheckNewEpisodeData(
+                AnimeData?.NextEpisodesReleaseDate,
+                Progress,
+                AnimeId.toString()
+              );
 
             return {
               AnimeId,
@@ -213,7 +222,6 @@ const HomePoster: FC = () => {
               photoURL: AnimeData.photoPath,
               type: AnimeData.type,
               NewEpisodeAvailable,
-              broadcast: AnimeData?.Airing && AnimeData?.broadcast,
             };
           }
         )
@@ -347,9 +355,6 @@ const HomePoster: FC = () => {
           ({ AnimeId }) => AnimeId.toString() === animeId
         );
         if (!AnimeData) return null;
-
-        if (AnimeData?.broadcast)
-          CheckNewEpisodeData(AnimeData.broadcast, animeId);
 
         // Sort By ActiveWatchType
         const ActiveWatchType_CONDITION =
@@ -647,9 +652,9 @@ function GroupFormInput({
           Value={InputGroupName}
           setValue={setInputGroupName}
           HandleSubmit={HandleSubmit}
-          className={`h-10 w-80 xl:absolute xl:-top-5 xl:left-2${
-            GroupsMatch ? "" : " mb-2"
-          }${InputGroupName.trim().length < 3 ? " reset" : ""}`}
+          className={`h-10 w-80 ${GroupsMatch ? "" : " mb-2"}${
+            InputGroupName.trim().length < 3 ? " reset" : ""
+          }`}
           placeholder="Name of group"
         />
         {GroupsMatch && (
@@ -706,13 +711,20 @@ function AnimeSearchFormInput({ SearchAnime }: AnimeSearchFormInputProps) {
 function AnimePosterComponent({
   AnimeRenderedElements,
 }: AnimePosterComponentProps) {
+  if (!AnimeRenderedElements)
+    return (
+      <Link href="/anime">
+        <a className="text-xl font-bold text-red-300 hover:rounded hover:border-b-2 hover:border-red-300">
+          💢 You have 0 animes
+        </a>
+      </Link>
+    );
+  if (AnimeRenderedElements?.length <= 0)
+    return <a className="text-xl font-bold text-red-300">💢 No animes</a>;
+
   return (
     <div className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5">
-      {AnimeRenderedElements?.length <= 0 ? (
-        <span className="text-2xl font-bold text-red-300">💢 No Anime</span>
-      ) : (
-        AnimeRenderedElements
-      )}
+      {AnimeRenderedElements}
     </div>
   );
 }

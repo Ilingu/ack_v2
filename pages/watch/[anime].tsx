@@ -63,11 +63,16 @@ const WatchPage: NextPage = () => {
 
     if (!UserAnimeData || !CurrentAnimeData) push(`/anime/${query.anime}`);
 
-    if (CurrentAnimeData?.Airing && CurrentAnimeData?.broadcast)
-      CheckNewEpisodeData(CurrentAnimeData?.broadcast, query.anime.toString());
-
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
+
+    // Check NewEp
+    if (CurrentAnimeData?.Airing && !UserAnimeData?.NewEpisodeAvailable)
+      CheckNewEpisodeData(
+        CurrentAnimeData?.NextEpisodesReleaseDate,
+        UserAnimeData?.Progress,
+        query.anime.toString()
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnime, UserAnimes, query]);
 

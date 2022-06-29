@@ -152,7 +152,6 @@ export interface UserAnimePosterShape {
   photoURL: string;
   type: AnimeType;
   NewEpisodeAvailable?: boolean;
-  broadcast?: string;
 }
 export interface UserGroupPosterShape {
   GroupName: string;

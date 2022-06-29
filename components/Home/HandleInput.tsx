@@ -28,6 +28,13 @@ const HandleInput: FC<HandleInputProps> = ({
       <button
         type="submit"
         className="text-headline focus:ring-primary-main h-full -translate-y-px rounded-r-md bg-black px-2 font-semibold outline-none transition-all focus:ring-2"
+        title={
+          className.includes("search")
+            ? "Search"
+            : className.includes("reset")
+            ? "Reset"
+            : `Create Group "${Value}"`
+        }
       >
         {className.includes("search") ? (
           <FaSearch className="icon" />

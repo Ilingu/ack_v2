@@ -26,7 +26,7 @@ import { getDoc } from "firebase/firestore";
 // UI
 import toast from "react-hot-toast";
 // Funcs
-import { IsEmptyString, isValidUrl, postToJSON } from "../utils/UtilsFunc";
+import { isValidUrl, postToJSON } from "../utils/UtilsFunc";
 
 /* CLIENT FUNC */
 
@@ -343,16 +343,19 @@ const NewEpReleased = async (AnimeId: string) => {
     });
   } catch (err) {}
 };
-export const CheckNewEpisodeData = (broadcast: string, AnimeId: string) => {
-  if (IsEmptyString(broadcast) || broadcast === "Unknown") return;
+export const CheckNewEpisodeData = (
+  NextEpsRelease: number[],
+  UserProgress: number[],
+  AnimeId: string
+) => {
+  if (!NextEpsRelease || !UserProgress) return;
 
-  const NextEpReleaseDate = ConvertBroadcastTimeZone(
-    broadcast,
-    "NextBroadcastNumber"
-  ) as number;
+  let LastEpReleasedID: number;
+  for (const [i, date] of NextEpsRelease.entries())
+    if (date < Date.now()) LastEpReleasedID = i + 1;
 
-  console.log(NextEpReleaseDate, AnimeId);
-  if (Date.now() >= NextEpReleaseDate) NewEpReleased(AnimeId);
+  if (!LastEpReleasedID || LastEpReleasedID <= 0) return;
+  if (!UserProgress.includes(LastEpReleasedID)) NewEpReleased(AnimeId);
 };
 
 /**
