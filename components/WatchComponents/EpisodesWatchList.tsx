@@ -1,4 +1,4 @@
-import React, {
+import {
   Dispatch,
   FC,
   Fragment,
@@ -13,8 +13,12 @@ import Image from "next/image";
 // DB
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase/firebase";
+// Types
 import { removeDuplicates } from "../../lib/utils/UtilsFunc";
-import toast from "react-hot-toast";
+import {
+  ConvertBroadcastTimeZone,
+  FormatDate,
+} from "../../lib/client/ClientFuncs";
 // Types
 import type {
   JikanApiResEpisodes,
@@ -24,6 +28,7 @@ import type {
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // UI
+import toast from "react-hot-toast";
 import {
   AiFillPlaySquare,
   AiOutlineEye,
@@ -35,14 +40,21 @@ import { FaEye, FaPlus, FaTrashAlt } from "react-icons/fa";
 interface EpsPosterProps {
   EpisodesData: JikanApiResEpisodes[];
   UserAnimeData: UserAnimeShape;
-  Duration: number;
-  NineAnimeUrl: string;
+  ExtraInfo: {
+    NineAnimeUrl: string;
+    NextEpisodesReleaseDate: number[];
+    Duration: number;
+    broadcast: string;
+  };
   setFocusMode: Dispatch<SetStateAction<boolean>>;
 }
 interface EpsPosterItemProps {
   EpisodeData: UserExtraEpisodesShape;
   watched: boolean;
-  NineAnimeEpUrl: string;
+  ExtraData: {
+    NineAnimeEpUrl: string;
+    ReleaseDate: number;
+  };
   UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
 }
 type SortOrderType = "descending" | "ascending";
@@ -73,9 +85,7 @@ const DecrementExtraEpisode = async () => {
 /* COMPONENTS */
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
-  Duration,
   setFocusMode,
-  NineAnimeUrl,
   UserAnimeData: {
     Progress,
     WatchType,
@@ -83,8 +93,8 @@ const EpsPoster: FC<EpsPosterProps> = ({
     ExtraEpisodes,
     TimestampDate,
     NewEpisodeAvailable,
-    NextEpisodeReleaseDate,
   },
+  ExtraInfo: { Duration, NineAnimeUrl, NextEpisodesReleaseDate, broadcast },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
   const [NextEP, setNextEp] = useState<number>(null);
@@ -98,6 +108,15 @@ const EpsPoster: FC<EpsPosterProps> = ({
   const { current: EpisodesLength } = useRef(
     EpisodesData.length + (ExtraEpisodes || 0)
   );
+
+  const NextEpisodeReleaseDate = useMemo((): number => {
+    if (!broadcast) return null;
+    const NextEpReleaseDateTimestamp = ConvertBroadcastTimeZone(
+      broadcast,
+      "NextBroadcastNumber"
+    ) as number;
+    return NextEpReleaseDateTimestamp;
+  }, [broadcast]);
 
   useEffect(() => {
     GlobalAnimeId = AnimeId.toString();
@@ -137,9 +156,12 @@ const EpsPoster: FC<EpsPosterProps> = ({
         return (
           <EpsPosterItem
             key={i}
-            NineAnimeEpUrl={
-              NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`
-            }
+            ExtraData={{
+              NineAnimeEpUrl:
+                NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`,
+              ReleaseDate:
+                NextEpisodesReleaseDate && NextEpisodesReleaseDate[i],
+            }}
             EpisodeData={epData}
             watched={watched}
             UpdateUserAnimeProgress={UpdateUserAnimeProgress}
@@ -211,9 +233,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
           NewEpisodeAvailable: remove
             ? NewEpisodeAvailable || deleteField()
             : deleteField(),
-          NextEpisodeReleaseDate: IsFinished
-            ? deleteField()
-            : NextEpisodeReleaseDate || deleteField(),
         });
 
         toast.success(`Marked as ${remove ? "un" : ""}watched !`);
@@ -230,7 +249,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
       GetAnimeRef,
       WatchType,
       NewEpisodeAvailable,
-      NextEpisodeReleaseDate,
     ]
   );
 
@@ -398,7 +416,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
 function EpsPosterItem({
   EpisodeData,
   watched,
-  NineAnimeEpUrl,
+  ExtraData: { NineAnimeEpUrl, ReleaseDate },
   UpdateUserAnimeProgress,
 }: EpsPosterItemProps) {
   const { title, mal_id, filler, recap, aired, isExtra } = EpisodeData || {};
@@ -446,12 +464,16 @@ function EpsPosterItem({
       <p className="text-headline lg:col-span-15 xs:col-span-16 col-span-13 font-semibold">
         {title}
       </p>
-      <div className="xs:col-span-4 text-headline col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider lg:col-span-3">
-        <a
-          href={NineAnimeEpUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="9AnimeLink flex w-24 items-center justify-center gap-1 rounded-lg bg-[#5a2e98]"
+      <a
+        href={NineAnimeEpUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="9AnimeLink xs:col-span-4 text-headline col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider lg:col-span-3"
+      >
+        <div
+          className={`9AnimeLink flex w-24 items-center justify-center gap-1 rounded-lg bg-[#5a2e98]${
+            ReleaseDate && ReleaseDate > Date.now() ? " bg-opacity-50" : ""
+          }`}
         >
           <Image
             src="/Assets/9animeLogo.png"
@@ -461,10 +483,10 @@ function EpsPosterItem({
             className="rounded-md bg-white"
           />{" "}
           9anime
-        </a>
-      </div>
+        </div>
+      </a>
       <p className="text-headline col-span-3 hidden justify-items-end font-semibold lg:grid">
-        {aired && new Date(aired).toLocaleDateString()}
+        {ReleaseDate ? FormatDate(ReleaseDate) : aired && FormatDate(aired)}
       </p>
     </div>
   );

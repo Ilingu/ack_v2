@@ -15,8 +15,6 @@ import type {
   SeasonAnimesShape,
 } from "../utils/types/interface";
 import type {
-  AnimeDatasShape,
-  AnimeStatusType,
   DateOfWeek,
   DayOfWeek,
   TheFourSeason,
@@ -28,8 +26,7 @@ import { getDoc } from "firebase/firestore";
 // UI
 import toast from "react-hot-toast";
 // Funcs
-import { encryptDatas, isValidUrl, postToJSON } from "../utils/UtilsFunc";
-import { useMutation } from "./trpc";
+import { IsEmptyString, isValidUrl, postToJSON } from "../utils/UtilsFunc";
 
 /* CLIENT FUNC */
 
@@ -147,91 +144,20 @@ export function JikanApiToSeasonAnimeShape(
   }));
 }
 
-interface SpecialAnimeShape {
-  AnimeData: AnimeShape;
-  IsAddableToDB: boolean;
-}
-/**
- * Transform JikanApi obj to AnimeShape obj
- * @param {AnimeDatasShape} JikanObj
- */
-export function JikanApiToAnimeShape(
-  JikanObj: AnimeDatasShape
-): SpecialAnimeShape {
-  const [AnimeData, EpsData, Recommendations, NineAnimeUrl] = JikanObj;
-  let NextRefresh = null;
-  let IsAddableToDB = true;
-
-  const NewSeasonAnime =
-    !!AnimeData?.airing ||
-    !AnimeData?.aired?.to ||
-    (AnimeData?.status as AnimeStatusType) === "Not yet aired";
-
-  if (NewSeasonAnime) NextRefresh = Date.now() + 345600000;
-  if (
-    !NewSeasonAnime &&
-    AnimeData?.score < 6 &&
-    AnimeData?.rank >= 1500 &&
-    AnimeData?.members < 15000
-  )
-    IsAddableToDB = false;
-
-  return {
-    AnimeData: {
-      title: AnimeData?.title,
-      Genre: AnimeData?.genres,
-      AgeRating: AnimeData?.rating,
-      Airing: AnimeData?.airing,
-      AiringDate: new Date(AnimeData?.aired?.from).toLocaleDateString(),
-      AlternativeTitle: {
-        title_english: AnimeData?.title_english,
-        title_japanese: AnimeData?.title_japanese,
-        title_synonyms: AnimeData?.title_synonyms,
-      },
-      OverallScore: AnimeData?.score,
-      ScoredBy: AnimeData?.scored_by,
-      Status: AnimeData?.status as AnimeStatusType,
-      type: AnimeData?.type,
-      ReleaseDate: `${AnimeData?.season} ${AnimeData?.year}`,
-      Synopsis: AnimeData?.synopsis,
-      Studios: AnimeData?.studios,
-      Theme: AnimeData?.themes,
-      photoPath: removeParamsFromPhotoUrl(AnimeData?.images?.jpg?.image_url),
-      malId: AnimeData?.mal_id,
-      trailer_url: AnimeData?.trailer?.embed_url,
-      nbEp: AnimeData?.episodes || 12,
-      MalPage: AnimeData?.url,
-      duration: AnimeData?.duration,
-      Recommendations:
-        Recommendations?.slice(0, 7).map((recom) => ({
-          ...recom,
-          image_url: removeParamsFromPhotoUrl(
-            recom?.entry?.images?.jpg?.image_url
-          ),
-        })) || [],
-      EpisodesData:
-        (AnimeData?.type === "TV" ||
-          AnimeData?.type === "OVA" ||
-          AnimeData?.type === "ONA") &&
-        EpsData,
-      broadcast:
-        AnimeData?.broadcast?.string &&
-        AnimeData?.broadcast?.string !== "Unknown"
-          ? AnimeData.broadcast.string
-          : null,
-      NextRefresh,
-      NineAnimeUrl,
-    },
-    IsAddableToDB,
-  };
-}
-
 /**
  * Remove ?s= from photoURL
  * @param {string} photoUrl
  */
 export const removeParamsFromPhotoUrl = (photoUrl: string) =>
   photoUrl.split("?s=")[0];
+
+/**
+ * Format a date in Date String
+ * @param {string | number} date
+ * @returns {string} Formatted String
+ */
+export const FormatDate = (date: string | number): string =>
+  new Date(date).toLocaleDateString();
 
 /**
  * Throw in app error (redirect to "/error")
@@ -287,7 +213,7 @@ export const WhitchSeason = () => {
 };
 
 /**
- * @returns The current Date From Day: 0 | 1 | 2 | 3 | 4 | 5 | 6
+ * @returns The current Date From Day: `0 | 1 | 2 | 3 | 4 | 5 | 6`
  */
 export const WhitchDate = (day: DayOfWeek): DateOfWeek => {
   if (day === "sundays") return 0;
@@ -299,8 +225,9 @@ export const WhitchDate = (day: DayOfWeek): DateOfWeek => {
   if (day === "saturdays") return 6;
   return 0;
 };
+
 /**
- * @returns The current Date From Day: 0 | 1 | 2 | 3 | 4 | 5 | 6
+ * @returns The current Date From Day: `"mondays" | "tuesdays" | "wednesdays" | "thursdays" | "fridays" | "saturdays" | "sundays"`
  */
 export const WhitchDay = (date: DateOfWeek): DayOfWeek => {
   if (date === 0) return "sundays";
@@ -401,6 +328,31 @@ export const ToggleFav = async (AnimeId: string, currentVal: boolean) => {
   } catch (err) {
     toast.error("Cannot add this anime to your favorite");
   }
+};
+
+const NewEpReleased = async (AnimeId: string) => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      AnimeId
+    );
+
+    await updateDoc(AnimeRef, {
+      NewEpisodeAvailable: true,
+    });
+  } catch (err) {}
+};
+export const CheckNewEpisodeData = (broadcast: string, AnimeId: string) => {
+  if (IsEmptyString(broadcast) || broadcast === "Unknown") return;
+
+  const NextEpReleaseDate = ConvertBroadcastTimeZone(
+    broadcast,
+    "NextBroadcastNumber"
+  ) as number;
+
+  console.log(NextEpReleaseDate, AnimeId);
+  if (Date.now() >= NextEpReleaseDate) NewEpReleased(AnimeId);
 };
 
 /**

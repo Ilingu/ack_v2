@@ -135,7 +135,6 @@ export interface UserAnimeShape {
   TimestampDate?: UserAnimeTimestampDate;
   ExtraEpisodes?: number;
   NewEpisodeAvailable?: boolean;
-  NextEpisodeReleaseDate?: number;
 }
 export interface UserAnimeTimestampDate {
   BeganDate: string; // Timestamp
@@ -153,7 +152,7 @@ export interface UserAnimePosterShape {
   photoURL: string;
   type: AnimeType;
   NewEpisodeAvailable?: boolean;
-  NextEpisodeReleaseDate?: number;
+  broadcast?: string;
 }
 export interface UserGroupPosterShape {
   GroupName: string;
@@ -189,6 +188,7 @@ export interface AnimeShape {
   malId: number;
   NextRefresh: number;
   NineAnimeUrl?: string;
+  NextEpisodesReleaseDate?: number[];
 }
 export interface AlternativeTitleShape {
   title_english: string;

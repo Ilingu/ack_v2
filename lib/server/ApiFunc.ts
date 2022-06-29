@@ -14,10 +14,10 @@ import type {
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
 } from "../utils/types/interface";
-import type { AnimeDatasShape } from "../utils/types/types";
+import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 // Func
-import { IsError, decryptDatas } from "../utils/UtilsFunc";
-import { callApi, JikanApiToAnimeShape } from "../client/ClientFuncs";
+import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFunc";
+import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
@@ -228,6 +228,11 @@ const AddNewGlobalAnime = async (
   }
 };
 
+/**
+ * Login to firebase user account from backend (via user JWT Token)
+ * @param {string} AuthToken
+ * @returns {FunctionJob<string>} `{success: boolean, data: string}`, if success `false` data return null; `data` is the user `uid`
+ */
 export const FbAuthentificate = async (
   AuthToken: string
 ): Promise<FunctionJob<string>> => {
@@ -275,4 +280,94 @@ export function getAllTheEpisodes(id: string): Promise<JikanApiResEpisodes[]> {
     };
     fetchOtherEP();
   });
+}
+
+/* HELPERS */
+interface SpecialAnimeShape {
+  AnimeData: AnimeShape;
+  IsAddableToDB: boolean;
+}
+/**
+ * Transform JikanApi obj (External API) to AnimeShape obj (Readable by the app, and stored in Firebase)
+ * @param {AnimeDatasShape} JikanObj
+ * @returns {SpecialAnimeShape} `{AnimeData: AnimeShape, IsAddableToDB: boolean}` --> `AnimeData` is the AnimeShape obj and `IsAddableToDB` is a boolean to say if this anime is worth to be stored into DB
+ */
+export function JikanApiToAnimeShape(
+  JikanObj: AnimeDatasShape
+): SpecialAnimeShape {
+  const [AnimeData, EpsData, Recommendations, NineAnimeUrl] = JikanObj;
+  let NextRefresh: number = null,
+    NextEpsReleaseDate: number[] = null;
+  let IsAddableToDB = true;
+
+  const NewSeasonAnime =
+    AnimeData?.airing ||
+    !AnimeData?.aired?.to ||
+    (AnimeData?.status as AnimeStatusType) === "Not yet aired";
+
+  if (NewSeasonAnime) NextRefresh = Date.now() + 345600000;
+  if (NewSeasonAnime && AnimeData?.aired?.from) {
+    const FirstEpReleaseDate = new Date(AnimeData.aired.from).getTime();
+    NextEpsReleaseDate = EpsData.map(({ aired }, i) => {
+      if (!aired) return FirstEpReleaseDate + 604800000 * i;
+      return new Date(aired).getTime();
+    });
+  }
+  if (
+    !NewSeasonAnime &&
+    AnimeData?.score < 6 &&
+    AnimeData?.rank >= 1500 &&
+    AnimeData?.members < 15000
+  )
+    IsAddableToDB = false;
+
+  return {
+    AnimeData: {
+      title: AnimeData?.title,
+      Genre: AnimeData?.genres,
+      AgeRating: AnimeData?.rating,
+      Airing: AnimeData?.airing,
+      AiringDate: new Date(AnimeData?.aired?.from).toLocaleDateString(),
+      AlternativeTitle: {
+        title_english: AnimeData?.title_english,
+        title_japanese: AnimeData?.title_japanese,
+        title_synonyms: AnimeData?.title_synonyms,
+      },
+      OverallScore: AnimeData?.score,
+      ScoredBy: AnimeData?.scored_by,
+      Status: AnimeData?.status as AnimeStatusType,
+      type: AnimeData?.type,
+      ReleaseDate: `${AnimeData?.season} ${AnimeData?.year}`,
+      Synopsis: AnimeData?.synopsis,
+      Studios: AnimeData?.studios,
+      Theme: AnimeData?.themes,
+      photoPath: removeParamsFromPhotoUrl(AnimeData?.images?.jpg?.image_url),
+      malId: AnimeData?.mal_id,
+      trailer_url: AnimeData?.trailer?.embed_url,
+      nbEp: AnimeData?.episodes || 12,
+      MalPage: AnimeData?.url,
+      duration: AnimeData?.duration,
+      Recommendations:
+        Recommendations?.slice(0, 7).map((recom) => ({
+          ...recom,
+          image_url: removeParamsFromPhotoUrl(
+            recom?.entry?.images?.jpg?.image_url
+          ),
+        })) || [],
+      EpisodesData:
+        (AnimeData?.type === "TV" ||
+          AnimeData?.type === "OVA" ||
+          AnimeData?.type === "ONA") &&
+        EpsData,
+      broadcast:
+        !IsEmptyString(AnimeData?.broadcast?.string) &&
+        AnimeData?.broadcast?.string !== "Unknown"
+          ? AnimeData.broadcast.string
+          : null,
+      NextRefresh,
+      NineAnimeUrl,
+      NextEpisodesReleaseDate: NextEpsReleaseDate,
+    },
+    IsAddableToDB,
+  };
 }

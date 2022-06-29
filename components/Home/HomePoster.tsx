@@ -25,14 +25,7 @@ import type {
   UserGroupShape,
 } from "../../lib/utils/types/interface";
 // Auth
-import {
-  deleteDoc,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  writeBatch,
-} from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase/firebase";
 // Func
 import {
@@ -41,7 +34,7 @@ import {
   removeDuplicates,
   shuffleArray,
 } from "../../lib/utils/UtilsFunc";
-import { ToggleFav } from "../../lib/client/ClientFuncs";
+import { CheckNewEpisodeData, ToggleFav } from "../../lib/client/ClientFuncs";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {
@@ -204,9 +197,9 @@ const HomePoster: FC = () => {
             Fav,
             WatchType,
             NewEpisodeAvailable,
-            NextEpisodeReleaseDate,
-          }) => {
+          }): UserAnimePosterShape => {
             if (!GlobalAnime) return null;
+
             const AnimeData = GlobalAnime.find(
               ({ malId }) => malId === AnimeId
             );
@@ -220,8 +213,8 @@ const HomePoster: FC = () => {
               photoURL: AnimeData.photoPath,
               type: AnimeData.type,
               NewEpisodeAvailable,
-              NextEpisodeReleaseDate,
-            } as UserAnimePosterShape;
+              broadcast: AnimeData?.Airing && AnimeData?.broadcast,
+            };
           }
         )
         .filter((UAP) => UAP),
@@ -304,10 +297,6 @@ const HomePoster: FC = () => {
 
   const AnimeRender = () => {
     // Animes Render
-    const batch = writeBatch(db);
-    const AnimeRef = (AnimeId: string) =>
-      doc(doc(db, "users", user.uid), "animes", AnimeId);
-
     if (!AnimesElementsOrder.current) {
       // Shuffle Array -> Order
       const AllAnimesId = filteredUserAnime.map(({ AnimeId }) =>
@@ -359,16 +348,8 @@ const HomePoster: FC = () => {
         );
         if (!AnimeData) return null;
 
-        // Notif Check
-        if (
-          AnimeData?.NextEpisodeReleaseDate &&
-          Date.now() >= AnimeData?.NextEpisodeReleaseDate
-        ) {
-          !AnimeData?.NewEpisodeAvailable &&
-            batch.update(AnimeRef(animeId), {
-              NewEpisodeAvailable: true,
-            });
-        }
+        if (AnimeData?.broadcast)
+          CheckNewEpisodeData(AnimeData.broadcast, animeId);
 
         // Sort By ActiveWatchType
         const ActiveWatchType_CONDITION =
@@ -398,7 +379,6 @@ const HomePoster: FC = () => {
       })
       .filter((Poster) => !!Poster);
 
-    (async () => await batch.commit())();
     setNewRenderForAnimes(AnimesPosterJSX);
   };
 

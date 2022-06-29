@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -6,21 +6,15 @@ import Image from "next/image";
 import { GlobalAppContext } from "../../lib/context";
 // Auth
 import AuthCheck from "../../components/Common/AuthCheck";
-import MetaTags from "../../components/Common/Metatags";
-// FB
-import { doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase/firebase";
 // Func
-import {
-  ConvertBroadcastTimeZone,
-  ToggleFav,
-} from "../../lib/client/ClientFuncs";
+import { CheckNewEpisodeData, ToggleFav } from "../../lib/client/ClientFuncs";
 // Types
 import type {
   AnimeShape,
   UserAnimeShape,
 } from "../../lib/utils/types/interface";
 // UI
+import MetaTags from "../../components/Common/Metatags";
 import AnimesWatchType from "../../components/Common/AnimesWatchType";
 import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
 import Link from "next/link";
@@ -31,36 +25,6 @@ import FocusModeComponent from "../../components/WatchComponents/FocusMode";
 import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
 
 /* Func */
-const AddNextEpisodeReleaseDate = async (
-  NextReleaseDate: number,
-  AnimeId: string
-) => {
-  try {
-    const AnimeRef = doc(
-      doc(db, "users", auth.currentUser.uid),
-      "animes",
-      AnimeId
-    );
-
-    await updateDoc(AnimeRef, {
-      NextEpisodeReleaseDate: NextReleaseDate,
-    });
-  } catch (err) {}
-};
-
-const NewEpReleased = async (AnimeId: string) => {
-  try {
-    const AnimeRef = doc(
-      doc(db, "users", auth.currentUser.uid),
-      "animes",
-      AnimeId
-    );
-
-    await updateDoc(AnimeRef, {
-      NewEpisodeAvailable: true,
-    });
-  } catch (err) {}
-};
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -81,11 +45,10 @@ const WatchPage: NextPage = () => {
     EpisodesData,
     duration,
     type,
-    broadcast,
-    Airing,
-    NextEpisodeReleaseDate,
-    NewEpisodeAvailable,
     NineAnimeUrl,
+    NewEpisodeAvailable,
+    NextEpisodesReleaseDate,
+    broadcast,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
@@ -100,30 +63,13 @@ const WatchPage: NextPage = () => {
 
     if (!UserAnimeData || !CurrentAnimeData) push(`/anime/${query.anime}`);
 
+    if (CurrentAnimeData?.Airing && CurrentAnimeData?.broadcast)
+      CheckNewEpisodeData(CurrentAnimeData?.broadcast, query.anime.toString());
+
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [GlobalAnime, UserAnimes, query]);
-
-  useEffect(() => {
-    /* NOTIF */
-    if (!NextEpisodeReleaseDate) return AddNextEpisodeReleaseDateToFB();
-    if (Date.now() >= NextEpisodeReleaseDate) {
-      !NewEpisodeAvailable && NewEpReleased(CurrentAnimeData.malId.toString());
-      AddNextEpisodeReleaseDateToFB();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [NextEpisodeReleaseDate, CurrentAnimeData]);
-
-  const AddNextEpisodeReleaseDateToFB = () => {
-    if (!broadcast || !Airing) return;
-
-    const BroadcastTime = ConvertBroadcastTimeZone(
-      broadcast,
-      "NextBroadcastNumber"
-    ) as number;
-    AddNextEpisodeReleaseDate(BroadcastTime, CurrentAnimeData.malId.toString());
-  };
 
   if (!UserAnimeData || !CurrentAnimeData)
     return (
@@ -224,9 +170,13 @@ const WatchPage: NextPage = () => {
                   <EpsPoster
                     EpisodesData={EpisodesData}
                     UserAnimeData={UserAnimeData}
+                    ExtraInfo={{
+                      NineAnimeUrl,
+                      NextEpisodesReleaseDate,
+                      Duration: parseInt(duration.split(" ")[0]),
+                      broadcast: broadcast || null,
+                    }}
                     setFocusMode={setFocusMode}
-                    NineAnimeUrl={NineAnimeUrl}
-                    Duration={parseInt(duration.split(" ")[0])}
                   />
                 )}
               </div>

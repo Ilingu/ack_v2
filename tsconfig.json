@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noEmit": true,
     "incremental": true,
