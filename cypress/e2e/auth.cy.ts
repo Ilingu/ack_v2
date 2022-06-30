@@ -68,8 +68,8 @@ describe("User Interaction", () => {
   it("Rename Username", () => {
     LoginWithCypress();
 
-    RenameUsername("ilingutest"); // Change
-    RenameUsername("ilingutesting"); // Back to normal
+    RenameUsername("testaccount"); // Change 1
+    RenameUsername("ilingutest"); // Change 2
   });
 
   it("Delete User", () => {
