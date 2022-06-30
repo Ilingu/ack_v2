@@ -2,7 +2,7 @@ export const LoginWithCypress = () => {
   cy.visit("/sign-up");
   cy.contains("Sign In/Up");
   cy.get('[data-testid="LoginWithGithub"]').click();
-  cy.wait(1000);
+  cy.wait(2000);
 };
 
 export const LogoutWithCypress = () => {
@@ -40,7 +40,7 @@ describe("User Login/Logout", () => {
     );
     cy.get('[data-testid="CreateNewUsernameBtnSubmition"]').click();
 
-    cy.wait(1000);
+    cy.wait(2000);
     cy.contains("Already Sign-in!");
   });
 
