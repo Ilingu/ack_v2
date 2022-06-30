@@ -1,5 +1,7 @@
-describe('empty spec', () => {
-  it('passes', () => {
-    cy.visit('https://example.cypress.io')
-  })
-})
+describe("empty spec", () => {
+  it("passes", () => {
+    expect(true).to.equal(true);
+  });
+});
+
+export {};
