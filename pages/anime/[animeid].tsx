@@ -84,6 +84,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       return ReturnProps({
         AddedToDB: false,
         AnimeUpdated: false,
+        FromCache: true,
         AnimeData: animeData,
       });
   }
@@ -104,6 +105,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         return ReturnProps({
           AddedToDB: false,
           AnimeUpdated: false,
+          FromCache: true,
           AnimeData,
         });
       }
@@ -337,7 +339,11 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 Airing ? "Ongoing" : "Finished",
               ]}
             />
-            <MyAnimes AnimeType={CurrentAnimeWatchType} malId={malId} />
+            {(animeData?.FromCache ||
+              animeData?.AddedToDB ||
+              animeData?.AnimeUpdated) && (
+              <MyAnimes AnimeType={CurrentAnimeWatchType} malId={malId} />
+            )}
           </div>
         </div>
       </section>

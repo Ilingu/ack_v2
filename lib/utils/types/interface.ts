@@ -38,6 +38,7 @@ export interface InternalApiResSuccess {
   AddedToDB: boolean;
   AnimeUpdated: boolean;
   AnimeData: AnimeShape;
+  FromCache?: boolean;
 }
 export interface ResDataUser {
   User: User;

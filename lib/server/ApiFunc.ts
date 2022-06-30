@@ -93,14 +93,22 @@ export const GetAnimeData = async (
       IsGood = false;
 
     if (IsGood) {
-      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(AnimeDatas);
+      const MissingElems =
+        EpisodesLength <= 0 ||
+        !NineAnimeLink ||
+        animeRecommendationsRes.length <= 0;
+
+      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(
+        AnimeDatas,
+        MissingElems
+      );
       animeData = AnimeData;
 
       let AddedToDB = false;
       let AnimeUpdated = false;
       if (IsAddableToDB) {
         [AddedToDB, AnimeUpdated] = await AddNewGlobalAnime(animeId, animeData);
-        await IndexAnimeInAlgolia({
+        IndexAnimeInAlgolia({
           title: animeData.title,
           AlternativeTitle: animeData.AlternativeTitle,
           OverallScore: animeData.OverallScore,
@@ -290,7 +298,8 @@ interface SpecialAnimeShape {
  * @returns {SpecialAnimeShape} `{AnimeData: AnimeShape, IsAddableToDB: boolean}` --> `AnimeData` is the AnimeShape obj and `IsAddableToDB` is a boolean to say if this anime is worth to be stored into DB
  */
 export function JikanApiToAnimeShape(
-  JikanObj: AnimeDatasShape
+  JikanObj: AnimeDatasShape,
+  MissingElems = false
 ): SpecialAnimeShape {
   const [AnimeData, EpsData, Recommendations, NineAnimeUrl] = JikanObj;
   let NextRefresh: number = null,
@@ -302,7 +311,7 @@ export function JikanApiToAnimeShape(
     !AnimeData?.aired?.to ||
     (AnimeData?.status as AnimeStatusType) === "Not yet aired";
 
-  if (NewSeasonAnime) NextRefresh = Date.now() + 345600000;
+  if (NewSeasonAnime || MissingElems) NextRefresh = Date.now() + 345600000; // 4 days
   if (NewSeasonAnime && AnimeData?.aired?.from) {
     const FirstEpReleaseDate = new Date(AnimeData.aired.from).getTime();
     NextEpsReleaseDate = EpsData.map(({ aired }, i) => {
