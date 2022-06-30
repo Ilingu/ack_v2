@@ -3,7 +3,10 @@ import Metatags from "../components/Common/Metatags";
 
 export default function Custom404() {
   return (
-    <main className="text-headline flex h-screen flex-col items-center justify-center">
+    <main
+      data-testid="404-Page"
+      className="text-headline flex h-screen flex-col items-center justify-center"
+    >
       <Metatags title="404 Page Not Found!" description="404 Page" />
       <h1 className="mb-2 font-mono text-6xl font-bold text-red-500">404</h1>
       <h2 className="mb-4 text-3xl font-semibold">

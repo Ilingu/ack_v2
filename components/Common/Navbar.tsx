@@ -32,7 +32,7 @@ const Navbar: FC = () => {
     <AuthCheck
       fallback={
         <Link href="/sign-up" passHref>
-          <a>
+          <a data-testid="Nav-Login-Btn">
             <button className="bg-primary-darker ml-2 rounded-lg py-2 px-4 text-lg font-bold">
               {screen?.width > 768 ? (
                 "Get Started Now"

@@ -6,7 +6,10 @@ import { BiErrorAlt } from "react-icons/bi";
 
 const CustomError: FC = () => {
   return (
-    <main className="text-headline flex h-screen flex-col items-center justify-center">
+    <main
+      data-testid="Error-Page-Main"
+      className="text-headline flex h-screen flex-col items-center justify-center"
+    >
       <Metatags title="Error Page" description="ACK Error Page" />
       <h1 className="mb-2 font-mono text-6xl font-bold text-red-500">
         <BiErrorAlt className="icon" /> ERROR

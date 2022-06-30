@@ -44,7 +44,7 @@ const UserProfil: FC<UserProfilProps> = ({
       <section className="mt-10 mb-2 flex gap-2 px-3 sm:gap-5">
         <div>
           <Image
-            src={user?.photoURL}
+            src={user?.photoURL || "https://ui-avatars.com/api/?name=I+L"}
             alt="User Avatar"
             height={180}
             width={180}
@@ -55,7 +55,10 @@ const UserProfil: FC<UserProfilProps> = ({
           <div className="text-headline flex flex-col text-3xl font-bold">
             {user?.displayName}
             <Link href={`/user/${username}`} passHref>
-              <a className="text-primary-whitest text-lg font-semibold hover:underline">
+              <a
+                data-testid="UserUsername"
+                className="text-primary-whitest text-lg font-semibold hover:underline"
+              >
                 @{username}
               </a>
             </Link>

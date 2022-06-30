@@ -11,7 +11,7 @@ const Home: NextPage = () => {
     <AuthCheck
       PageMetaData={["Home-Please Connect", "Home Page - Please Connect"]}
     >
-      <main>
+      <main data-testid="Home-Page-Main">
         <MetaTags />
         <HomePoster />
       </main>

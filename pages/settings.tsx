@@ -161,7 +161,10 @@ const Settings: NextPage = () => {
         "Private Page - Please Connect To Access It",
       ]}
     >
-      <main className="flex flex-col items-center">
+      <main
+        className="flex flex-col items-center"
+        data-testid="Settings-Page-Main"
+      >
         <MetaTags title="User's Settings" description="Settings of ACK User" />
         <div className="w-11/12 sm:w-5/6 md:w-11/12 lg:w-2/3 2xl:w-1/2">
           {/* User's Profile */}
@@ -302,6 +305,7 @@ const Settings: NextPage = () => {
                   your datas from this service (animes, username, account...)
                 </p>
                 <button
+                  data-testid="DeleteUserBtn"
                   onClick={() =>
                     setDeleteAccount((prev) => (prev + 1 > 2 ? 0 : prev + 1))
                   }
@@ -437,12 +441,14 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
       <span className="text-headline text-lg font-bold">@</span>
       <input
         type="text"
+        data-testid="RenameUsernameInput"
         value={Username}
         onChange={HandleChange}
         className="focus:ring-primary-main rounded-md p-1 outline-none transition-all focus:ring"
       />
       <button
         type="submit"
+        data-testid="RenameUsernameBtnSubmition"
         disabled={!IsValid}
         className="text-headline bg-primary-main hover:bg-primary-whiter focus:ring-primary-darker ml-2 rounded-md py-1
                      px-2 font-semibold tracking-wide outline-none transition-all focus:ring"

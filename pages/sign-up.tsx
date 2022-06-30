@@ -14,6 +14,8 @@ import {
   TwitterAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "../lib/firebase/firebase";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
@@ -70,6 +72,7 @@ function SignOutButton() {
       </h1>
       <button
         onClick={() => auth.signOut()}
+        data-testid="SignOutLoginPage"
         className="text-headline mt-4 w-1/3 rounded-md bg-red-400 py-2 px-2 text-lg font-semibold"
       >
         <FaSignOutAlt className="icon" />
@@ -81,6 +84,27 @@ function SignOutButton() {
 
 function SignInButton() {
   const signIn = async (method: ConnMethods) => {
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          "ilingu-testing-account@fake-provider.com",
+          process.env.NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD
+        ); // Try login
+        return;
+      } catch {}
+
+      try {
+        await createUserWithEmailAndPassword(
+          auth,
+          "ilingu-testing-account@fake-provider.com",
+          process.env.NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD
+        );
+        return;
+      } catch (error) {} // Try Creating
+      return;
+    }
+
     try {
       await signInWithPopup(
         auth,
@@ -128,6 +152,7 @@ function SignInButton() {
           <FaTwitter className="icon text-blue-500" /> Twitter
         </button>
         <button
+          data-testid="LoginWithGithub"
           onClick={() => signIn("github")}
           className="bg-bgi-darker text-headline focus:ring-headline w-5/6 rounded py-2 px-2 
           text-xl font-semibold outline-none transition hover:bg-gray-600 focus:ring-4"
@@ -176,6 +201,7 @@ function UsernameForm() {
     try {
       // Commit req at same time
       const batch = writeBatch(db);
+
       batch.set(userDoc, {
         username: formValue,
         photoURL: user.photoURL,
@@ -210,6 +236,7 @@ function UsernameForm() {
       <form onSubmit={onSubmit} className="flex flex-col items-center">
         <input
           type="text"
+          data-testid="CreateNewUsernameInput"
           name="username"
           placeholder="username"
           value={formValue}
@@ -226,6 +253,7 @@ function UsernameForm() {
         <div className="w-full">
           <button
             type="submit"
+            data-testid="CreateNewUsernameBtnSubmition"
             className="mt-2 w-4/6 rounded bg-green-300 py-2 px-2 text-xl font-semibold text-gray-800 outline-none  
           transition hover:bg-green-200 focus:ring-4 focus:ring-green-200 focus:ring-offset-2"
             disabled={!isValid}
@@ -270,10 +298,21 @@ function UsernameForm() {
 function UsernameMessage({ username, isValid, loading }) {
   if (loading) return <p className="mt-1">Checking...</p>;
   if (isValid)
-    return <p className="mt-1 text-green-500">{username} is available!</p>;
+    return (
+      <p
+        data-testid="CreateUsernameStatusDebug"
+        className="mt-1 text-green-500"
+      >
+        {username} is available!
+      </p>
+    );
   if (username && !isValid)
-    return <p className="mt-1 text-red-500">That username is taken!</p>;
-  return <p></p>;
+    return (
+      <p data-testid="CreateUsernameStatusDebug" className="mt-1 text-red-500">
+        That username is taken!
+      </p>
+    );
+  return <p data-testid="CreateUsernameStatusDebug"></p>;
 }
 
 export default SignUpPage;

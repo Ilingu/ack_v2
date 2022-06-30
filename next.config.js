@@ -8,6 +8,7 @@ module.exports = withPWA({
       "lh3.googleusercontent.com", // Google
       "avatars.githubusercontent.com", // Github
       "pbs.twimg.com", // Twitter
+      "ui-avatars.com", // Avatar Placeholder
     ],
   },
   pwa: {
