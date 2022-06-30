@@ -8,7 +8,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - run: npm ci # Installing dependencies
+
+      - name: Install Npm Dependencies
+        run: npm ci # Installing dependencies
+
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:
