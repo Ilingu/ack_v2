@@ -49,6 +49,7 @@ const WatchPage: NextPage = () => {
     NewEpisodeAvailable,
     NextEpisodesReleaseDate,
     broadcast,
+    Airing,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
   useEffect(() => {
@@ -179,7 +180,7 @@ const WatchPage: NextPage = () => {
                       NineAnimeUrl,
                       NextEpisodesReleaseDate,
                       Duration: parseInt(duration.split(" ")[0]),
-                      broadcast: broadcast || null,
+                      broadcast: Airing && (broadcast || null),
                     }}
                     setFocusMode={setFocusMode}
                   />

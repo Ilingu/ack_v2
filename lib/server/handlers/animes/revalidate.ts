@@ -35,7 +35,7 @@ export default async function revalidateAnime(
     if ((AnimeData?.NextRefresh || 0) > Date.now())
       return ThrowError("BAD_REQUEST", "Anime is not expire"); // ❌
 
-    await res.unstable_revalidate(`/anime/${AnimeID}`);
+    await res.revalidate(`/anime/${AnimeID}`);
     return true; // ✅
   } catch (err) {
     console.error("Error on api route '/deleteUser'", err);
