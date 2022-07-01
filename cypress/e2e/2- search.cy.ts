@@ -16,7 +16,7 @@ describe("Search Interaction", () => {
       cy.get('[data-testid="SearchAnimeInput"]')
         .type(`{selectAll}{backspace}${title}`)
         .should("have.value", title);
-      cy.wait(605);
+      cy.wait(605); // Debounce Time
       cy.get('[data-testid="ResultFoundTitle"]').contains(
         `"${title.trim().toLowerCase()}"`
       );
@@ -35,9 +35,9 @@ describe("Search Interaction", () => {
         .type(`{selectAll}{backspace}${title}`)
         .should("have.value", title);
 
-      cy.wait(600);
+      cy.wait(600); // Debounce Time
       cy.get('[data-testid="GlobalSearchBtn"]').click();
-      cy.wait(500);
+      cy.wait(500); // Cypress don't wait the render -_-
 
       cy.get('[data-testid="ResultFoundTitle"]').contains(
         `"${title.trim().toLowerCase()}"`

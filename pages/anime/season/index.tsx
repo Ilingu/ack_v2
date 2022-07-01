@@ -10,7 +10,11 @@ import Link from "next/link";
 import debounce from "lodash.debounce";
 import { GetStaticProps, NextPage } from "next";
 // Types
-import { IsError, Return404 } from "../../../lib/utils/UtilsFunc";
+import {
+  IsEmptyString,
+  IsError,
+  Return404,
+} from "../../../lib/utils/UtilsFunc";
 import {
   callApi,
   JikanApiToSeasonAnimeShape,
@@ -25,6 +29,7 @@ import type {
 import type { TheFourSeason } from "../../../lib/utils/types/types";
 import { TheFourSeasonEnum } from "../../../lib/utils/types/enums";
 // UI
+import toast from "react-hot-toast";
 import {
   FaCalendarAlt,
   FaExternalLinkAlt,
@@ -76,7 +81,7 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     const season = WhitchSeason();
 
     if (season === "winter" && m === 12) y++;
-    return y.toString();
+    return y;
   });
   const [Loading, setLoading] = useState(false);
   const SkipFirstCallbackInstance = useRef(true);
@@ -96,33 +101,40 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
     setRenderedSeasonAnime(JSXElems);
   };
 
-  const GetSeason = async (year: string, season: TheFourSeason) => {
+  const GetSeason = async (year: number, season: TheFourSeason) => {
+    if (isNaN(year) || year < 1990 || year > 2105 || IsEmptyString(season))
+      return toast.error("Invalid Season") as unknown as void;
+    setLoading(true);
+
     try {
-      setLoading(true);
-      UpComingAnime.current = false;
       const { success, data: seasonAnimeFetch } =
         await callApi<JikanApiResSeasonRoot>(
           `https://api.jikan.moe/v4/seasons/${year}/${season}`
         );
+
       if (!success || IsError(seasonAnimeFetch as unknown as JikanApiERROR))
         return;
 
+      UpComingAnime.current = false;
       setSeasonAnimes(seasonAnimeFetch.data.slice(0, 50));
-      setLoading(false);
     } catch (err) {
+      toast.error("Cannot fetch this season");
       console.error(err);
     }
+    setLoading(false);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const CheckFinishChoosing = useCallback(
-    debounce((y: string, season: TheFourSeason) => {
+    debounce((y: number, season: TheFourSeason) => {
       if (SkipFirstCallbackInstance.current) {
         SkipFirstCallbackInstance.current = false;
         return;
       }
+
+      if (isNaN(y) || y < 1990 || y > 2105) return;
       GetSeason(y, season);
-    }, 2000),
+    }, 1000),
     []
   );
 
@@ -149,7 +161,11 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
           ) : (
             <Fragment>
               <span className="text-primary-main capitalize">{Season}</span>
-              &apos;s <span className="text-primary-main"> {Year}</span> animes
+              &apos;s{" "}
+              <span className="text-primary-main">
+                {Year || new Date().getFullYear().toString()}
+              </span>{" "}
+              animes
             </Fragment>
           )}
         </h1>
@@ -159,19 +175,19 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
         >
           <input
             type="number"
-            value={Year}
-            onChange={(e) => {
-              const val = e.target.valueAsNumber;
-              if (val < 1990 || isNaN(val)) return;
-              setYear(val.toString());
-            }}
+            data-testid="SeasonYearInput"
+            value={Year.toString()}
+            onChange={(e) => setYear(e?.target?.valueAsNumber || NaN)}
             min="1990"
+            max="2105" /* If this site goes further than that, first congratulation, second change this because this site is now broken */
             className="bg-bgi-black text-headline focus:ring-primary-main mr-2 rounded-md py-2 px-1 text-center font-semibold shadow-lg outline-none
              transition focus:ring-2"
             placeholder="Year"
+            required
           />
           <select
             value={Season}
+            data-testid="SeasonSeasonSelect"
             onChange={(e) => setSeason(e.target.value as TheFourSeason)}
             placeholder="Season"
             className="bg-bgi-black text-headline focus:ring-primary-main mr-2 w-52 rounded-md py-2 px-1 text-center font-semibold capitalize shadow-lg outline-none
@@ -191,15 +207,19 @@ const SeasonAnimes: NextPage<SeasonAnimesProps> = ({ seasonAnimesISR }) => {
             </option>
           </select>
           <button
-            className="bg-primary-whiter text-headline focus:ring-primary-darker flex h-9 w-9 items-center justify-center rounded-lg py-2 px-1 outline-none transition-all focus:ring-2"
+            data-testid="SeasonBtnSubmition"
             onClick={() => GetSeason(Year, Season)}
+            className="bg-primary-whiter text-headline focus:ring-primary-darker flex h-9 w-9 items-center justify-center rounded-lg py-2 px-1 outline-none transition-all focus:ring-2"
           >
             <FaSync className={`${Loading ? "animate-spin" : ""}`} />
           </button>
         </form>
         <Divider />
       </header>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6">
+      <div
+        data-testid="SeasonAnimesFound"
+        className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6"
+      >
         {RenderedSeasonAnime}
       </div>
     </div>
