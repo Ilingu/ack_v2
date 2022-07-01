@@ -19,10 +19,14 @@ describe("Season Interaction", () => {
     return SeasonArr[Math.round(Math.random() * (SeasonArr.length - 1))];
   };
 
+  beforeEach(() => {
+    if (Cypress.currentTest.title === "Should Login") return;
+    VisitWithLoginCheck("/anime/season");
+  });
+
   it("Should Login", LoginWithCypress);
 
   it("Should Have Upcoming and Current Animes Season", () => {
-    VisitWithLoginCheck("/anime/season");
     CheckResult();
 
     cy.get('[data-testid="SeasonBtnSubmition"]').click();
@@ -30,8 +34,6 @@ describe("Season Interaction", () => {
   });
 
   it("Should Pick a Previous Year Season", () => {
-    VisitWithLoginCheck("/anime/season");
-
     cy.get('[data-testid="SeasonYearInput"]')
       .type(`{selectAll}{backspace}${new Date().getFullYear() - 1}`)
       .should("have.value", `${new Date().getFullYear() - 1}`);
@@ -45,8 +47,6 @@ describe("Season Interaction", () => {
   type SeasonNum = { [season in TheFourSeason]: number };
   type NumSeason = { [num: number]: string };
   it("Should Pick Next Season", () => {
-    VisitWithLoginCheck("/anime/season");
-
     const SeasonToNum: SeasonNum = {
       spring: 0,
       summer: 1,

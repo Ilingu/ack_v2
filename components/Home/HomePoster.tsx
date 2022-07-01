@@ -514,7 +514,7 @@ const HomePoster: FC = () => {
         SearchGroup={SearchGroup}
       />
 
-      <div className="relative w-10/12">
+      <div className="relative w-10/12" data-testid="HomeAnimesListContainer">
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
@@ -723,7 +723,10 @@ function AnimePosterComponent({
     return <a className="text-xl font-bold text-red-300">💢 No animes</a>;
 
   return (
-    <div className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5">
+    <div
+      data-testid="HomeAnimesList"
+      className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5"
+    >
       {AnimeRenderedElements}
     </div>
   );

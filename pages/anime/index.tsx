@@ -260,7 +260,10 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
         </h1>
       )}
       {animeFound && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-7">
+        <div
+          data-testid="SearchAnimesFoundList"
+          className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-7"
+        >
           <SearchPosterContext.Provider value={{ reqTitle }}>
             <AnimePoster AnimeToTransform={animeFound} />
           </SearchPosterContext.Provider>

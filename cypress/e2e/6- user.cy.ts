@@ -1,9 +1,5 @@
 import { LoginWithCypress } from "../support/e2e";
 
-describe("Anime Interaction", () => {
-  // /watch
-});
-
 describe("User Interaction", () => {
   const RenameUsername = (NewUsername: string) => {
     cy.visit("/settings");
@@ -15,9 +11,9 @@ describe("User Interaction", () => {
     cy.get('[data-testid="UserUsername"]').contains(NewUsername);
   };
 
-  it("Rename Username", () => {
-    LoginWithCypress();
+  it("Should Login", LoginWithCypress);
 
+  it("Rename Username", () => {
     RenameUsername("testaccount"); // Change 1
     RenameUsername("ilingutest"); // Change 2
   });

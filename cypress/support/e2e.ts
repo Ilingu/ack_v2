@@ -132,5 +132,13 @@ export enum TheFourSeasonEnum {
   SUMMER = "summer",
   FALL = "fall",
 }
+export enum AnimeWatchType {
+  UNWATCHED = "unwatched",
+  WATCHED = "watched",
+  WATCHING = "watching",
+  WANT_TO_WATCH = "want_to_watch",
+  WONT_WATCH = "wont_watch",
+  DROPPED = "dropped",
+}
 type TestingAnimes = { title: string; found: boolean };
 export type TheFourSeason = "winter" | "spring" | "summer" | "fall";
