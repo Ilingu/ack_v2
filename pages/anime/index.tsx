@@ -206,6 +206,7 @@ function FormInput({ Submit }: FormInputProps) {
       </h1>
       <input
         type="text"
+        data-testid="SearchAnimeInput"
         ref={SearchInputRef}
         placeholder="Bungo Stray Dogs"
         className="bg-bgi-darker text-headline focus:ring-primary-whiter h-16 w-11/12 rounded-md px-2 text-center text-2xl font-semibold outline-none transition focus:ring-2 xl:w-2/3"
@@ -227,6 +228,7 @@ function FormInput({ Submit }: FormInputProps) {
         </span>{" "}
         <span
           onClick={() => Submit(title.trim().toLowerCase(), true)}
+          data-testid="GlobalSearchBtn"
           className="text-primary-whiter hover:text-primary-main cursor-pointer text-lg transition hover:underline"
         >
           Chercher Globalement <FaGlobe className="icon text-thirdly" />
@@ -243,8 +245,10 @@ function AnimeFoundList({ animeFound, reqTitle, Submit }: AnimeFoundListProps) {
       {reqTitle && (
         <h1 className="text-headline mt-4 text-2xl font-semibold">
           Résultats pour{" "}
-          <span className="text-primary-main">&quot;{reqTitle}&quot;</span> (
-          {animeFound?.length})
+          <span data-testid="ResultFoundTitle" className="text-primary-main">
+            &quot;{reqTitle}&quot;
+          </span>{" "}
+          (<span data-testid="ResultFoundNumber">{animeFound?.length}</span>)
           {animeFound?.length > 0 || (
             <p
               onClick={() => Submit(reqTitle.trim().toLowerCase(), true)}

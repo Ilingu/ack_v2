@@ -16,7 +16,7 @@ export default function offlinePage() {
         ✨
       </h2>
       <Image
-        src="/Assets/9animeLogo.png"
+        src="/Assets/NoInternet.gif"
         alt="No Internet Gif"
         width="480"
         height="270"

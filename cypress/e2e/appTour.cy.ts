@@ -1,18 +1,7 @@
-export const LoginWithCypress = () => {
-  cy.visit("/sign-up");
-  cy.contains("Sign In/Up");
-  cy.get('[data-testid="LoginWithGithub"]').click();
-  cy.wait(2000);
-};
-
-export const LogoutWithCypress = () => {
-  cy.visit("/sign-up");
-  cy.contains("Already Sign-in!");
-  cy.get('[data-testid="SignOutLoginPage"]').click();
-};
+import { LoginWithCypress, LogoutWithCypress } from "../support/e2e";
 
 describe("User Login/Logout", () => {
-  it("Should Login", () => {
+  it("Should Create Account", () => {
     let NavLoginBtn = null;
 
     // Testing Path To Go to Login Page
@@ -52,6 +41,12 @@ describe("User Login/Logout", () => {
     cy.get('[data-testid="AuthFailed"]').contains("You must be signed in!");
     cy.get('[data-testid="Nav-Login-Btn"]').contains("Get Started Now");
   });
+});
+
+describe("Season Interaction", () => {});
+
+describe("Anime Interaction", () => {
+  // /watch
 });
 
 describe("User Interaction", () => {
