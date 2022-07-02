@@ -140,5 +140,13 @@ export enum AnimeWatchType {
   WONT_WATCH = "wont_watch",
   DROPPED = "dropped",
 }
+export enum AnimeWatchTypeDisplayable {
+  WATCHED = "watched",
+  WATCHING = "watching",
+  WANT_TO_WATCH = "want_to_watch",
+  DROPPED = "dropped",
+  ALL = "all",
+  FAV = "favorite",
+}
 type TestingAnimes = { title: string; found: boolean };
 export type TheFourSeason = "winter" | "spring" | "summer" | "fall";

@@ -24,10 +24,18 @@ const HandleInput: FC<HandleInputProps> = ({
         onChange={(e) => setValue(e.target.value)}
         className="text-headline focus:ring-primary-main h-full w-[90%] rounded-l-md bg-black text-center font-semibold outline-none transition-all focus:ring-2 sm:text-lg"
         placeholder={placeholder}
+        data-testid={
+          className.includes("search") ? "HomeSearchInput" : "HomeAddGroupInput"
+        }
       />
       <button
         type="submit"
         className="text-headline focus:ring-primary-main h-full -translate-y-px rounded-r-md bg-black px-2 font-semibold outline-none transition-all focus:ring-2"
+        data-testid={
+          className.includes("search")
+            ? "HomeSearchSubmitionBtn"
+            : "HomeAddGroupSubmitionBtn"
+        }
         title={
           className.includes("search")
             ? "Search"

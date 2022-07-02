@@ -31,6 +31,7 @@ import { db } from "../../lib/firebase/firebase";
 import {
   copyToClipboard,
   filterUserAnime,
+  IsEmptyString,
   removeDuplicates,
   shuffleArray,
 } from "../../lib/utils/UtilsFunc";
@@ -82,28 +83,19 @@ interface GroupFormInputProps {
 }
 interface HomeGroupItemPosterProp {
   GroupData: UserGroupPosterShape;
-  setSelectedGroup: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      data: UserGroupPosterShape;
-    }>
-  >;
+  setSelectedGroup: React.Dispatch<React.SetStateAction<string>>;
 }
 interface AnimePosterComponentProps {
   AnimeRenderedElements: JSX.Element[];
 }
 interface GroupComponentProps {
   GroupRenderedElements: JSX.Element[];
-  selectedGroupName: {
+  selectedGroup: {
     name: string;
     data: UserGroupPosterShape;
   };
-  setSelectedGroup: React.Dispatch<
-    React.SetStateAction<{
-      name: string;
-      data: UserGroupPosterShape;
-    }>
-  >;
+  setSelectedGroup: React.Dispatch<React.SetStateAction<string>>;
+
   ToggleGroup: (
     id: string,
     method: "ADD" | "DELETE" | "DELETE_DB",
@@ -146,13 +138,7 @@ const HomePoster: FC = () => {
   );
 
   // Group
-  const [selectedGroupName, setSelectedGroup] = useState<{
-    name: string;
-    data: UserGroupPosterShape;
-  }>({
-    name: null,
-    data: null,
-  });
+  const [selectedGroupName, setSelectedGroup] = useState<string>(null);
 
   /* EFFECT */
   // LocalHost
@@ -229,6 +215,31 @@ const HomePoster: FC = () => {
     [GlobalAnime, filteredUserAnime]
   );
 
+  const TransformToPosterGroupData = useCallback(
+    ({ GroupAnimesId, GroupName }: UserGroupShape): UserGroupPosterShape => {
+      const FilteredAnimesForGroup = AnimesHomePostersData.filter(
+        ({ AnimeId }) => {
+          let Pass = false;
+
+          GroupAnimesId.forEach((GroupAnimeId) => {
+            if (AnimeId.toString() === GroupAnimeId) Pass = true;
+          });
+          return Pass;
+        }
+      );
+      return { GroupName, Animes: FilteredAnimesForGroup };
+    },
+    [AnimesHomePostersData]
+  );
+
+  const SelectedGroupData = useMemo(() => {
+    if (IsEmptyString(selectedGroupName) || UserGroups.length <= 0) return null;
+    const GroupData = UserGroups.find(
+      ({ GroupName }) => GroupName === selectedGroupName
+    );
+    return TransformToPosterGroupData(GroupData);
+  }, [selectedGroupName, UserGroups, TransformToPosterGroupData]);
+
   /* RENDER */
   const GroupRender = () => {
     // Group Render
@@ -265,23 +276,6 @@ const HomePoster: FC = () => {
         }
       });
     }
-
-    const TransformToPosterGroupData = ({
-      GroupAnimesId,
-      GroupName,
-    }: UserGroupShape): UserGroupPosterShape => {
-      const FilteredAnimesForGroup = AnimesHomePostersData.filter(
-        ({ AnimeId }) => {
-          let Pass = false;
-
-          GroupAnimesId.forEach((GroupAnimeId) => {
-            if (AnimeId.toString() === GroupAnimeId) Pass = true;
-          });
-          return Pass;
-        }
-      );
-      return { GroupName, Animes: FilteredAnimesForGroup };
-    };
 
     const GroupsPosterJSX = GroupsElementsOrder.current.map(
       (GroupNameId, i) => {
@@ -451,11 +445,11 @@ const HomePoster: FC = () => {
       const SafeGrName = encodeURI(kebabCase(GrName));
       try {
         if (!SafeGrName || SafeGrName.trim().length <= 0) throw new Error();
+        setSelectedGroup(null);
 
         const GroupRef = doc(doc(db, "users", user.uid), "groups", SafeGrName);
         await deleteDoc(GroupRef);
 
-        setSelectedGroup(null);
         toast.success("Group successfully deleted");
       } catch (err) {
         toast.error("Couldn't delete this group");
@@ -518,7 +512,7 @@ const HomePoster: FC = () => {
         {HomeDisplayType === HomeDisplayTypeEnum.GROUP ? (
           <GroupComponent
             GroupRenderedElements={GroupRenderedElements}
-            selectedGroupName={selectedGroupName}
+            selectedGroup={{ name: selectedGroupName, data: SelectedGroupData }}
             setSelectedGroup={setSelectedGroup}
             ToggleGroup={ToggleGroup}
             DeleteGroup={DeleteGroup}
@@ -542,6 +536,7 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
           " decoration-primary-darker text-headline"
         }`}
+        data-testid="HomeSwitchToBookmarks"
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
           setHomeDisplayType(HomeDisplayTypeEnum.ANIMES)
@@ -557,7 +552,7 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
           {HomeDisplayType === HomeDisplayTypeEnum.ANIMES && (
             <FaBookmark className="icon animate-fadeIn" />
           )}{" "}
-          Bookmark
+          Bookmarks
         </span>
       </h1>
       <VerticalDivider />
@@ -568,6 +563,7 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
           " decoration-primary-darker text-headline"
         }`}
+        data-testid="HomeSwitchToCollections"
         onClick={() =>
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
           setHomeDisplayType(HomeDisplayTypeEnum.GROUP)
@@ -583,7 +579,7 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
           {HomeDisplayType === HomeDisplayTypeEnum.GROUP && (
             <BsFillCollectionFill className="icon animate-fadeIn" />
           )}{" "}
-          Collection
+          Collections
         </span>
       </h1>
     </header>
@@ -658,10 +654,7 @@ function GroupFormInput({
           placeholder="Name of group"
         />
         {GroupsMatch && (
-          <div
-            className="text-primary-whitest z-10 mb-3 w-80 cursor-pointer rounded-md bg-slate-800 p-0.5 text-center font-semibold capitalize 
-          outline-none sm:w-96 xl:absolute xl:top-8 xl:left-2"
-          >
+          <div className="text-primary-whitest z-10 mb-3 w-80 cursor-pointer rounded-md bg-slate-800 p-0.5 text-center font-semibold outline-none">
             {GroupsMatch.map((text) => (
               <p
                 key={text}
@@ -733,7 +726,7 @@ function AnimePosterComponent({
 }
 
 function GroupComponent({
-  selectedGroupName,
+  selectedGroup,
   setSelectedGroup,
   GroupRenderedElements,
   ToggleGroup,
@@ -741,19 +734,22 @@ function GroupComponent({
 }: GroupComponentProps) {
   return (
     <Fragment>
-      <div className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5">
+      <div
+        className="grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5"
+        data-testid="HomeGroupsList"
+      >
         {GroupRenderedElements}
       </div>
 
       <div className="absolute top-0 left-1/2 w-9/12 -translate-x-1/2">
-        {selectedGroupName?.name && (
+        {selectedGroup?.name && (
           <div
             className="animate-fadeIn bg-bgi-darker flex cursor-pointer flex-col 
           rounded-lg bg-opacity-90 p-2"
           >
             <h1 className="text-headline text-center text-2xl font-bold capitalize">
               <span className="text-primary-main">
-                {selectedGroupName.data.GroupName}
+                {selectedGroup?.data?.GroupName}
               </span>{" "}
               Group
             </h1>
@@ -766,18 +762,22 @@ function GroupComponent({
             <button
               className="text-headline absolute top-0 left-2 text-3xl transition-all hover:text-red-500"
               title="Delete this group"
-              onClick={() => DeleteGroup(selectedGroupName?.name)}
+              data-testid="HomeDeleteSelectedGroup"
+              onClick={() => DeleteGroup(selectedGroup?.name)}
             >
               <FaTrashAlt className="icon" />
             </button>
-            <div className="mt-3 grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-              {selectedGroupName.data.Animes.map((AnimeData, i) => (
+            <div
+              className="mt-3 grid grid-cols-1 justify-items-center gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4"
+              data-testid="HomeSelectedGroupAnimesList"
+            >
+              {selectedGroup?.data?.Animes?.map((AnimeData, i) => (
                 <AnimeItemPoster
                   key={AnimeData?.AnimeId || i}
                   AnimeData={AnimeData}
                   RenderType="groupList"
                   ToggleGroup={ToggleGroup}
-                  NameOfGroup={selectedGroupName.name}
+                  NameOfGroup={selectedGroup?.name}
                 />
               ))}
             </div>
@@ -812,6 +812,7 @@ function AnimeItemPoster({
       onClick={() => ToggleGroup(AnimeId.toString(), "ADD")}
       className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-green-400"
       title="Add to collection"
+      data-testid="HomeAddToGroup"
     >
       <FaPlus className="icon" />
     </div>
@@ -826,6 +827,7 @@ function AnimeItemPoster({
         ToggleGroup(AnimeId.toString(), "DELETE");
       }}
       className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-red-500"
+      data-testid="HomeRemoveFromGroup"
     >
       <FaMinus className="icon" />
     </div>
@@ -917,7 +919,7 @@ function GroupItemPoster({
       className="bg-bgi-whiter grid h-80 w-52 cursor-pointer grid-rows-6 rounded-lg"
       onClick={() => {
         scrollTo(0, 80);
-        setSelectedGroup({ name: GroupData.GroupName, data: GroupData });
+        setSelectedGroup(GroupData.GroupName);
       }}
     >
       <div className="row-span-5 grid grid-cols-2">

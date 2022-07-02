@@ -352,13 +352,15 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
         <h1 className="text-headline mb-8 text-4xl font-bold tracking-wider">
           Trailer:
         </h1>
-        <iframe
-          className="ring-primary-main sm:w-iframe-w sm:h-iframe-h rounded-xl ring-4"
-          src={trailer_url}
-          title="YouTube video player"
-          frameBorder="0"
-          allowFullScreen
-        ></iframe>
+        {process.env.NODE_ENV === "production" && (
+          <iframe
+            className="ring-primary-main sm:w-iframe-w sm:h-iframe-h rounded-xl ring-4"
+            src={trailer_url}
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        )}
       </section>
       {/* Episodes */}
       {EpisodesData && (
