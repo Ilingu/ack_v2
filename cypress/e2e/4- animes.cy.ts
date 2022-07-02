@@ -72,7 +72,7 @@ describe("Animes Interaction", () => {
     cy.get('[data-testid="HomeAnimesListContainer"]')
       .should("not.have.text", "You have 0 animes")
       .should("not.have.text", "No animes"); // Check that we now have some animes
-    cy.get('[data-testid="HomeAnimesList"]', { timeout: 10000 })
+    cy.get('[data-testid="HomeAnimesList"]')
       .children()
       .should("have.length", 2); // Check that we now have the 2 previously added animes
     for (const animeTitle of FiveAnimesToAdd) {
@@ -155,7 +155,7 @@ describe("Animes Interaction", () => {
       });
       cy.get("@hrefPath").then((hrefPath) => {
         cy.url().should("include", hrefPath);
-        cy.get('[data-testid="MyAnimesSelectType"]', { timeout: 10000 })
+        cy.get('[data-testid="MyAnimesSelectType"]')
           .should("not.have.value", TypeWatch)
           .select(TypeWatch); // Change status type to the testing one
         cy.wait(2000); // Cypress sucks
