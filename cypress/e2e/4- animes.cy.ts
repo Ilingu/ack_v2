@@ -139,7 +139,7 @@ describe("Animes Interaction", () => {
     VisitWithLoginCheck("/");
     cy.get('[data-testid="HomeAnimesList"]')
       .children()
-      .should("have.length", 1); // Check thta at least 1 anime is present
+      .should("have.length", 1); // Check that at least 1 anime is present
 
     const { WATCHED, WATCHING, WANT_TO_WATCH, DROPPED } = AnimeWatchType;
     const TestTypeArr = [WATCHED, WANT_TO_WATCH, DROPPED, WATCHING];
@@ -155,7 +155,7 @@ describe("Animes Interaction", () => {
       });
       cy.get("@hrefPath").then((hrefPath) => {
         cy.url().should("include", hrefPath);
-        cy.get('[data-testid="MyAnimesSelectType"]')
+        cy.get('[data-testid="MyAnimesSelectType"]', { timeout: 10000 })
           .should("not.have.value", TypeWatch)
           .select(TypeWatch); // Change status type to the testing one
         cy.wait(2000); // Cypress sucks
@@ -232,5 +232,10 @@ describe("Animes Interaction", () => {
     cy.get('[data-testid="HomeGroupsList"] > div').click();
     cy.get('[data-testid="HomeSelectedGroupAnimesList"]').should("exist");
     cy.get('[data-testid="HomeDeleteSelectedGroup"]').click();
+
+    cy.wait(500);
+    cy.get('[data-testid="HomeGroupsList"]')
+      .children()
+      .should("have.length", 0);
   });
 });

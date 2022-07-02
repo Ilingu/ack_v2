@@ -182,6 +182,7 @@ const FocusMode: FC<FocusModeProps> = ({
         </button>
         <button
           onClick={UpdateUserAnimeProgress}
+          data-testid="FocusModeNextEpBtn"
           data-hotkey="ArrowRight"
           className="text-headline bg-bgi-black hover:text-primary-whiter hover:ring-primary-main rounded-full p-4 text-5xl 
         transition-all hover:ring-2"

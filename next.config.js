@@ -1,7 +1,11 @@
 const withPWA = require("next-pwa");
 const runtimeCaching = require("next-pwa/cache");
 
-module.exports = withPWA({
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
+  reactStrictMode: true,
   images: {
     domains: [
       "cdn.myanimelist.net", // Anime Poster
@@ -11,6 +15,16 @@ module.exports = withPWA({
       "ui-avatars.com", // Avatar Placeholder
     ],
   },
+  compiler:
+    process.env.NODE_ENV === "production"
+      ? {
+          reactRemoveProperties: { properties: ["^data-testid$"] },
+          removeConsole: { exclude: ["warn", "error"] },
+        }
+      : undefined,
+};
+
+module.exports = withPWA({
   pwa: {
     dest: "public",
     register: true,
@@ -18,9 +32,9 @@ module.exports = withPWA({
     runtimeCaching,
     buildExcludes: [/middleware-manifest\.json$/],
   },
-  reactStrictMode: true,
   fallbacks: {
     image: "/favicon.ico",
     video: "/NoInternet.gif",
   },
+  ...nextConfig,
 });

@@ -208,7 +208,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       const success = await RevalidateAnimeMut.mutateAsync(AnimeID);
 
       if (!success) console.error(`Cannot Revalidate ${AnimeID}`);
-      else console.log(`${AnimeID} revalidated with success`);
+      else console.warn(`${AnimeID} revalidated with success`);
     } catch (err) {
       console.error(`Cannot Revalidate ${AnimeID}`);
     }

@@ -62,7 +62,7 @@ export async function callApi<T = any>(
  */
 export const GetAnimesDatasByIds = async (AnimesIds: number[]) => {
   if (AnimesIds.length <= 0) return null;
-  console.log("FB Query, Elements length:", AnimesIds.length);
+  console.warn("FB Query, Elements length:", AnimesIds.length);
 
   try {
     const QAnimesDocs = await Promise.all(
@@ -365,7 +365,7 @@ export const CheckNewEpisodeData = (
 export const GetLastReleasedAnimeEp = (): Promise<
   AdkamiLastReleasedEpisodeShape[]
 > => {
-  console.log("Brute Force 'GetLastReleasedAnimeEp' Called");
+  console.warn("Brute Force 'GetLastReleasedAnimeEp' Called");
   const fetchData = async (): Promise<
     AdkamiLastReleasedEpisodeShape[] | false
   > => {

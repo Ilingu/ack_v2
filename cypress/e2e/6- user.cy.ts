@@ -1,8 +1,8 @@
-import { LoginWithCypress } from "../support/e2e";
+import { LoginWithCypress, VisitWithLoginCheck } from "../support/e2e";
 
 describe("User Interaction", () => {
   const RenameUsername = (NewUsername: string) => {
-    cy.visit("/settings");
+    VisitWithLoginCheck("/settings");
     cy.get('[data-testid="RenameUsernameInput"]')
       .type(`{selectAll}{backspace}${NewUsername}`)
       .should("have.value", NewUsername);
@@ -19,7 +19,7 @@ describe("User Interaction", () => {
   });
 
   it("Delete User", () => {
-    cy.visit("/settings");
+    VisitWithLoginCheck("/settings");
     cy.get('[data-testid="DeleteUserBtn"]').dblclick();
     cy.wait(11000);
 

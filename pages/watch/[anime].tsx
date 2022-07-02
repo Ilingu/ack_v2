@@ -99,6 +99,7 @@ const WatchPage: NextPage = () => {
           {/* Banner */}
           <div
             className="from-bgi-darker absolute -z-10 h-80 w-full bg-gradient-to-t bg-cover bg-fixed bg-center bg-no-repeat object-cover opacity-80 blur-sm"
+            data-testid="WatchBanner"
             style={{
               backgroundImage: `url("${photoPath.split(".jpg")[0] + "l.jpg"}")`,
             }}
@@ -116,9 +117,10 @@ const WatchPage: NextPage = () => {
                       height={283}
                       className="rounded-lg object-cover"
                       placeholder="blur"
+                      data-testid="WatchImgPoster"
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
                     />
-                    {!!NewEpisodeAvailable && (
+                    {NewEpisodeAvailable && (
                       <div className="text-headline bg-primary-darker  absolute top-0 rounded-md px-3 py-1 text-lg font-bold tracking-wide">
                         NEW
                       </div>
@@ -131,7 +133,7 @@ const WatchPage: NextPage = () => {
                 <h1
                   id="WatchBigTitle"
                   className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl ${
-                    !!NewEpisodeAvailable ? "text-indigo-50" : "text-headline"
+                    NewEpisodeAvailable ? "text-indigo-50" : "text-headline"
                   } h-full font-extrabold tracking-wider`}
                 >
                   {title.slice(0, 20)}
@@ -143,6 +145,7 @@ const WatchPage: NextPage = () => {
               <div className="gta-buttons flex flex-wrap justify-center gap-x-4 gap-y-2 lg:ml-20 lg:-mt-20 2xl:-ml-20">
                 <button
                   onClick={() => setFocusMode(true)}
+                  data-testid="WatchActivateFocusModeBtn"
                   className="shadow-primary-darker bg-primary-main text-headline h-14 w-14 rounded-md text-xl shadow-md 
                   outline-none"
                 >

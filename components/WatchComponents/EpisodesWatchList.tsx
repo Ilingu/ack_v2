@@ -64,7 +64,8 @@ type HTMLElementEvent<T extends HTMLElement> = Event & {
 
 /* FUNC */
 let GlobalAnimeId: string;
-const DecrementExtraEpisode = async () => {
+const AddExtraEpisode = async (NoOfEpsToAdd: number) => {
+  if (NoOfEpsToAdd <= 0) return;
   try {
     const AnimeRef = doc(
       doc(db, "users", auth.currentUser.uid),
@@ -73,12 +74,30 @@ const DecrementExtraEpisode = async () => {
     );
 
     await updateDoc(AnimeRef, {
-      ExtraEpisodes: increment(-1),
+      ExtraEpisodes: increment(NoOfEpsToAdd),
     });
 
-    toast.success("Deleted!", { duration: 500 });
+    toast.success(`${NoOfEpsToAdd} eps added!`);
   } catch (err) {
-    toast.error("Error, cannot execute this action.");
+    toast.error(`Error, cannot add ${NoOfEpsToAdd} extra eps.`);
+  }
+};
+
+const DecrementExtraEpisode = async (_: any, del = false) => {
+  try {
+    const AnimeRef = doc(
+      doc(db, "users", auth.currentUser.uid),
+      "animes",
+      GlobalAnimeId
+    );
+
+    await updateDoc(AnimeRef, {
+      ExtraEpisodes: del ? deleteField() : increment(-1),
+    });
+
+    !del && toast.success("Deleted!", { duration: 500 });
+  } catch (err) {
+    toast.error("Error, cannot delete this extra ep.");
   }
 };
 
@@ -118,84 +137,76 @@ const EpsPoster: FC<EpsPosterProps> = ({
     return NextEpReleaseDateTimestamp;
   }, [broadcast]);
 
-  useEffect(() => {
-    GlobalAnimeId = AnimeId.toString();
-  }, [AnimeId]);
-
-  useEffect(
-    () => {
-      // Data
-      const EpsData: UserExtraEpisodesShape[] = [
-        ...(EpisodesData || []),
-        ...(GenerateExtraEp || []),
-      ];
-      const FilteredEpsData = (
-        SortOrder === "ascending" ? [...EpsData].reverse() : EpsData
-      ).slice(0, LoadAll ? EpsData.length : 30);
-
-      // Required For Render
-      const ProgressToObj =
-        (Progress &&
-          Progress.reduce((a, Ep_ID) => ({ ...a, [Ep_ID]: Ep_ID }), {})) ||
-        null;
-      let NextEp = null;
-      let NoWatched = 0;
-
-      // Render
-      const JSXElems = FilteredEpsData.map((epData, i) => {
-        let watched = true;
-        if (
-          !Progress ||
-          (Progress && Progress[0] !== -2811 && !ProgressToObj[epData.mal_id])
-        ) {
-          watched = false;
-          !NextEp && (NextEp = epData.mal_id);
-        }
-        watched && NoWatched++;
-
-        return (
-          <EpsPosterItem
-            key={i}
-            ExtraData={{
-              NineAnimeEpUrl:
-                NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`,
-              ReleaseDate:
-                NextEpisodesReleaseDate && NextEpisodesReleaseDate[i],
-            }}
-            EpisodeData={epData}
-            watched={watched}
-            UpdateUserAnimeProgress={UpdateUserAnimeProgress}
-          />
-        );
-      });
-      if (Progress && Progress[0] === -2811) NoWatched = EpisodesLength;
-
-      setNextEp(NextEp);
-      setNoWatchedEp(NoWatched);
-
-      setNewRender(JSXElems);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [EpisodesData, Progress, WatchType, SortOrder, LoadAll]
-  );
-
-  /* FUNC */
-  const GenerateExtraEp = useMemo(
-    (): UserExtraEpisodesShape[] =>
-      Array(ExtraEpisodes || 0)
-        .fill(null)
-        .map((_: null, i) => ({
-          mal_id: i + 1 + EpisodesData.length,
-          isExtra: true,
-        })),
-    [EpisodesData.length, ExtraEpisodes]
-  );
+  const GenerateExtraEp = useMemo((): UserExtraEpisodesShape[] => {
+    if (!ExtraEpisodes || ExtraEpisodes <= 0) return [];
+    return Array(ExtraEpisodes || 0)
+      .fill(null)
+      .map((_: null, i) => ({
+        mal_id: i + 1 + EpisodesData?.length,
+        isExtra: true,
+      }));
+  }, [EpisodesData.length, ExtraEpisodes]);
 
   const GetAnimeRef = useMemo(
     () =>
       doc(doc(db, "users", auth.currentUser.uid), "animes", AnimeId.toString()),
     [AnimeId]
   );
+
+  /* FUNC */
+  const RenderEpisodes = () => {
+    // Data
+    const EpsData: UserExtraEpisodesShape[] = [
+      ...(EpisodesData || []),
+      ...(GenerateExtraEp || []),
+    ];
+    const FilteredEpsData = (
+      SortOrder === "ascending" ? [...EpsData].reverse() : EpsData
+    ).slice(0, LoadAll ? EpsData.length : 30);
+
+    // Required For Render
+    const ProgressToObj =
+      (Progress &&
+        Progress.reduce((a, Ep_ID) => ({ ...a, [Ep_ID]: Ep_ID }), {})) ||
+      null;
+    let NextEp = null;
+    let NoWatched = 0;
+
+    // Render
+    const JSXElems = FilteredEpsData.map((epData, i) => {
+      let watched = true;
+      if (
+        !Progress ||
+        (Progress && Progress[0] !== -2811 && !ProgressToObj[epData.mal_id])
+      ) {
+        watched = false;
+        !NextEp && (NextEp = epData.mal_id);
+      }
+      watched && NoWatched++;
+
+      return (
+        <EpsPosterItem
+          key={i}
+          ExtraData={{
+            NineAnimeEpUrl:
+              NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`,
+            ReleaseDate: NextEpisodesReleaseDate && NextEpisodesReleaseDate[i],
+          }}
+          EpisodeData={epData}
+          watched={watched}
+          UpdateUserAnimeProgress={UpdateUserAnimeProgress}
+        />
+      );
+    });
+    if (Progress && Progress[0] === -2811) NoWatched = EpisodesLength;
+
+    setNextEp(NextEp);
+    setNoWatchedEp(NoWatched);
+
+    setNewRender(JSXElems);
+
+    if (ExtraEpisodes === 0) DecrementExtraEpisode(null, true);
+  };
 
   const UpdateUserAnimeProgress = useCallback(
     async (epId: number, remove: boolean) => {
@@ -270,19 +281,24 @@ const EpsPoster: FC<EpsPosterProps> = ({
     }
   };
 
-  const AddExtraEpisode = async () => {
-    if (NoOfEpsToAdd <= 0) return;
-    try {
-      await updateDoc(GetAnimeRef, {
-        ExtraEpisodes: increment(NoOfEpsToAdd),
-      });
+  /* Effects */
+  useEffect(() => {
+    GlobalAnimeId = AnimeId.toString();
+  }, [AnimeId]);
 
-      toast.success(`${NoOfEpsToAdd} eps added!`);
-      setNoOfEpsToAdd(0);
-    } catch (err) {
-      toast.error("Error, cannot execute this action.");
-    }
-  };
+  useEffect(RenderEpisodes, [
+    EpisodesData,
+    Progress,
+    WatchType,
+    SortOrder,
+    LoadAll,
+    GenerateExtraEp,
+    EpisodesLength,
+    NineAnimeUrl,
+    NextEpisodesReleaseDate,
+    UpdateUserAnimeProgress,
+    ExtraEpisodes,
+  ]);
 
   /* JSX */
   return (
@@ -290,13 +306,20 @@ const EpsPoster: FC<EpsPosterProps> = ({
       <h1 className="text-headline mb-3 flex flex-col text-center text-4xl font-bold">
         Episodes{" "}
         <span className="text-description text-lg font-semibold italic">
-          Total: {EpisodesLength} {"//"} Remaining:{" "}
-          {EpisodesLength - NoWatchedEp} eps x {Duration} min
+          Total: <span data-testid="EpisodesLength">{EpisodesLength}</span>{" "}
+          {"//"} Remaining:{" "}
+          <span data-testid="EpisodesRemaining">
+            {EpisodesLength - NoWatchedEp}
+          </span>{" "}
+          eps x <span data-testid="EpisodesDuration">{Duration}</span> min
         </span>
       </h1>
       <div className="mb-1 flex flex-wrap gap-2">
         {!isNaN(Duration) && (
-          <div className="text-primary-whiter text-xl font-bold tracking-wide">
+          <div
+            className="text-primary-whiter text-xl font-bold tracking-wide"
+            data-testid="WatchTimeRemaining"
+          >
             {Math.floor((Duration * (EpisodesLength - NoWatchedEp)) / 60)} Hr{" "}
             {(Duration * (EpisodesLength - NoWatchedEp)) % 60} min{" "}
             <span className="text-description text-lg font-semibold italic">
@@ -356,22 +379,24 @@ const EpsPoster: FC<EpsPosterProps> = ({
         )}
       </div>
       <div className="mb-3 flex flex-wrap justify-center gap-2 md:justify-start">
-        <div
+        <button
           onClick={() =>
             setSortOrder(
               SortOrder === "descending" ? "ascending" : "descending"
             )
           }
-          className="text-headline bg-bgi-whitest cursor-pointer rounded-md p-1 font-semibold"
+          data-testid="WatchFilterOrderBtn"
+          className="text-headline bg-bgi-whitest rounded-md p-1 font-semibold"
         >
           {SortOrder === "descending" ? "Descending" : "Ascending"}
-        </div>
-        <div
+        </button>
+        <button
           onClick={ToggleEpState}
+          data-testid="WatchMarkBtn"
           className="text-headline bg-bgi-whitest mr-auto cursor-pointer rounded-md p-1 font-semibold"
         >
           Mark as &quot;{Progress && Progress[0] === -2811 && "Un"}watched&quot;
-        </div>
+        </button>
         <button
           onClick={(event) => {
             if (
@@ -379,8 +404,10 @@ const EpsPoster: FC<EpsPosterProps> = ({
                 .id === "DigitAddEpsInput"
             )
               return;
-            AddExtraEpisode();
+            AddExtraEpisode(NoOfEpsToAdd);
+            setNoOfEpsToAdd(0);
           }}
+          data-testid="WatchAddExtraEpsBtn"
           className="text-headline bg-primary-darker focus:ring-primary-whiter w-40 rounded-md py-1 text-center font-bold outline-none
              transition focus:ring-2"
         >
@@ -388,6 +415,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
           <input
             id="DigitAddEpsInput"
             type="number"
+            data-testid="WatchAddExtraEpsInput"
             value={NoOfEpsToAdd || ""}
             onChange={({ target: { value, valueAsNumber } }) =>
               value.length <= 2 && setNoOfEpsToAdd(valueAsNumber)
@@ -397,7 +425,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
           Ep{NoOfEpsToAdd > 1 && "s"}
         </button>
       </div>
-      <div className="mb-2 grid grid-cols-1 gap-2">{RenderedEps}</div>
+      <div className="mb-2 grid grid-cols-1 gap-2" data-testid="WatchEpsList">
+        {RenderedEps}
+      </div>
       <div className="mb-4 flex justify-center">
         {!LoadAll && RenderedEps?.length !== EpisodesLength && (
           <button
@@ -423,12 +453,14 @@ function EpsPosterItem({
 
   return (
     <div
+      data-testid="WatchEpisodeItem"
       onClick={(event) => {
         const target = (event as unknown as HTMLElementEvent<HTMLButtonElement>)
           .target;
         if (
           target.classList[0] === "DeleteExtraEp" ||
-          target.classList[0] === "9AnimeLink"
+          target.classList[0] === "9AnimeLink" ||
+          target.parentElement.classList[0] === "DeleteExtraEp"
         )
           return;
         UpdateUserAnimeProgress(mal_id, watched);
@@ -446,9 +478,14 @@ function EpsPosterItem({
       }${watched ? " scale-95" : ""}`}
     >
       {isExtra && (
-        <div onClick={DecrementExtraEpisode} className="absolute right-4">
-          <FaTrashAlt className="DeleteExtraEp text-red-500" />
-        </div>
+        <button
+          onClick={DecrementExtraEpisode}
+          id={`EpDeleteExtraEpBtn-${mal_id}`}
+          data-testid="WatchDeleteExtraEpBtn"
+          className="DeleteExtraEp absolute right-4 h-full w-1/12 outline-none"
+        >
+          <FaTrashAlt className="DeleteExtraEp absolute top-[calc(50%-8px)] right-0 text-red-500" />
+        </button>
       )}
       <div>
         {watched ? (
