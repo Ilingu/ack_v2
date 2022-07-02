@@ -21,7 +21,7 @@ describe("User Interaction", () => {
   it("Delete User", () => {
     VisitWithLoginCheck("/settings");
     cy.get('[data-testid="DeleteUserBtn"]').dblclick();
-    cy.wait(11000);
+    cy.wait(11000); // Debounce time
 
     cy.visit("/");
     cy.get('[data-testid="AuthFailed"]').contains("You must be signed in!");
