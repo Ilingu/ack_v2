@@ -72,7 +72,7 @@ describe("Animes Interaction", () => {
     cy.get('[data-testid="HomeAnimesListContainer"]')
       .should("not.have.text", "You have 0 animes")
       .should("not.have.text", "No animes"); // Check that we now have some animes
-    cy.get('[data-testid="HomeAnimesList"]')
+    cy.get('[data-testid="HomeAnimesList"]', { timeout: 10000 })
       .children()
       .should("have.length", 2); // Check that we now have the 2 previously added animes
     for (const animeTitle of FiveAnimesToAdd) {

@@ -106,15 +106,6 @@ export const TestCorrectAnimes: TestingAnimes[] = [
 ];
 export const TestInvalidAnimes: TestingAnimes[] = [
   { title: "sdd", found: false }, // 3 letters
-  { title: "sDd", found: false }, // 3 letters + case sensitive
-  {
-    title: "AzeRtyuii", // Random Letter
-    found: false,
-  },
-  {
-    title: "31859", // Random Number
-    found: false,
-  },
   {
     title: "3A1a8bc85ez7e9OP", // Random Number + Letter
     found: false,
