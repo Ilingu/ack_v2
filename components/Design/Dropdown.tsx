@@ -10,6 +10,7 @@ const Dropdown: FC<Props> = ({ children, ActiveElem, className }) => {
 
   return (
     <div
+      data-testid="DropdownBtn"
       className={`relative inline-block h-10 text-center ${className}`}
       onClick={() => setShow((prev) => !prev)}
     >
@@ -50,6 +51,7 @@ const Dropdown: FC<Props> = ({ children, ActiveElem, className }) => {
           aria-orientation="vertical"
           aria-labelledby="menu-button"
           tabIndex={-1}
+          data-testid="DropdownChildOptions"
         >
           <div className="py-1" role="none">
             {children}
