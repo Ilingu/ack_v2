@@ -183,6 +183,7 @@ describe("Watch Animes Interaction", () => {
       for (let index = 0; index < EpisodesLength - 2; index++) {
         // `- 2` --> The 2 "traps" eps already finished
         cy.get('[data-testid="FocusModeNextEpBtn"]').click();
+        cy.wait(100);
       }
     });
 
