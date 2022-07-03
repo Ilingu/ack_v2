@@ -165,10 +165,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
     ).slice(0, LoadAll ? EpsData.length : 30);
 
     // Required For Render
-    const ProgressToObj =
-      (Progress &&
-        Progress.reduce((a, Ep_ID) => ({ ...a, [Ep_ID]: Ep_ID }), {})) ||
-      null;
     let NextEp = null;
     let NoWatched = 0;
 
@@ -177,7 +173,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
       let watched = true;
       if (
         !Progress ||
-        (Progress && Progress[0] !== -2811 && !ProgressToObj[epData.mal_id])
+        (Progress && Progress[0] !== -2811 && !Progress.includes(epData.mal_id))
       ) {
         watched = false;
         !NextEp && (NextEp = epData.mal_id);

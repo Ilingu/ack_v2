@@ -77,18 +77,13 @@ const FocusMode: FC<FocusModeProps> = ({
 
   useEffect(() => {
     // FocusData
-    const ProgressToObj =
-      (Progress &&
-        Progress.reduce((a, Ep_ID) => ({ ...a, [Ep_ID]: Ep_ID }), {})) ||
-      null;
-
     let NextEpId: number = null,
       NextEpTitle: string = null,
       NextEpFiller: boolean = null,
       NextEpRecap: boolean = null;
 
     for (let id = 1; id < EpisodesLength + 1; id++) {
-      if ((!ProgressToObj || !ProgressToObj[id]) && !NextEpId) {
+      if ((!Progress || !Progress.includes(id)) && !NextEpId) {
         NextEpId = id;
 
         const EpisodeData = EpisodesData.find(({ mal_id }) => mal_id === id);

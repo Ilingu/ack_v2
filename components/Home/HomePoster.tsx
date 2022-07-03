@@ -253,22 +253,14 @@ const HomePoster: FC = () => {
       GroupsElementsOrder.current = GroupsOrder;
     }
     if (UserGroups.length !== GroupsElementsOrder.current.length) {
-      const ToObjRA = UserGroups.reduce(
-        (a, { GroupName }) => ({ ...a, [GroupName]: GroupName }),
-        {}
-      );
-      const ToObjCA = GroupsElementsOrder.current.reduce(
-        (a, GrName) => ({ ...a, [GrName]: GrName }),
-        {}
-      );
-
       // Check If New Group To Add
       UserGroups.forEach(({ GroupName }) => {
-        if (!ToObjCA[GroupName]) GroupsElementsOrder.current.unshift(GroupName);
+        if (!GroupsElementsOrder.current.find((GrName) => GrName === GroupName))
+          GroupsElementsOrder.current.unshift(GroupName);
       });
       // Check If Group To Delete
       GroupsElementsOrder.current.forEach((GrName) => {
-        if (!ToObjRA[GrName]) {
+        if (!UserGroups.find(({ GroupName }) => GroupName === GrName)) {
           const CurrentGroups = GroupsElementsOrder.current;
           const indexToDel = CurrentGroups.indexOf(GrName);
           if (indexToDel === -1) return;
@@ -311,23 +303,20 @@ const HomePoster: FC = () => {
     if (filteredUserAnime.length !== AnimesElementsOrder.current.length) {
       const AllRealAnime = filteredUserAnime;
 
-      const ToObjRA = AllRealAnime.reduce(
-        (a, { AnimeId }) => ({ ...a, [AnimeId]: AnimeId }),
-        {}
-      );
-      const ToObjCA = AnimesElementsOrder.current.reduce(
-        (a, id) => ({ ...a, [id]: id }),
-        {}
-      );
-
       // Check If New Anime To Add
       AllRealAnime.forEach(({ AnimeId }) => {
-        if (!ToObjCA[AnimeId])
+        if (
+          !AnimesElementsOrder.current.find(
+            (AnimeID) => AnimeId.toString() === AnimeID
+          )
+        )
           AnimesElementsOrder.current.unshift(AnimeId.toString());
       });
       // Check If Anime To Delete
       AnimesElementsOrder.current.forEach((AnimeID) => {
-        if (!ToObjRA[AnimeID]) {
+        if (
+          !AllRealAnime.find(({ AnimeId }) => AnimeId.toString() === AnimeID)
+        ) {
           const CurrentAnimes = AnimesElementsOrder.current;
           const indexToDel = CurrentAnimes.indexOf(AnimeID);
           if (indexToDel === -1) return;
@@ -335,13 +324,6 @@ const HomePoster: FC = () => {
         }
       });
     }
-
-    let AnimesToAddToObj = null;
-    if (AnimesToAdd.length > 0)
-      AnimesToAddToObj = AnimesToAdd.reduce(
-        (a, id) => ({ ...a, [id]: id }),
-        {}
-      );
 
     const AnimesPosterJSX = AnimesElementsOrder.current
       .map((animeId, i) => {
@@ -371,7 +353,9 @@ const HomePoster: FC = () => {
             key={animeId || i}
             AnimeData={AnimeData}
             RenderType="animeList"
-            IsAnimeToAdd={AnimesToAddToObj && !!AnimesToAddToObj[animeId]}
+            IsAnimeToAdd={
+              AnimesToAdd.length > 0 && AnimesToAdd.includes(animeId)
+            }
             ToggleGroup={ToggleGroup}
           />
         );
