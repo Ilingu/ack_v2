@@ -14,5 +14,6 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 const auth = admin.auth();
+const deleteField = admin.firestore.FieldValue.delete;
 
-export { db, auth };
+export { db, auth, deleteField };

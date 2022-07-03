@@ -214,15 +214,11 @@ const AddNewGlobalAnime = async (
       await animesConfigPathsRef.get()
     ).data() as AnimeConfigPathsIdShape;
 
-    const ArrayPathsToObjPaths = animesConfigPaths?.AllAnimeId.reduce(
-      (a, id) => ({ ...a, [id]: id }),
-      {}
-    );
-    if (!ArrayPathsToObjPaths[animeId]) {
-      const newAnimeConfigPaths = {
-        AllAnimeId: [...animesConfigPaths?.AllAnimeId, animeId],
-      };
-      batch.update(animesConfigPathsRef, newAnimeConfigPaths);
+    if (!animesConfigPaths?.AllAnimeId?.includes(animeId)) {
+      const NewAnimeConfig = [...animesConfigPaths.AllAnimeId, animeId];
+      batch.update(animesConfigPathsRef, {
+        AllAnimeId: NewAnimeConfig,
+      });
     }
 
     await batch.commit(); // Commit FB Change
