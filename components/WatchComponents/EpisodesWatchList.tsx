@@ -513,7 +513,7 @@ function EpsPosterItem({
             width={16}
             height={16}
             alt="9anime Logo"
-            className="rounded-md bg-white"
+            className="9AnimeLink rounded-md bg-white"
           />{" "}
           9anime
         </div>

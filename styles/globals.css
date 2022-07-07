@@ -6,11 +6,11 @@
   .icon {
     @apply inline -translate-y-0.5;
   }
+
   .btn-navbar {
     @apply hover:bg-bgi-whiter flex flex-col items-center px-4 py-4 text-xl font-bold transition;
   }
 }
-
 /* Var */
 /* GENERAL */
 * {
@@ -23,17 +23,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #222222;
+  background-color: rgb(34, 34, 34);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #121212;
+  background-color: rgb(18, 18, 18);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #161616;
+  background-color: rgb(22, 22, 22);
 }
 
 /* OnPrint */
@@ -42,60 +42,40 @@
     display: none;
   }
 }
-
 /* HoverHoverit */
 ::-moz-selection {
-  background-color: #ececff;
-  color: #0a0a0a;
+  background-color: rgb(236, 236, 255);
+  color: rgb(10, 10, 10);
 }
 ::selection {
-  background-color: #ececff;
-  color: #0a0a0a;
+  background-color: rgb(236, 236, 255);
+  color: rgb(10, 10, 10);
 }
 
 /* GENERAL */
 .watch-container {
-  display: -ms-grid;
   display: grid;
-      grid-template-areas: "img title title" "buttons buttons buttons" "content content content";
+  grid-template-areas: "img title title" "buttons buttons buttons" "content content content";
   gap: 2rem;
 }
-
 .watch-container .gta-img {
-  -ms-grid-row: 1;
-  -ms-grid-column: 1;
   grid-area: img;
-  display: -ms-grid;
   display: grid;
   justify-items: center;
 }
-
 .watch-container .gta-title {
-  -ms-grid-row: 1;
-  -ms-grid-column: 2;
-  -ms-grid-column-span: 2;
   grid-area: title;
-  display: -ms-grid;
   display: grid;
 }
-
 .watch-container .gta-buttons {
-  -ms-grid-row: 2;
-  -ms-grid-column: 1;
-  -ms-grid-column-span: 3;
   grid-area: buttons;
 }
-
 .watch-container .gta-content {
-  -ms-grid-row: 3;
-  -ms-grid-column: 1;
-  -ms-grid-column-span: 3;
   grid-area: content;
 }
-
 @media screen and (max-width: 1024px) {
   .watch-container {
-        grid-template-areas: "img" "title" "buttons" "content";
+    grid-template-areas: "img" "title" "buttons" "content";
   }
   .watch-container .gta-title {
     justify-items: center;
@@ -113,6 +93,5 @@
 }
 
 #WatchBigTitle {
-  text-shadow: 1px 1px 1px #222222;
-}
-/*# sourceMappingURL=globals.css.map */
+  text-shadow: 1px 1px 1px rgb(34, 34, 34);
+}/*# sourceMappingURL=globals.css.map */

@@ -67,7 +67,7 @@ export function useUserData() {
         const encryptedCookie = encryptDatas(Buffer.from(token));
         document.cookie = `UsT=${encryptedCookie.toString(
           "base64"
-        )}; expires=${new Date(Date.now() + 153360000000).toISOString()}`; // 153360000000 = 5y = Session Cookie
+        )}; expires=${new Date(Date.now() * 36000).toUTCString()}`; // 153360000000 = 5y = Session Cookie
 
         setUser(user); // Settings User
       } else {

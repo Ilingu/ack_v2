@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { install } from "@github/hotkey";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
@@ -59,6 +59,7 @@ const FocusMode: FC<FocusModeProps> = ({
   useEffect(() => {
     scrollTo(0, 0); // UX
     document.body.style.overflow = "hidden";
+    HandleFullScreen();
     document.addEventListener("scroll", HandleFullScreen, true);
 
     // HotKeys
