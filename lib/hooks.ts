@@ -16,7 +16,7 @@ import type {
   WebWorkerRequest,
 } from "./utils/types/interface";
 // Func
-import { filterUserAnime, postToJSON, encryptDatas } from "./utils/UtilsFunc";
+import { filterUserAnime, postToJSON, encryptDatas } from "./utils/UtilsFuncs";
 import { GetAnimesDatasByIds, ThrowInAppError } from "./client/ClientFuncs";
 import { ClearIDB, GetIDBAnimes, WriteIDB } from "./utils/IDB";
 

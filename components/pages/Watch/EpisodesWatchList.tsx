@@ -12,21 +12,21 @@ import {
 import Image from "next/image";
 // DB
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase/firebase";
+import { auth, db } from "../../../lib/firebase/firebase";
 // Types
-import { removeDuplicates } from "../../lib/utils/UtilsFunc";
+import { removeDuplicates } from "../../../lib/utils/UtilsFuncs";
 import {
   ConvertBroadcastTimeZone,
   FormatDate,
-} from "../../lib/client/ClientFuncs";
+} from "../../../lib/client/ClientFuncs";
 // Types
 import type {
   JikanApiResEpisodes,
   UserAnimeShape,
   UserAnimeTimestampDate,
   UserExtraEpisodesShape,
-} from "../../lib/utils/types/interface";
-import { AnimeWatchType } from "../../lib/utils/types/enums";
+} from "../../../lib/utils/types/interface";
+import { AnimeWatchType } from "../../../lib/utils/types/enums";
 // UI
 import toast from "react-hot-toast";
 import {
@@ -505,8 +505,15 @@ function EpsPosterItem({
       >
         <div
           className={`9AnimeLink flex w-24 items-center justify-center gap-1 rounded-lg bg-[#5a2e98]${
-            ReleaseDate && ReleaseDate > Date.now() ? " bg-opacity-50" : ""
+            ReleaseDate && ReleaseDate > Date.now()
+              ? " text-description opacity-50"
+              : ""
           }`}
+          title={
+            ReleaseDate && ReleaseDate > Date.now()
+              ? "Not published yet"
+              : `Published!`
+          }
         >
           <Image
             src="/Assets/9animeLogo.png"

@@ -189,12 +189,10 @@ export const ParseCookies = (
 ): FunctionJob<{ [K: string]: string }> => {
   try {
     const cookies = RawCookies.split("; ");
-    const ParsedCookies = {};
-
-    cookies.forEach((cookie) => {
+    const ParsedCookies = cookies.reduce((acc, cookie) => {
       const [key, value] = cookie.split("=");
-      ParsedCookies[key] = value;
-    });
+      return { ...acc, ...{ [key]: value } };
+    }, {});
 
     return { success: true, data: ParsedCookies };
   } catch (err) {

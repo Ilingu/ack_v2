@@ -1,23 +1,17 @@
 import { NextPage } from "next";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import debounce from "lodash.debounce";
 // UI
-import MetaTags from "../../components/Common/Metatags";
+import MetaTags from "../../components/Services/Metatags";
 import Divider from "../../components/Design/Divider";
-import AnimePoster from "../../components/Search/SearchPoster";
+import AnimePoster from "../../components/pages/Search/SearchPoster";
 // Utility Func
 import {
   AnimeShapeToPosterData,
   callApi,
   removeParamsFromPhotoUrl,
 } from "../../lib/client/ClientFuncs";
-import { removeDuplicates } from "../../lib/utils/UtilsFunc";
+import { removeDuplicates } from "../../lib/utils/UtilsFuncs";
 import { SearchAnimeInAlgolia } from "../../lib/algolia/algolia";
 // Types
 import type {

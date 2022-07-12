@@ -8,7 +8,7 @@ import { AppRouter } from "./api/trpc/[trpc]";
 import { AppProps } from "next/app";
 // UI
 import "../styles/globals.css";
-import Navbar from "../components/Common/Navbar";
+import Navbar from "../components/Layouts/Navbar";
 import { GlobalAppContext } from "../lib/context";
 import { NetworkCheck, ThrowInAppError } from "../lib/client/ClientFuncs";
 

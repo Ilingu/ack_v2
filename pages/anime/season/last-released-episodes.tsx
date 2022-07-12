@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import type { AdkamiLastReleasedEpisodeShape } from "../../../lib/utils/types/interface";
 import { GetLastReleasedAnimeEp } from "../../../lib/client/ClientFuncs";
 // UI
-import MetaTags from "../../../components/Common/Metatags";
+import MetaTags from "../../../components/Services/Metatags";
 import Divider from "../../../components/Design/Divider";
 import Loader from "../../../components/Design/Loader";
 import VerticalDivider from "../../../components/Design/VerticalDivider";

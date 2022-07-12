@@ -13,20 +13,20 @@ import Image from "next/image";
 import kebabCase from "lodash.kebabcase";
 import debounce from "lodash.debounce";
 // Types
-import { GlobalAppContext } from "../../lib/context";
+import { GlobalAppContext } from "../../../lib/context";
 import {
   AnimeWatchType,
   AnimeWatchTypeDisplayable,
   HomeDisplayTypeEnum,
-} from "../../lib/utils/types/enums";
+} from "../../../lib/utils/types/enums";
 import type {
   UserAnimePosterShape,
   UserGroupPosterShape,
   UserGroupShape,
-} from "../../lib/utils/types/interface";
+} from "../../../lib/utils/types/interface";
 // Auth
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../lib/firebase/firebase";
+import { db } from "../../../lib/firebase/firebase";
 // Func
 import {
   copyToClipboard,
@@ -34,8 +34,11 @@ import {
   IsEmptyString,
   removeDuplicates,
   shuffleArray,
-} from "../../lib/utils/UtilsFunc";
-import { CheckNewEpisodeData, ToggleFav } from "../../lib/client/ClientFuncs";
+} from "../../../lib/utils/UtilsFuncs";
+import {
+  CheckNewEpisodeData,
+  ToggleFav,
+} from "../../../lib/client/ClientFuncs";
 // UI
 import { AiFillCloseCircle, AiFillStar, AiOutlineStar } from "react-icons/ai";
 import {
@@ -48,8 +51,8 @@ import {
 import { FcOk } from "react-icons/fc";
 import { BsFillCollectionFill } from "react-icons/bs";
 import toast from "react-hot-toast";
-import Dropdown from "../Design/Dropdown";
-import VerticalDivider from "../Design/VerticalDivider";
+import Dropdown from "../../Design/Dropdown";
+import VerticalDivider from "../../Design/VerticalDivider";
 import HandleInput from "./HandleInput";
 
 /* INTERFACE */
@@ -583,8 +586,10 @@ function SortByWatchType({
         (CurrentActiveWatch, i) => (
           <a
             key={i}
-            className={`hover:text-primary-main block cursor-pointer px-4 py-2 text-base transition-all${
-              ActiveWatchType === CurrentActiveWatch ? " text-primary-main" : ""
+            className={`hover:text-headline block cursor-pointer px-4 py-2 text-base transition-all${
+              ActiveWatchType === CurrentActiveWatch
+                ? " text-headline font-bold"
+                : ""
             }`}
             role="menuitem"
             tabIndex={-1}

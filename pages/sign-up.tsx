@@ -21,7 +21,7 @@ import { auth, db } from "../lib/firebase/firebase";
 import { doc, getDoc, writeBatch } from "@firebase/firestore";
 import debounce from "lodash.debounce";
 // UI
-import MetaTags from "../components/Common/Metatags";
+import MetaTags from "../components/Services/Metatags";
 import Divider from "../components/Design/Divider";
 import { GlobalAppContext } from "../lib/context";
 import toast from "react-hot-toast";

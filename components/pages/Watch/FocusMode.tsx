@@ -2,20 +2,20 @@ import { FC, useEffect, useRef, useState } from "react";
 import { install } from "@github/hotkey";
 // DB
 import { deleteField, doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase/firebase";
+import { auth, db } from "../../../lib/firebase/firebase";
 // Funcs
 import {
   DeviceCheckType,
   ManageFullScreen,
-} from "../../lib/client/ClientFuncs";
-import { removeDuplicates } from "../../lib/utils/UtilsFunc";
+} from "../../../lib/client/ClientFuncs";
+import { removeDuplicates } from "../../../lib/utils/UtilsFuncs";
 // Types
 import type {
   JikanApiResEpisodes,
   UserAnimeShape,
   UserAnimeTimestampDate,
-} from "../../lib/utils/types/interface";
-import { AnimeWatchType } from "../../lib/utils/types/enums";
+} from "../../../lib/utils/types/interface";
+import { AnimeWatchType } from "../../../lib/utils/types/enums";
 // UI
 import {
   AiOutlineCheck,

@@ -8,7 +8,7 @@ import type {
 import {
   filterUserAnime,
   SpotDifferenciesBetweenArrays,
-} from "../utils/UtilsFunc";
+} from "../utils/UtilsFuncs";
 import { GetAnimesDatasByIds } from "../client/ClientFuncs";
 
 onmessage = async (e: MessageEvent<WebWorkerRequest<DifferenceWWShapeReq>>) => {

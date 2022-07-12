@@ -5,7 +5,7 @@ import Image from "next/image";
 // CTX
 import { GlobalAppContext } from "../../lib/context";
 // Auth
-import AuthCheck from "../../components/Common/AuthCheck";
+import AuthCheck from "../../components/Services/AuthCheck";
 // Func
 import { CheckNewEpisodeData, ToggleFav } from "../../lib/client/ClientFuncs";
 // Types
@@ -14,15 +14,15 @@ import type {
   UserAnimeShape,
 } from "../../lib/utils/types/interface";
 // UI
-import MetaTags from "../../components/Common/Metatags";
-import AnimesWatchType from "../../components/Common/AnimesWatchType";
-import EpsPoster from "../../components/WatchComponents/EpisodesWatchList";
+import MetaTags from "../../components/Services/Metatags";
+import AnimesWatchType from "../../components/Services/AnimesWatchType";
+import EpsPoster from "../../components/pages/Watch/EpisodesWatchList";
 import Link from "next/link";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { FaPlay, FaSpinner } from "react-icons/fa";
-import MovieList from "../../components/WatchComponents/MovieList";
-import FocusModeComponent from "../../components/WatchComponents/FocusMode";
-import MovieFocusMode from "../../components/WatchComponents/MovieFocusMode";
+import MovieList from "../../components/pages/Watch/MovieList";
+import FocusModeComponent from "../../components/pages/Watch/FocusMode";
+import MovieFocusMode from "../../components/pages/Watch/MovieFocusMode";
 
 /* Func */
 

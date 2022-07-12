@@ -1,13 +1,13 @@
 import React, { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import { EpisodesSearchContext } from "../../lib/context";
+import { EpisodesSearchContext } from "../../../lib/context";
 // Types
 import type {
   EpisodesShape,
   JikanApiResEpisodes,
-} from "../../lib/utils/types/interface";
+} from "../../../lib/utils/types/interface";
 // Funcs
-import { JikanApiToEpisodesShape } from "../../lib/client/ClientFuncs";
+import { JikanApiToEpisodesShape } from "../../../lib/client/ClientFuncs";
 // UI
 import { FaEye } from "react-icons/fa";
 

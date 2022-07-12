@@ -1,9 +1,9 @@
 import { NextPage } from "next";
 // Auth
-import AuthCheck from "../components/Common/AuthCheck";
+import AuthCheck from "../components/Services/AuthCheck";
 // UI
-import MetaTags from "../components/Common/Metatags";
-import HomePoster from "../components/Home/HomePoster";
+import MetaTags from "../components/Services/Metatags";
+import HomePoster from "../components/pages/Home/HomePoster";
 
 /* Components */
 const Home: NextPage = () => {

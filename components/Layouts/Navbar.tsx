@@ -5,7 +5,7 @@ import { install } from "@github/hotkey";
 // Funcs
 import { DeviceCheckType } from "../../lib/client/ClientFuncs";
 // Auth
-import AuthCheck from "./AuthCheck";
+import AuthCheck from "../Services/AuthCheck";
 // UI
 import { FaLeaf, FaSearch, FaSignInAlt } from "react-icons/fa";
 import { FiSettings } from "react-icons/fi";

@@ -1,11 +1,15 @@
 import algoliasearch from "algoliasearch";
 import { AlgoliaDatasShape } from "../utils/types/interface";
 
-const AlgoliaClient = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
-  process.env.ALGOLIA_PRIVATE_KEY
-);
-const SearchDB = AlgoliaClient.initIndex("prod_ACK");
+const isTestEnv = process.env.NODE_ENV === "test";
+
+const AlgoliaClient =
+  !isTestEnv &&
+  algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
+    process.env.ALGOLIA_PRIVATE_KEY
+  );
+const SearchDB = !isTestEnv && AlgoliaClient.initIndex("prod_ACK");
 
 /**
  * Index a New Anime in Algoria

@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import debounce from "lodash.debounce";
@@ -14,7 +8,7 @@ import {
   IsEmptyString,
   IsError,
   Return404,
-} from "../../../lib/utils/UtilsFunc";
+} from "../../../lib/utils/UtilsFuncs";
 import {
   callApi,
   JikanApiToSeasonAnimeShape,
@@ -37,7 +31,7 @@ import {
   FaSync,
 } from "react-icons/fa";
 import Divider from "../../../components/Design/Divider";
-import MetaTags from "../../../components/Common/Metatags";
+import MetaTags from "../../../components/Services/Metatags";
 
 /* Interface */
 interface SeasonAnimesProps {

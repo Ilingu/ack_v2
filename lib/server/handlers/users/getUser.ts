@@ -1,7 +1,7 @@
 import { auth, db } from "../../../firebase/firebase-admin";
 import { AnimeWatchType } from "../../../utils/types/enums";
 import { ResDataUser, UserAnimeShape } from "../../../utils/types/interface";
-import { postToJSON } from "../../../utils/UtilsFunc";
+import { postToJSON } from "../../../utils/UtilsFuncs";
 import { FbAuthentificate } from "../../ApiFunc";
 import { BasicCheck, HandlerRequestShape, ThrowError } from "../../trpc";
 

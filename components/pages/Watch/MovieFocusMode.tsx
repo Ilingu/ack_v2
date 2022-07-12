@@ -1,12 +1,12 @@
 import { FC, useEffect } from "react";
-import { ManageFullScreen } from "../../lib/client/ClientFuncs";
+import { ManageFullScreen } from "../../../lib/client/ClientFuncs";
 // DB
 import { doc, updateDoc } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase/firebase";
+import { auth, db } from "../../../lib/firebase/firebase";
 // UI
 import { AiOutlineCheckSquare, AiOutlineCloseSquare } from "react-icons/ai";
 import toast from "react-hot-toast";
-import { AnimeWatchType } from "../../lib/utils/types/enums";
+import { AnimeWatchType } from "../../../lib/utils/types/enums";
 
 /* INERFACES */
 interface MovieFocusMode {

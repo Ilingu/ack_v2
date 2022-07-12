@@ -1,7 +1,7 @@
 import { BasicCheck, HandlerRequestShape, ThrowError } from "../../trpc";
 // Funcs
 import { FbAuthentificate } from "../../ApiFunc";
-import { isValidUrl } from "../../../utils/UtilsFunc";
+import { isValidUrl } from "../../../utils/UtilsFuncs";
 import { db } from "../../../firebase/firebase-admin";
 // Types
 import { AnimeShape } from "../../../utils/types/interface";

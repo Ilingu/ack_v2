@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 import { useMemo } from "react";
 // UI
-import MetaTags from "../../components/Common/Metatags";
+import MetaTags from "../../components/Services/Metatags";
 import UserProfil, {
   SkeletonUserProfil,
-} from "../../components/User/UserProfil";
+} from "../../components/pages/User/UserProfil";
 // tRPC
 import { useQuery } from "../../lib/client/trpc";
 // Types

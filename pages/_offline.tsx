@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import MetaTags from "../components/Common/Metatags";
+import MetaTags from "../components/Services/Metatags";
 
 export default function offlinePage() {
   return (

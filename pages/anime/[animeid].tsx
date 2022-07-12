@@ -1,11 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, {
-  Fragment,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -17,23 +11,22 @@ import type {
   Studio as StudioShape,
   GenreTag,
   AlternativeTitleShape,
-  InternalApiResError,
   InternalApiResSuccess,
 } from "../../lib/utils/types/interface";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
-import { Return404 } from "../../lib/utils/UtilsFunc";
+import { Return404 } from "../../lib/utils/UtilsFuncs";
 import { ConvertBroadcastTimeZone } from "../../lib/client/ClientFuncs";
 import { GetAnimeData } from "../../lib/server/ApiFunc";
 // FB
-import AuthCheck from "../../components/Common/AuthCheck";
+import AuthCheck from "../../components/Services/AuthCheck";
 import { db as AdminDB } from "../../lib/firebase/firebase-admin";
 // UI
-import MetaTags from "../../components/Common/Metatags";
+import MetaTags from "../../components/Services/Metatags";
 import Loader from "../../components/Design/Loader";
-import EpisodesList from "../../components/Search/EpisodesList";
-import RecommandationsList from "../../components/Search/RecommandationsList";
-import AnimesWatchType from "../../components/Common/AnimesWatchType";
+import EpisodesList from "../../components/pages/Search/EpisodesList";
+import RecommandationsList from "../../components/pages/Search/RecommandationsList";
+import AnimesWatchType from "../../components/Services/AnimesWatchType";
 import {
   FaCalendarAlt,
   FaClock,
@@ -98,8 +91,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   try {
     const SecureAnimeID = parseInt(animeId).toString();
 
-    const JikanAnimeRes = await GetAnimeData(SecureAnimeID);
-    if ((JikanAnimeRes as InternalApiResError).err === true) {
+    const { success: SuccessApiFetch, data: JikanAnimeRes } =
+      await GetAnimeData(SecureAnimeID);
+    if (!SuccessApiFetch || !JikanAnimeRes || !JikanAnimeRes?.AnimeData) {
       if (animeFB.exists) {
         const AnimeData = animeFB.data() as AnimeShape;
         return ReturnProps({

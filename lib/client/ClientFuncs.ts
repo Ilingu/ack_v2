@@ -26,7 +26,7 @@ import { getDoc } from "firebase/firestore";
 // UI
 import toast from "react-hot-toast";
 // Funcs
-import { isValidUrl, postToJSON } from "../utils/UtilsFunc";
+import { isValidUrl, postToJSON } from "../utils/UtilsFuncs";
 
 /* CLIENT FUNC */
 
@@ -298,8 +298,9 @@ export const ConvertBroadcastTimeZone = (
     if (ReturnType === "NextBroadcastString") return NextBroadcastUTC1Str;
 
     const SplitedUTC1Date = NextBroadcastUTC1Str.split(",");
-    const UTC1DayDate = SplitedUTC1Date[0].split("/").reverse().join("/");
-    const ToDay = WhitchDay(new Date(UTC1DayDate).getDay() as DateOfWeek);
+    const ToDay = WhitchDay(
+      new Date(SplitedUTC1Date[0]).getDay() as DateOfWeek
+    );
     return `${ToDay} ${SplitedUTC1Date[1].trim().replace(":00", "")}`;
   } catch (err) {
     return "None";

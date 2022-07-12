@@ -1,11 +1,15 @@
 import algoliasearch from "algoliasearch/lite";
 import { AlgoliaDatasShape, AlgoliaResShape } from "../utils/types/interface";
 
-const AlgoliaClient = algoliasearch(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
-  process.env.NEXT_PUBLIC_ALGOLIA_PUBLIC_KEY
-);
-const SearchDB = AlgoliaClient.initIndex("prod_ACK");
+const isTestEnv = process.env.NODE_ENV === "test";
+
+const AlgoliaClient =
+  !isTestEnv &&
+  algoliasearch(
+    process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
+    process.env.NEXT_PUBLIC_ALGOLIA_PUBLIC_KEY
+  );
+const SearchDB = !isTestEnv && AlgoliaClient.initIndex("prod_ACK");
 
 /**
  * Search Animes with is title in Algolia DB

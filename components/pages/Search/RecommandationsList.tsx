@@ -5,9 +5,9 @@ import Link from "next/link";
 import type {
   JikanApiResRecommandations,
   RecommendationsShape,
-} from "../../lib/utils/types/interface";
+} from "../../../lib/utils/types/interface";
 // Funcs
-import { JikanApiToRecommendationShape } from "../../lib/client/ClientFuncs";
+import { JikanApiToRecommendationShape } from "../../../lib/client/ClientFuncs";
 
 interface RecommandationsListProps {
   RecommandationsData: JikanApiResRecommandations[];

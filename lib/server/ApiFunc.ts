@@ -5,7 +5,6 @@ import type {
   AnimeConfigPathsIdShape,
   AnimeShape,
   FunctionJob,
-  InternalApiResError,
   InternalApiResSuccess,
   JikanApiERROR,
   JikanApiResAnime,
@@ -16,7 +15,7 @@ import type {
 } from "../utils/types/interface";
 import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 // Func
-import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFunc";
+import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
@@ -37,7 +36,7 @@ export const IsBlacklistedHost = (host: string): boolean => {
  */
 export const GetAnimeData = async (
   animeId: string
-): Promise<InternalApiResSuccess | InternalApiResError> => {
+): Promise<FunctionJob<InternalApiResSuccess>> => {
   let animeData: AnimeShape;
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
@@ -57,7 +56,7 @@ export const GetAnimeData = async (
       IsError(animeResData?.data as unknown as JikanApiERROR) ||
       IsError(animeRecommendationsResData?.data as unknown as JikanApiERROR)
     )
-      return { message: `Error when fetching: ${animeId}.`, err: true };
+      return { success: false };
 
     const { data: animeRes } = animeResData;
     const { data: animeRecommendationsRes } = animeRecommendationsResData;
@@ -106,7 +105,7 @@ export const GetAnimeData = async (
 
       let AddedToDB = false;
       let AnimeUpdated = false;
-      if (IsAddableToDB) {
+      if (IsAddableToDB && process.env.NODE_ENV !== "test") {
         [AddedToDB, AnimeUpdated] = await AddNewGlobalAnime(animeId, animeData);
         IndexAnimeInAlgolia({
           title: animeData.title,
@@ -118,12 +117,15 @@ export const GetAnimeData = async (
         });
       }
 
-      return { AddedToDB, AnimeUpdated, AnimeData: animeData };
+      return {
+        success: true,
+        data: { AddedToDB, AnimeUpdated, AnimeData: animeData },
+      };
     }
-    return { message: `Anime with ID "${animeId}" NotFound`, err: true };
+    return { success: false };
   } catch (err) {
     console.error(err);
-    return { message: err, err: true };
+    return { success: false };
   }
 };
 
@@ -153,7 +155,10 @@ const Fetch9AnimeLink = async (
       const NineAnimeQuery = encodeURIComponent(
         `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${name}`
       );
-      const URLQuery = `https://api.webscrapingapi.com/v1?api_key=${process.env.WEB_SCAPPING_API_KEY}&url=${NineAnimeQuery}&device=desktop&proxy_type=datacenter`;
+      const URLQuery =
+        process.env.NODE_ENV === "production"
+          ? `https://api.webscrapingapi.com/v1?api_key=${process.env.WEB_SCAPPING_API_KEY}&url=${NineAnimeQuery}&device=desktop&proxy_type=datacenter`
+          : decodeURIComponent(NineAnimeQuery);
       TemplateURLs.push(URLQuery);
     }
 

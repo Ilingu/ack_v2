@@ -4,7 +4,7 @@ import { NextApiResponse } from "next";
 // Types
 import { tRPCError } from "../utils/types/types";
 // Funcs
-import { IsEmptyString, ParseCookies } from "../utils/UtilsFunc";
+import { IsEmptyString, ParseCookies } from "../utils/UtilsFuncs";
 import { IsBlacklistedHost } from "./ApiFunc";
 
 export interface HandlerRequestShape<T = any> {

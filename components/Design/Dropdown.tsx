@@ -17,13 +17,13 @@ const Dropdown: FC<Props> = ({ children, ActiveElem, className }) => {
       <div>
         <button
           type="button"
-          className="text-headline bg-bgi-whitest hover:bg-bgi-whiter inline-flex w-full justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-100"
+          className="text-headline bg-primary-darker hover:bg-primary-main inline-flex w-full justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-100"
           id="menu-button"
           aria-expanded="true"
           aria-haspopup="true"
         >
           Sort By{" "}
-          <span className="text-primary-whiter ml-1 border-b border-dashed capitalize">
+          <span className="text-headline ml-1 border-b border-dashed font-bold capitalize tracking-wide">
             {ActiveElem.replaceAll("_", " ")}
           </span>
           <svg
@@ -46,7 +46,7 @@ const Dropdown: FC<Props> = ({ children, ActiveElem, className }) => {
 
       {Show && (
         <div
-          className="bg-bgi-whitest animate-fadeIn text-headline absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md text-center font-semibold capitalize shadow-lg ring-1 ring-white ring-opacity-5 focus:outline-none"
+          className="bg-primary-main animate-fadeIn text-description absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md text-center font-semibold capitalize shadow-lg ring-1 ring-white ring-opacity-5 focus:outline-none"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="menu-button"

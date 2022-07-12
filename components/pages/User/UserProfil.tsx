@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 // Types
 import type { User } from "firebase/auth";
-import type { UserStatsShape } from "../../lib/utils/types/interface";
+import type { UserStatsShape } from "../../../lib/utils/types/interface";
 // UI
-import Divider from "../Design/Divider";
+import Divider from "../../Design/Divider";
 import { AiFillMail } from "react-icons/ai";
 import { FaCheck, FaClock } from "react-icons/fa";
 import { BiStats } from "react-icons/bi";

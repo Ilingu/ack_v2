@@ -10,16 +10,16 @@ import React, {
 import { NextPage } from "next";
 import debounce from "lodash.debounce";
 // Auth
-import AuthCheck from "../components/Common/AuthCheck";
+import AuthCheck from "../components/Services/AuthCheck";
 import { GlobalAppContext } from "../lib/context";
 import { auth, db } from "../lib/firebase/firebase";
 import { useMutation } from "../lib/client/trpc";
 // UI
-import MetaTags from "../components/Common/Metatags";
+import MetaTags from "../components/Services/Metatags";
 import toast from "react-hot-toast";
 import Divider from "../components/Design/Divider";
 import { FiSettings } from "react-icons/fi";
-import UserProfil from "../components/User/UserProfil";
+import UserProfil from "../components/pages/User/UserProfil";
 // Types
 import type {
   BeforeInstallPromptEvent,

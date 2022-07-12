@@ -8,7 +8,7 @@ on:
     branches: ["main"]
 
 jobs:
-  cypress-run:
+  testing-run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,6 +16,9 @@ jobs:
 
       - name: Install Npm Dependencies
         run: npm ci # Installing dependencies
+
+      - name: Vitest Test
+        run: npm run test
 
       - name: Cypress run
         uses: cypress-io/github-action@v4
