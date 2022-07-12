@@ -32,13 +32,13 @@ export default async function revalidateAnime(
       return ThrowError("BAD_REQUEST", "ID is not found"); // ❌
 
     const AnimeData = RevalidateDoc.data() as AnimeShape;
-    if ((AnimeData?.NextRefresh || 0) <= Date.now())
-      return ThrowError("BAD_REQUEST", "Anime is not expire"); // ❌
+    if ((AnimeData?.NextRefresh || 0) > Date.now())
+      return ThrowError("BAD_REQUEST", "Anime is not expired"); // ❌
 
     await res.revalidate(`/anime/${AnimeID}`);
     return true; // ✅
   } catch (err) {
-    console.error("Error on api route '/deleteUser'", err);
+    console.error("Error on api route '/revalidate'", err);
     return ThrowError("INTERNAL_SERVER_ERROR", JSON.stringify(err)); // ❌
   }
 }

@@ -32,8 +32,8 @@ const CacheDatasToIDB = async (
   const IDBObject: IDBShape = {
     AnimesStored: NewGlobalAnimesDatas,
     expire: NewExpire
-      ? Date.now() + 259200000
-      : (await GetIDBAnimes())[0]?.expire || Date.now(), // 3J --> Force Refresh for AnimesDatas Updates
+      ? Date.now() + 172800000 // 2J --> Force Refresh for AnimesDatas Updates
+      : (await GetIDBAnimes())[0]?.expire || Date.now(),
   };
   await WriteIDB(IDBObject);
 };
