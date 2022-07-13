@@ -41,3 +41,4 @@ jobs:
           NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD: ${{ secrets.NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          CI_TEST: "true"

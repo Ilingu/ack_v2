@@ -32,8 +32,13 @@ export default async function revalidateAnime(
       return ThrowError("BAD_REQUEST", "ID is not found"); // ❌
 
     const AnimeData = RevalidateDoc.data() as AnimeShape;
-    if ((AnimeData?.NextRefresh || 0) > Date.now())
+    if ((AnimeData?.NextRefresh || 0) > Date.now()) {
+      console.error({
+        ServerTime: Date.now(),
+        NextRefreshTime: AnimeData?.NextRefresh,
+      });
       return ThrowError("BAD_REQUEST", "Anime is not expired"); // ❌
+    }
 
     await res.revalidate(`/anime/${AnimeID}`);
     return true; // ✅
