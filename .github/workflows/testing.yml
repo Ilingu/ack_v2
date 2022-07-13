@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Npm Dependencies
+      - name: Install NPM Dependencies
         run: npm ci # Installing dependencies
 
       - name: Vitest Test
@@ -41,4 +41,3 @@ jobs:
           NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD: ${{ secrets.NEXT_PUBLIC_DEV_ACCOUNT_PASSWORD }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-          CI_TEST: "true"
