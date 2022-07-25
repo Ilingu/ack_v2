@@ -14,6 +14,8 @@ name: "CodeQL"
 on:
   push:
     branches: ["main", "dev"]
+    paths:
+      - "ack_app"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ["main", "dev"]
@@ -32,11 +34,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript"]
+        language: ["javascript", "go"]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
     steps:
+      - name: Right dir
+        run: cd ack_app
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
