@@ -6,11 +6,13 @@ import (
 	"log"
 	"math/rand"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/input"
+	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/stealth"
 )
 
@@ -21,8 +23,27 @@ type ScrappingConfig struct {
 	Type           string
 }
 
+func NewBrowser() (*rod.Browser, error) {
+	if os.Getenv("APP_MODE") != "prod" {
+		return rod.New().Timeout(2 * time.Minute).MustConnect().MustIncognito().NoDefaultDevice(), nil // In dev
+	}
+
+	// In prod
+	path, ok := launcher.LookPath() // looking for the chromium execuatble path
+	if !ok {
+		return nil, errors.New("cannot find the chromium executable")
+	}
+
+	l := launcher.New().Bin(path)
+	l.Headless(true).Set("disable-gpu").Set("disable-dev-shm-usage").Set("disable-setuid-sandbox").Set("no-sandbox")
+	return rod.New().Timeout(2 * time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
+}
+
 func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
-	browser := rod.New().Timeout(2 * time.Minute).MustConnect().MustIncognito().NoDefaultDevice()
+	browser, err := NewBrowser()
+	if err != nil {
+		return "", err
+	}
 	defer browser.MustClose()
 
 	SearchPage := stealth.MustPage(browser)
