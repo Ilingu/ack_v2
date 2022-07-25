@@ -11,6 +11,9 @@ jobs:
   testing-run:
     runs-on: ubuntu-latest
     steps:
+      - name: Right Directory
+        run: cd ack_app
+
       - name: Checkout
         uses: actions/checkout@v2
 

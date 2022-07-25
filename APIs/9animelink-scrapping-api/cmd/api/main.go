@@ -19,7 +19,7 @@ func main() {
 
 	// Loading env variables
 	if os.Getenv("APP_MODE") != "prod" {
-		err := godotenv.Load("../../")
+		err := godotenv.Load("../../.env")
 		if err != nil {
 			log.Fatal("Error loading .env file")
 		}
