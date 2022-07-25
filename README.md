@@ -15,6 +15,8 @@ Over the year this project has changed a lot but in the same time always does th
 
 That how this app is born, the AnimChecker V2 (aka **ack_v2**) **from November 2021 to now**. It use SSR,SSG... Typescript, tailwind, modern and advanced coding practices, the V1 was this mentality: "it should work, no matter how I do it." the V2 is more like: "it should work with the best solutions" by following this mentality I made a lot of sacrifices but also learn a considerable amount of things coming from errors that are now carved on my mind, e.g The V2 has far less functionnalities than the V1 but it's on purpose, because some of these were irrevelant or "too much", plus at the end of V1 it a 2 apps in one which does not respect the principle of [**Single responsibility**](https://en.wikipedia.org/wiki/Single-responsibility_principle) at all. With this app I take my time to better understand what I'm doing and how to be able even in 5y to not restart with a V3.
 
+You may also wonder why I don't use some premade services like **MAL** or else? Simply because I wanted a very personalized app (with a good looking UI), that meet only my demand, and not the demand of Millions of users, and apart from that the purpose of this app was to exerce my webdev skills.
+
 ## Made With:
 
 1. **Elegance** ✅

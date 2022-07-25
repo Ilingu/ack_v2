@@ -25,7 +25,7 @@ type ScrappingConfig struct {
 	Type           string
 }
 
-func NewBrowser() (*rod.Browser, error) {
+func newBrowser() (*rod.Browser, error) {
 	if os.Getenv("APP_MODE") != "prod" {
 		return rod.New().Timeout(3 * time.Minute).MustConnect().MustIncognito().NoDefaultDevice(), nil // In dev
 	}
@@ -41,7 +41,7 @@ func NewBrowser() (*rod.Browser, error) {
 	return rod.New().Timeout(3 * time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
 }
 
-func CheckAndCloseCookies(page *rod.Page, inputSearch *rod.Element) {
+func checkAndCloseCookies(page *rod.Page, inputSearch *rod.Element) {
 	_, hided := page.Timeout(time.Second).Element(".fc-consent-root")
 	if hided == nil {
 		page.Timeout(2 * time.Second).MustElement(".fc-consent-root .fc-footer-buttons .fc-cta-consent").MustClick() // Cookie popup is opened --> closed it
@@ -58,10 +58,11 @@ func CheckAndCloseCookies(page *rod.Page, inputSearch *rod.Element) {
 	time.Sleep(time.Second / 4)
 }
 
-func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
-	browser, err := NewBrowser()
+func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan error) {
+	browser, err := newBrowser()
 	if err != nil {
-		return "", err
+		errCh <- err
+		return
 	}
 	defer browser.MustClose()
 
@@ -84,7 +85,7 @@ func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 			time.Sleep(time.Second / time.Duration(rand.Intn(30)+20)) // type interval: between 50ms and 20ms
 		}
 
-		CheckAndCloseCookies(SearchPage, inputSearch)
+		checkAndCloseCookies(SearchPage, inputSearch)
 		inputSearch.MustKeyActions().Type(input.Enter).MustDo()   // Submit by pressing enter on form (because clicking on submitBtn triggered the anti-bot detection)
 		pageLoaderr = SearchPage.Timeout(PAGE_TIMEOUT).WaitLoad() // wait for response
 		if pageLoaderr != nil {
@@ -134,8 +135,9 @@ func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 			continue // invalid url --> next title
 		}
 
-		return NineAnimeURL, nil
+		UrlPageCh <- NineAnimeURL
+		return
 	}
 
-	return "", errors.New("cannot find anime url in these requests")
+	errCh <- errors.New("cannot find anime url in these requests")
 }

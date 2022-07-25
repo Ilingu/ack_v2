@@ -7,7 +7,7 @@ import {
 describe("Search Interaction", () => {
   it("Should Login", LoginWithCypress);
 
-  it("Should Find Animes via Algoria", () => {
+  it("Should Find Animes via Algolia", () => {
     cy.visit("/anime");
     for (const { title, found } of [
       ...TestCorrectAnimes,
