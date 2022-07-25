@@ -159,7 +159,6 @@ const Fetch9AnimeLink = async (
 
     // 3 attempts to get the url, if the 3 failed return null
     for (let i = 0; i < 3; i++) {
-      console.log(i, APIUrl);
       const ApiRes = await fetch(APIUrl);
       if (!ApiRes.ok) {
         continue;
@@ -167,7 +166,6 @@ const Fetch9AnimeLink = async (
 
       const { success, data: UrlLink }: NineAnimeAPIResShape =
         await ApiRes.json();
-      console.log(UrlLink);
       if (!success || IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/"))
         continue;
 

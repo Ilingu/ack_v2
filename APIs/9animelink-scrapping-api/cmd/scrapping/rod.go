@@ -68,8 +68,13 @@ func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 	SearchPage := stealth.MustPage(browser)
 
 	for _, title := range sc.TitlesItarable {
+		log.Printf("[LOG]: Processing %s\n", title)
 		SearchPage.MustNavigate("https://9anime.id/filter") // go to filter page
-		SearchPage.MustWaitLoad()
+		pageLoaderr := SearchPage.Timeout(PAGE_TIMEOUT).WaitLoad()
+		if pageLoaderr != nil {
+			log.Println("[WARN] cannot load page")
+			continue
+		}
 
 		inputSearch := SearchPage.Timeout(PAGE_TIMEOUT).MustElement(`form.filters [name="keyword"]`) // search input
 
@@ -80,8 +85,12 @@ func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 		}
 
 		CheckAndCloseCookies(SearchPage, inputSearch)
-		inputSearch.MustKeyActions().Type(input.Enter).MustDo() // Submit by pressing enter on form (because clicking on submitBtn triggered the anti-bot detection)
-		SearchPage.MustWaitLoad()                               // wait for response
+		inputSearch.MustKeyActions().Type(input.Enter).MustDo()   // Submit by pressing enter on form (because clicking on submitBtn triggered the anti-bot detection)
+		pageLoaderr = SearchPage.Timeout(PAGE_TIMEOUT).WaitLoad() // wait for response
+		if pageLoaderr != nil {
+			log.Println("[WARN] cannot load page")
+			continue
+		}
 
 		correctUrl := fmt.Sprintf("?keyword=%s", url.QueryEscape(title)) // encodeURI() in go: https://www.urlencoder.io/golang/
 		if !strings.Contains(SearchPage.MustInfo().URL, correctUrl) {
@@ -102,9 +111,15 @@ func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 
 		/* Get result and check it */
 		result, err := SearchPage.Timeout(PAGE_TIMEOUT / 5).Element("#list-items") // posters list
-		if err != nil || len(result.MustElements(".item")) <= 0 {
+		if err != nil {
 			log.Println("[WARN]: No Anime Children")
 			continue // No animes found --> next title
+		} else {
+			resultChildren, err := result.Timeout(time.Second).Elements(".item")
+			if err != nil || len(resultChildren) <= 0 {
+				log.Println("[WARN]: No Anime Children")
+				continue // No animes found --> next title
+			}
 		}
 
 		AnimePoster, errNotFound := SearchPage.Timeout(PAGE_TIMEOUT / 5).Element(`#list-items :first-child .ani.poster > a`) // search anime elem
