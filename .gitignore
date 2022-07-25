@@ -51,5 +51,4 @@ yarn-error.log*
 /lib/template.ts
 
 # Others
-/API
 /ackv2_admin_firebase_sdk.json

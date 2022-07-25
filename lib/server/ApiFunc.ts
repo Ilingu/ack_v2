@@ -152,46 +152,51 @@ const Fetch9AnimeLink = async (
       ...title_synonyms,
     ];
     for (const name of TitlesItarable) {
-      const NineAnimeQuery = encodeURIComponent(
-        `https://9anime.id/filter?season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=subbed&keyword=${name}`
-      );
+      const NineAnimeQuery = `https://9anime.id/filter?keyword=${name
+        .toLowerCase()
+        .replaceAll(
+          " ",
+          "+"
+        )}&season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=sub&sort=recently_updated`;
       const URLQuery =
         process.env.NODE_ENV === "production"
           ? `https://api.webscrapingapi.com/v1?api_key=${process.env.WEB_SCAPPING_API_KEY}&url=${NineAnimeQuery}&device=desktop&proxy_type=datacenter`
-          : decodeURIComponent(NineAnimeQuery);
+          : NineAnimeQuery;
       TemplateURLs.push(URLQuery);
     }
 
-    const cheerio = await import("cheerio");
-    const AttemptGettingNineAnimeUrl = (): Promise<string> =>
-      new Promise((res) => {
-        let i = 0;
-        const FetchingLink = async () => {
-          if (i > TemplateURLs.length - 1) return res(null);
+    // const cheerio = await import("cheerio");
+    // const AttemptGettingNineAnimeUrl = (): Promise<string> =>
+    //   new Promise((res) => {
+    //     let i = 0;
+    //     const FetchingLink = async () => {
+    //       if (i > TemplateURLs.length - 1) return res(null);
 
-          const response = await fetch(TemplateURLs[i]);
-          if (!response.ok) {
-            i++;
-            return FetchingLink();
-          }
+    //       const response = await fetch(TemplateURLs[i]);
+    //       if (!response.ok) {
+    //         i++;
+    //         return FetchingLink();
+    //       }
 
-          const HTMLDoc = await response.text();
+    //       const HTMLDoc = await response.text();
 
-          const $ = cheerio.load(HTMLDoc);
-          const UrlLink = $(".anime-list:first-child > li > a").attr("href");
+    //       const $ = cheerio.load(HTMLDoc);
+    //       const UrlLink = $("#list-items :first-child .ani.poster > a").attr(
+    //         "href"
+    //       );
 
-          if (IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/")) {
-            i++;
-            return FetchingLink();
-          }
+    //       if (IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/")) {
+    //         i++;
+    //         return FetchingLink();
+    //       }
 
-          return res(UrlLink);
-        };
-        FetchingLink();
-      });
+    //       return res(UrlLink);
+    //     };
+    //     FetchingLink();
+    //   });
 
-    const UrlLink = await AttemptGettingNineAnimeUrl();
-    return UrlLink;
+    // const UrlLink = await AttemptGettingNineAnimeUrl();
+    return null;
   } catch (err) {
     console.error(err);
     return null;
