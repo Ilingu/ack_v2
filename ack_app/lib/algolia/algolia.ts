@@ -1,5 +1,5 @@
 import algoliasearch from "algoliasearch/lite";
-import { AlgoliaDatasShape, AlgoliaResShape } from "../utils/types/interface";
+import { AlgoliaDatasShape, FunctionJob } from "../utils/types/interface";
 
 const isTestEnv = process.env.NODE_ENV === "test";
 
@@ -17,10 +17,11 @@ const SearchDB = !isTestEnv && AlgoliaClient.initIndex("prod_ACK");
  */
 export const SearchAnimeInAlgolia = async (
   queryString: string
-): Promise<AlgoliaResShape> => {
+): Promise<FunctionJob<AlgoliaDatasShape[]>> => {
   try {
     const resAnimes = await SearchDB.search(queryString);
-    if (!resAnimes) throw new Error("Cannot Get From Algolia");
+    if (!resAnimes) return { success: false }; // "Cannot Get From Algolia"
+
     return {
       success: true,
       data: resAnimes.hits as unknown as AlgoliaDatasShape[],

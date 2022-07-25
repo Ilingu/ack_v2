@@ -29,8 +29,8 @@ export interface DifferenceWWShapeReq {
   CachedValues: AnimeShape[];
   NewValues: UserAnimeShape[];
 }
-// Api routes
 
+// Api routes
 export interface InternalApiResSuccess {
   AddedToDB: boolean;
   AnimeUpdated: boolean;
@@ -44,10 +44,6 @@ export interface ResDataUser {
   UserFavoriteAnime: string;
 }
 // Algolia
-export interface AlgoliaResShape {
-  success: boolean;
-  data?: AlgoliaDatasShape[];
-}
 export interface AlgoliaDatasShape {
   title: string;
   AlternativeTitle: AlternativeTitleShape;
@@ -191,6 +187,10 @@ export interface AlternativeTitleShape {
   title_english: string;
   title_japanese: string;
   title_synonyms: string[];
+}
+/* 9anime-api res */
+export interface NineAnimeAPIResShape extends FunctionJob<string> {
+  statusCode: number;
 }
 /* adkami-api Error */
 export interface ADKamiScrapperApiERROR {

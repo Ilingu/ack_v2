@@ -14,8 +14,6 @@ name: "CodeQL"
 on:
   push:
     branches: ["main", "dev"]
-    paths:
-      - "ack_app"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ["main", "dev"]
@@ -39,9 +37,6 @@ jobs:
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
     steps:
-      - name: Right dir
-        run: cd ack_app
-
       - name: Checkout repository
         uses: actions/checkout@v3
 

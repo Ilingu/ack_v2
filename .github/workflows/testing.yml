@@ -3,21 +3,14 @@ name: Cypress Tests
 on:
   push:
     branches: ["main"]
-    paths:
-      - "ack_app"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ["main"]
-    paths:
-      - "ack_app"
 
 jobs:
   testing-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Right dir
-        run: cd ack_app
-
       - name: Checkout
         uses: actions/checkout@v2
 

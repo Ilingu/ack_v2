@@ -12,6 +12,7 @@ import type {
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
+  NineAnimeAPIResShape,
 } from "../utils/types/interface";
 import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 // Func
@@ -144,59 +145,36 @@ const Fetch9AnimeLink = async (
       title_synonyms,
     } = data;
 
-    const TemplateURLs = [];
     const TitlesItarable = [
       title,
       title_japanese,
       title_english,
       ...title_synonyms,
     ];
-    for (const name of TitlesItarable) {
-      const NineAnimeQuery = `https://9anime.id/filter?keyword=${name
-        .toLowerCase()
-        .replaceAll(
-          " ",
-          "+"
-        )}&season[]=${season}&year[]=${year}&type[]=${type.toLowerCase()}&language[]=sub&sort=recently_updated`;
-      const URLQuery =
-        process.env.NODE_ENV === "production"
-          ? `https://api.webscrapingapi.com/v1?api_key=${process.env.WEB_SCAPPING_API_KEY}&url=${NineAnimeQuery}&device=desktop&proxy_type=datacenter`
-          : NineAnimeQuery;
-      TemplateURLs.push(URLQuery);
+    const APIUrl = encodeURI(
+      `https://ack-9anime-scrapping.up.railway.app/getLink?TitlesItarable=${TitlesItarable.join(
+        ","
+      )}&season=${season}&year=${year}&type=${type}`
+    );
+
+    // 3 attempts to get the url, if the 3 failed return null
+    for (let i = 0; i < 3; i++) {
+      console.log(i, APIUrl);
+      const ApiRes = await fetch(APIUrl);
+      if (!ApiRes.ok) {
+        continue;
+      }
+
+      const { success, data: UrlLink }: NineAnimeAPIResShape =
+        await ApiRes.json();
+      console.log(UrlLink);
+      if (!success || IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/"))
+        continue;
+
+      return UrlLink;
     }
 
-    // const cheerio = await import("cheerio");
-    // const AttemptGettingNineAnimeUrl = (): Promise<string> =>
-    //   new Promise((res) => {
-    //     let i = 0;
-    //     const FetchingLink = async () => {
-    //       if (i > TemplateURLs.length - 1) return res(null);
-
-    //       const response = await fetch(TemplateURLs[i]);
-    //       if (!response.ok) {
-    //         i++;
-    //         return FetchingLink();
-    //       }
-
-    //       const HTMLDoc = await response.text();
-
-    //       const $ = cheerio.load(HTMLDoc);
-    //       const UrlLink = $("#list-items :first-child .ani.poster > a").attr(
-    //         "href"
-    //       );
-
-    //       if (IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/")) {
-    //         i++;
-    //         return FetchingLink();
-    //       }
-
-    //       return res(UrlLink);
-    //     };
-    //     FetchingLink();
-    //   });
-
-    // const UrlLink = await AttemptGettingNineAnimeUrl();
-    return null;
+    return null; // the 3 attemps failed...
   } catch (err) {
     console.error(err);
     return null;

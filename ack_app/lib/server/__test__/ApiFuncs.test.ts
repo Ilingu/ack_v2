@@ -120,6 +120,6 @@ describe.concurrent("Testing ApiFuncs", () => {
         await (() => new Promise((res) => setTimeout(res, 2000)))();
       }
     },
-    60_000 // 1min timeout
+    60_000 * 3 // 3min timeout
   );
 });

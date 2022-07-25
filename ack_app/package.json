@@ -6,15 +6,16 @@
   "keywords": [
     "Anime",
     "Otaku",
+    "list",
     "NextJS",
     "Tailwind",
-    "list"
+    "TypeScript"
   ],
   "author": "Ilingu",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ilingu/ack_v2"
+    "url": "https://github.com/Ilingu/ack_v2.git"
   },
   "scripts": {
     "dev": "next dev",
