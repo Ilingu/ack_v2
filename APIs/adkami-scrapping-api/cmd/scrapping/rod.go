@@ -54,23 +54,22 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 	log.Printf("Go at: %s", ScrappingURL)
 	SearchPage.MustNavigate(ScrappingURL)
 	SearchPage.MustWaitLoad()
-	log.Println(SearchPage.MustInfo().URL)
 
-	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
+	LastDOMEpList := SearchPage.Timeout(2 * time.Second).MustElements(`#indexpage .video-item-list.up`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
 
 	for _, DOMEp := range LastDOMEpList {
 		// Parents
-		ImgParent := DOMEp.MustElement(".img")
-		TopParent := DOMEp.MustElement(".top")
-		InfoParent := DOMEp.MustElement(".info")
+		ImgParent := DOMEp.Timeout(2 * time.Second).MustElement(".img")
+		TopParent := DOMEp.Timeout(2 * time.Second).MustElement(".top")
+		InfoParent := DOMEp.Timeout(2 * time.Second).MustElement(".info")
 
 		// Data
-		Title := TopParent.MustElement("a").MustElement(".title").MustText()
-		EpisodeId := TopParent.MustElement(".episode").MustText()
-		TimeReleased := InfoParent.MustElement(".date").MustText()
-		ImgP := ImgParent.MustElement("img").MustAttribute("data-original")
-		Team := TopParent.MustElement(".team").MustText()
+		Title := TopParent.Timeout(2 * time.Second).MustElement("a").Timeout(2 * time.Second).MustElement(".title").Timeout(2 * time.Second).MustText()
+		EpisodeId := TopParent.Timeout(2 * time.Second).MustElement(".episode").Timeout(2 * time.Second).MustText()
+		TimeReleased := InfoParent.Timeout(2 * time.Second).MustElement(".date").Timeout(2 * time.Second).MustText()
+		ImgP := ImgParent.Timeout(2 * time.Second).MustElement("img").Timeout(2 * time.Second).MustAttribute("data-original")
+		Team := TopParent.Timeout(2 * time.Second).MustElement(".team").Timeout(2 * time.Second).MustText()
 
 		var Img string
 		if ImgP != nil {
