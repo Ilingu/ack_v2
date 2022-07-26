@@ -2,15 +2,12 @@ package scrapping
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
-	"github.com/go-rod/stealth"
 )
 
 func newBrowser() (*rod.Browser, error) {
@@ -37,25 +34,26 @@ type AdkamiNewEpisodeShape struct {
 }
 
 func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
+	log.Println("Fecthing New Eps...")
 	browser, err := newBrowser()
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	defer browser.MustClose()
-	log.Println("1. Fecthing New Eps...")
 
-	SearchPage := stealth.MustPage(browser)
+	// SearchPage := stealth.MustPage(browser)
 
 	ADKamiURL := "https://www.adkami.com/"
-	ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
-	SearchPage.MustNavigate(ScrappingURL)
+	// ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
+	// log.Printf("Go at: %s", ScrappingURL)
+
+	SearchPage := browser.MustPage(ADKamiURL)
+	// SearchPage.MustNavigate(ScrappingURL)
 	SearchPage.MustWaitLoad()
-	log.Println("2. On ADKami...")
 
 	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
-	log.Println("3. DOM Elems Fetched...")
 
 	for _, DOMEp := range LastDOMEpList {
 		// Parents
@@ -79,6 +77,5 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		AdkamiNewEpisodes = append(AdkamiNewEpisodes, NewEp)
 	}
 
-	log.Println("4. Done!", len(AdkamiNewEpisodes))
 	return AdkamiNewEpisodes
 }
