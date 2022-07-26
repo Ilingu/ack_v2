@@ -2,9 +2,7 @@ package scrapping
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"time"
 
@@ -15,7 +13,7 @@ import (
 
 func newBrowser() (*rod.Browser, error) {
 	if os.Getenv("APP_MODE") != "prod" {
-		return rod.New().Timeout(3 * time.Minute).MustConnect().MustIncognito().NoDefaultDevice(), nil // In dev
+		return rod.New().Timeout(time.Minute).MustConnect().MustIncognito().NoDefaultDevice(), nil // In dev
 	}
 
 	// In prod
@@ -24,9 +22,8 @@ func newBrowser() (*rod.Browser, error) {
 		return nil, errors.New("cannot find the chromium executable")
 	}
 
-	l := launcher.New().Bin(path)
-	l.Headless(true).Set("disable-gpu").Set("disable-dev-shm-usage").Set("disable-setuid-sandbox").Set("no-sandbox")
-	return rod.New().Timeout(3 * time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
+	l := launcher.NewUserMode().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
+	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
 }
 
 type AdkamiNewEpisodeShape struct {
@@ -48,9 +45,9 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 
 	SearchPage := stealth.MustPage(browser)
 
-	ADKamiURL := "https://www.adkami.com/"
-	ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
-	SearchPage.MustNavigate(ScrappingURL)
+	// ADKamiURL := "https://www.adkami.com/"
+	// ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
+	SearchPage.MustNavigate("https://www.adkami.com/")
 	SearchPage.MustWaitLoad()
 	log.Println("2. On ADKami...")
 
