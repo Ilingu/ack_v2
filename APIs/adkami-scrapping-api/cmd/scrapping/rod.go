@@ -68,7 +68,11 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		return nil
 	}
 
-	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
+	LastDOMEpList, err := SearchPage.Elements(`#indexpage .video-item-list.up`) // search input
+	if err != nil {
+		log.Println(len(LastDOMEpList))
+		return nil
+	}
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
 
 	for _, DOMEp := range LastDOMEpList {
