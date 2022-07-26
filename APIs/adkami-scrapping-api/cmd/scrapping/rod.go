@@ -42,13 +42,16 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		return nil
 	}
 	defer browser.MustClose()
-	log.Println("Fecthing New Eps...")
+	log.Println("1. Fecthing New Eps...")
 
 	SearchPage := stealth.MustPage(browser)
-	SearchPage.MustNavigate("https://www.adkami.com/").MustWaitLoad()
+	SearchPage.MustNavigate("https://www.adkami.com/")
+	SearchPage.MustWaitLoad()
+	log.Println("2. On ADKami...")
 
 	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
+	log.Println("3. DOM Elems Fetched...")
 
 	for _, DOMEp := range LastDOMEpList {
 		// Parents
@@ -72,5 +75,6 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		AdkamiNewEpisodes = append(AdkamiNewEpisodes, NewEp)
 	}
 
+	log.Println("4. Done!")
 	return AdkamiNewEpisodes
 }
