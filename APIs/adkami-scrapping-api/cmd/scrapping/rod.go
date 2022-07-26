@@ -2,7 +2,9 @@ package scrapping
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"time"
 
@@ -45,9 +47,9 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 
 	SearchPage := stealth.MustPage(browser)
 
-	// ADKamiURL := "https://www.adkami.com/"
-	// ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
-	SearchPage.MustNavigate("https://www.adkami.com/")
+	ADKamiURL := "https://www.adkami.com/"
+	ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
+	SearchPage.MustNavigate(ScrappingURL)
 	SearchPage.MustWaitLoad()
 	log.Println("2. On ADKami...")
 
