@@ -24,7 +24,7 @@ func newBrowser() (*rod.Browser, error) {
 		return nil, errors.New("cannot find the chromium executable")
 	}
 
-	l := launcher.NewUserMode().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
+	l := launcher.New().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
 	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
 }
 
@@ -48,7 +48,7 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 	SearchPage := stealth.MustPage(browser)
 
 	ADKamiURL := "https://www.adkami.com/"
-	ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
+	ScrappingURL := fmt.Sprintf("https://api.scraperbox.com/scrape?token=%s&proxy_location=fr&residential_proxy=true&url=%s", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
 
 	log.Printf("Go at: %s", ScrappingURL)
 	SearchPage.MustNavigate(ScrappingURL)

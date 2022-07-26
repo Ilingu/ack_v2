@@ -1,7 +1,9 @@
 package main
 
 import (
+	"adkami-scrapping-api/cmd/caching"
 	"adkami-scrapping-api/cmd/scrapping"
+	"log"
 	"net/http"
 )
 
@@ -18,10 +20,22 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Checking if there is cache...
+	cachedDatas, ok := caching.ReadCachingFile()
+	if ok {
+		HandleResponse(&w, http.StatusOK, cachedDatas) // ✅
+		log.Println("From Cache ⚡")
+		return
+	}
+
+	// No Cache... Fetch
 	AdkamiLatestEps := scrapping.FetchAdkamiLatestEps()
 	if AdkamiLatestEps == nil || len(AdkamiLatestEps) <= 0 {
 		HandleResponse(&w, http.StatusBadRequest, "no animes returned")
 		return
 	}
 	HandleResponse(&w, http.StatusOK, AdkamiLatestEps) // ✅
+
+	// Cache result
+	caching.CacheNewEpsDatas(AdkamiLatestEps)
 }
