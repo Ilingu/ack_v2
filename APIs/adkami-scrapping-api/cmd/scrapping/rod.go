@@ -68,9 +68,11 @@ func FetchAdkamiLatestEps() ([]AdkamiNewEpisodeShape, error) {
 		return nil, errors.New("error when requesting scrappong api")
 	}
 
-	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
+	LastDOMEpList := SearchPage.MustElements(`.video-item-list`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
-	log.Println(len(LastDOMEpList))
+	if len(LastDOMEpList) <= 0 {
+		return nil, errors.New("cannot query the items")
+	}
 
 	for _, DOMEp := range LastDOMEpList {
 		// Parents
