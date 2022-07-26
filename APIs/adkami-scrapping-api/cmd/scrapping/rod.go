@@ -75,6 +75,6 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		AdkamiNewEpisodes = append(AdkamiNewEpisodes, NewEp)
 	}
 
-	log.Println("4. Done!")
+	log.Println("4. Done!", len(AdkamiNewEpisodes), AdkamiNewEpisodes[0])
 	return AdkamiNewEpisodes
 }
