@@ -2,12 +2,15 @@ package scrapping
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"time"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/stealth"
 )
 
 func newBrowser() (*rod.Browser, error) {
@@ -21,10 +24,8 @@ func newBrowser() (*rod.Browser, error) {
 		return nil, errors.New("cannot find the chromium executable")
 	}
 
-	// .Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
-	// .MustIncognito().NoDefaultDevice()
-	l := launcher.New().Bin(path).Headless(true).Set("no-sandbox")
-	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect(), nil
+	l := launcher.NewUserMode().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
+	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
 }
 
 type AdkamiNewEpisodeShape struct {
@@ -44,14 +45,13 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 	}
 	defer browser.MustClose()
 
-	// SearchPage := stealth.MustPage(browser)
+	SearchPage := stealth.MustPage(browser)
 
 	ADKamiURL := "https://www.adkami.com/"
-	// ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
-	// log.Printf("Go at: %s", ScrappingURL)
+	ScrappingURL := fmt.Sprintf("https://api.webscrapingapi.com/v1?api_key=%s&url=%s&device=desktop&proxy_type=datacenter", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
 
-	SearchPage := browser.MustPage(ADKamiURL)
-	// SearchPage.MustNavigate(ScrappingURL)
+	log.Printf("Go at: %s", ScrappingURL)
+	SearchPage.MustNavigate(ScrappingURL)
 	SearchPage.MustWaitLoad()
 
 	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
