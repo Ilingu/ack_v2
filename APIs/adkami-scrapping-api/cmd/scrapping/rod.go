@@ -24,7 +24,8 @@ func newBrowser() (*rod.Browser, error) {
 		return nil, errors.New("cannot find the chromium executable")
 	}
 
-	l := launcher.New().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
+	l := launcher.New().Bin(path)
+	l.Headless(true).Set("no-sandbox").Set("disable-setuid-sandbox").Set("disable-dev-shm-usage").Set("disable-gpu")
 	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
 }
 
