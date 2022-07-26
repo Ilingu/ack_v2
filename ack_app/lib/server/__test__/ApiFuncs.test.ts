@@ -23,7 +23,7 @@ interface LittleAnimeShape {
   MalPage: string;
   duration: string;
   broadcast: string;
-  NineAnimeUrl?: string;
+  ProvidersLink?: string[];
 }
 
 global.fetch = fetch;
@@ -62,7 +62,12 @@ describe.concurrent("Testing ApiFuncs", () => {
             MalPage: "https://myanimelist.net/anime/44055/Sasaki_to_Miyano",
             duration: "23 min per ep",
             broadcast: "Mondays at 00:30 (JST)",
-            NineAnimeUrl: "/watch/sasaki-and-miyano.prrw6",
+            ProvidersLink: [
+              "https://gogoanime.lu/category/sasaki-to-miyano",
+              "https://chia-anime.su/anime/sasaki-to-miyano",
+              "https://kickassanime.su/anime/sasaki-to-miyano",
+              "https://lite.animevibe.se/anime/sasaki-to-miyano",
+            ],
           },
         },
         {
@@ -81,7 +86,12 @@ describe.concurrent("Testing ApiFuncs", () => {
             MalPage: "https://myanimelist.net/anime/34572/Black_Clover",
             duration: "23 min per ep",
             broadcast: "Tuesdays at 18:25 (JST)",
-            NineAnimeUrl: "/watch/black-clover.v2k6",
+            ProvidersLink: [
+              "https://gogoanime.lu/category/black-clover",
+              "https://chia-anime.su/anime/black-clover",
+              "https://kickassanime.su/anime/black-clover",
+              "https://lite.animevibe.se/anime/black-clover",
+            ],
           },
         },
         {
@@ -101,7 +111,10 @@ describe.concurrent("Testing ApiFuncs", () => {
             MalPage: "https://myanimelist.net/anime/26243/Owari_no_Seraph",
             duration: "23 min per ep",
             broadcast: "Saturdays at 22:00 (JST)",
-            NineAnimeUrl: "/watch/seraph-of-the-end-vampire-reign.g98",
+            ProvidersLink: [
+              "https://gogoanime.lu/category/owari-no-seraph",
+              "https://lite.animevibe.se/anime/owari-no-seraph",
+            ],
           },
         },
       ];
@@ -114,6 +127,10 @@ describe.concurrent("Testing ApiFuncs", () => {
 
         expect(success).toBe(true);
         for (const exceptedKey of Object.keys(excepted)) {
+          if (exceptedKey === "ProvidersLink") {
+            expect(AnimeData?.ProvidersLink).toEqual(excepted.ProvidersLink);
+            continue;
+          }
           expect(AnimeData[exceptedKey]).toBe(excepted[exceptedKey]);
         }
 

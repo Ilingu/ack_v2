@@ -42,8 +42,20 @@ export type AnimeDatasShape = [
   JikanApiResAnime,
   JikanApiResEpisodes[],
   JikanApiResRecommandations[],
-  string
+  string[]
 ];
+
+export type AnimeProviders =
+  | "https://gogoanime.lu/category"
+  | "https://chia-anime.su/anime"
+  | "https://kickassanime.su/anime"
+  | "https://lite.animevibe.se/anime";
+export type AnimeProvidersName =
+  | "gogoanime"
+  | "chia-anime"
+  | "kickassanime"
+  | "animevibe";
+export type ProviderUIInfo = [AnimeProvidersName, string, string];
 
 export type tRPCError =
   | "PARSE_ERROR"

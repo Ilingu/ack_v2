@@ -13,9 +13,15 @@ import type {
   AlternativeTitleShape,
   InternalApiResSuccess,
 } from "../../lib/utils/types/interface";
+import type { ProviderUIInfo } from "../../lib/utils/types/types";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
-import { Return404 } from "../../lib/utils/UtilsFuncs";
+import {
+  GetProviderUIInfo,
+  pickTextColorBasedOnBgColor,
+  ProviderUrlIdentifier,
+  Return404,
+} from "../../lib/utils/UtilsFuncs";
 import { ConvertBroadcastTimeZone } from "../../lib/client/ClientFuncs";
 import { GetAnimeData } from "../../lib/server/ApiFunc";
 // FB
@@ -167,6 +173,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     Status,
     AiringDate,
     NextRefresh,
+    ProvidersLink,
   } = animeData?.AnimeData || {};
 
   useEffect(() => {
@@ -224,17 +231,17 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       />
       {/* Overall Info */}
       <section className="relative lg:w-5/6">
-        <h1 className="text-primary-main text-center text-4xl font-bold underline lg:text-left">
+        <h1 className="text-center text-4xl font-bold text-primary-main underline lg:text-left">
           {title}
         </h1>
         <div className="mt-6 flex flex-col items-center">
           <div className="xl:w-5/6">
-            <div className="text-headline mb-6 grid grid-cols-2 justify-items-center gap-2 text-2xl font-bold md:grid-cols-4">
+            <div className="mb-6 grid grid-cols-2 justify-items-center gap-2 text-2xl font-bold text-headline md:grid-cols-4">
               <div>
                 <FaTv className="icon" />{" "}
                 <span className="text-primary-whiter">{type}</span>{" "}
                 {type === "TV" && (
-                  <span className="text-description text-xl italic">
+                  <span className="text-xl italic text-description">
                     ({nbEp} eps)
                   </span>
                 )}
@@ -244,16 +251,16 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 <span className="text-primary-whiter">
                   {OverallScore || "No score yet"}
                 </span>{" "}
-                <span className="text-description text-xl italic">
+                <span className="text-xl italic text-description">
                   {ScoredByTransform && `(${ScoredByTransform} people)`}
                 </span>
               </div>
               <div>
                 <FaCalendarAlt className="icon" />{" "}
-                <span className="text-primary-whiter capitalize">
+                <span className="capitalize text-primary-whiter">
                   {Status === "Not yet aired" ? AiringDate : ReleaseDate}
                 </span>
-                <span className="text-description text-xl italic">
+                <span className="text-xl italic text-description">
                   {Status === "Not yet aired"
                     ? " (Not yet aired)"
                     : Airing || " (Finished)"}
@@ -263,7 +270,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 {Airing && broadcast ? (
                   <Fragment>
                     <FaClock className="icon" />{" "}
-                    <span className="text-primary-whiter capitalize">
+                    <span className="capitalize text-primary-whiter">
                       {ConvertBroadcastTimeZone(broadcast, "BroadcastFormated")}{" "}
                       UTC+1
                     </span>
@@ -295,7 +302,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                       <img
                         src={photoPath}
                         alt={`${title}'s cover`}
-                        className="ring-primary-whiter rounded-md shadow-md ring-2"
+                        className="rounded-md shadow-md ring-2 ring-primary-whiter"
                       />
                     </a>
                   </Link>
@@ -303,17 +310,17 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                   <img
                     src={photoPath}
                     alt={`${title}'s cover`}
-                    className="ring-primary-whiter rounded-md shadow-md ring-2"
+                    className="rounded-md shadow-md ring-2 ring-primary-whiter"
                   />
                 )}{" "}
                 <a href={MalPage} target="_blank" rel="noreferrer">
                   <FaInfo
-                    className="left-info-bubble text-headline bg-primary-main absolute -top-3 h-12 w-12 cursor-pointer rounded-full 
-                    py-2 px-2 font-bold transition hover:scale-110 lg:-left-3"
+                    className="absolute left-info-bubble -top-3 h-12 w-12 cursor-pointer rounded-full bg-primary-main py-2 
+                    px-2 font-bold text-headline transition hover:scale-110 lg:-left-3"
                   />
                 </a>
               </div>
-              <p className="text-headline xs:text-lg px-2 text-justify text-base font-semibold md:px-4 lg:col-span-5 lg:px-8">
+              <p className="px-2 text-justify text-base font-semibold text-headline xs:text-lg md:px-4 lg:col-span-5 lg:px-8">
                 <SynopsisComponent
                   Synopsis={Synopsis?.replace("[Written by MAL Rewrite]", "")}
                 />
@@ -328,7 +335,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 (Airing && broadcast) || type === "Movie" ? Studios : null
               }
               OtherInfos={[
-                animeData?.AnimeData?.NineAnimeUrl || null,
+                ProvidersLink ? ProvidersLink[0] : null,
                 Airing && broadcast,
                 Airing ? "Ongoing" : "Finished",
               ]}
@@ -342,13 +349,13 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
         </div>
       </section>
       {/* Trailer */}
-      <section className="bg-bgi-whiter flex w-11/12 flex-col items-center rounded-xl py-4 lg:w-5/6">
-        <h1 className="text-headline mb-8 text-4xl font-bold tracking-wider">
+      <section className="flex w-11/12 flex-col items-center rounded-xl bg-bgi-whiter py-4 lg:w-5/6">
+        <h1 className="mb-8 text-4xl font-bold tracking-wider text-headline">
           Trailer:
         </h1>
         {process.env.NODE_ENV === "production" && (
           <iframe
-            className="ring-primary-main sm:w-iframe-w sm:h-iframe-h rounded-xl ring-4"
+            className="rounded-xl ring-4 ring-primary-main sm:h-iframe-h sm:w-iframe-w"
             src={trailer_url}
             title="YouTube video player"
             frameBorder="0"
@@ -362,13 +369,13 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
           <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
             <EpisodesList
               Eps={EpisodesData}
-              NineAnimeBaseUrl={animeData?.AnimeData?.NineAnimeUrl}
+              ProvidersLink={ProvidersLink || []}
             />
           </EpisodesSearchContext.Provider>
         </section>
       )}
       {/* Recommendation */}
-      <section className="bg-bgi-whiter mt-2 w-5/6 rounded-xl py-4">
+      <section className="mt-2 w-5/6 rounded-xl bg-bgi-whiter py-4">
         <RecommandationsList
           RecommandationsData={Recommendations?.slice(0, 7)}
         />
@@ -385,8 +392,8 @@ function MyAnimes({ malId, AnimeType }: MyAnimeProps) {
           <Link href="/sign-up">
             <a>
               <div
-                className="group bg-bgi-black text-headline w-full rounded-lg py-3 px-1 text-center 
-             text-2xl font-semibold outline-none transition hover:text-red-400 hover:underline hover:decoration-red-500"
+                className="group w-full rounded-lg bg-bgi-black py-3 px-1 text-center text-2xl 
+             font-semibold text-headline outline-none transition hover:text-red-400 hover:underline hover:decoration-red-500"
               >
                 You{" "}
                 <span className="font-bold tracking-wide text-red-400 group-hover:text-red-500">
@@ -414,7 +421,7 @@ function MyAnimesCore({ children }) {
   return (
     <div className="mb-4 flex justify-center">
       <div className="w-2/3">
-        <p className="text-headline text-xl font-bold tracking-wide">
+        <p className="text-xl font-bold tracking-wide text-headline">
           MY ANIME:
         </p>
         {children}
@@ -451,7 +458,7 @@ function SpecialInfo({
   return (
     <div className="flex justify-center">
       <div className="w-2/3">
-        <p className="text-headline text-lg font-bold underline">
+        <p className="text-lg font-bold text-headline underline">
           Special info:
         </p>
         <div className="flex flex-wrap justify-center">{TagsSpecialInfo}</div>
@@ -461,35 +468,47 @@ function SpecialInfo({
 }
 
 function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
-  const Is9AnimeLink =
-    typeof dataToShow === "string" && dataToShow?.startsWith("/watch/");
+  const IsProviderLink =
+    typeof dataToShow === "string" && ProviderUrlIdentifier(dataToShow);
+  const UIInfo = IsProviderLink && GetProviderUIInfo([dataToShow])[0];
+
   return (
     <div
-      className={`text-headline ${
-        Is9AnimeLink ? "bg-[#5a2e98]" : "bg-bgi-black"
-      } hover:text-primary-whiter hover:bg-bgi-darker mr-2 mb-2 cursor-default rounded-lg py-2 px-2 font-bold transition`}
+      style={{
+        backgroundColor: IsProviderLink ? UIInfo[1] : "rgb(28 28 28)",
+        color: IsProviderLink ? pickTextColorBasedOnBgColor(UIInfo[1]) : "#fff",
+      }}
+      className="mr-2 mb-2 cursor-default rounded-lg py-2 px-2 font-bold transition hover:bg-bgi-darker hover:text-primary-whiter"
     >
-      {Is9AnimeLink ? <NineAnimeBadge path={dataToShow} /> : dataToShow}
+      {IsProviderLink ? (
+        <ProviderAnimeBadge UIInfo={UIInfo} path={dataToShow} />
+      ) : (
+        dataToShow
+      )}
     </div>
   );
 }
 
-function NineAnimeBadge({ path }: { path: string }) {
+interface ProviderAnimeBadgeProps {
+  UIInfo: ProviderUIInfo;
+  path: string;
+}
+function ProviderAnimeBadge({ UIInfo, path }: ProviderAnimeBadgeProps) {
   return (
     <a
-      href={`https://9anime.id${path}`}
+      href={path}
       target="_blank"
       rel="noreferrer"
-      className="flex items-center justify-center gap-1"
+      className="flex items-center justify-center gap-1 capitalize"
     >
       <Image
-        src="/Assets/9animeLogo.png"
+        src={UIInfo[2]}
         width={16}
         height={16}
         alt="9anime Logo"
         className="rounded-md bg-white"
       />
-      9Anime
+      {UIInfo[0]}
     </a>
   );
 }
@@ -502,7 +521,7 @@ function TagsAnime({ Genres, Themes }: TagsAnimesProps) {
   return (
     <div className="flex justify-center">
       <div className="mt-4 w-2/3">
-        <p className="text-headline text-lg font-bold underline">Tags:</p>
+        <p className="text-lg font-bold text-headline underline">Tags:</p>
         <div className="flex flex-wrap justify-center">{Tags}</div>
       </div>
     </div>
@@ -515,8 +534,8 @@ function TagsAnimeItem({ name, url }: { name: string; url: string }) {
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="text-headline bg-bgi-black hover:text-primary-whiter hover:bg-bgi-darker mr-2 mb-2 cursor-pointer rounded-lg py-2 px-2
-       font-bold transition"
+      className="mr-2 mb-2 cursor-pointer rounded-lg bg-bgi-black py-2 px-2 font-bold text-headline transition
+       hover:bg-bgi-darker hover:text-primary-whiter"
     >
       {name}
     </a>
@@ -528,7 +547,7 @@ function SynopsisComponent({ Synopsis }: { Synopsis: string }) {
     <Fragment>
       {Synopsis}
       <br />
-      <span className="text-description italic">
+      <span className="italic text-description">
         Source: [Written by MAL Rewrite]
       </span>
     </Fragment>

@@ -7,14 +7,16 @@ import type {
   FunctionJob,
   InternalApiResSuccess,
   JikanApiERROR,
-  JikanApiResAnime,
   JikanApiResAnimeRoot,
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
-  NineAnimeAPIResShape,
 } from "../utils/types/interface";
-import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
+import type {
+  AnimeDatasShape,
+  AnimeProviders,
+  AnimeStatusType,
+} from "../utils/types/types";
 // Func
 import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
@@ -30,6 +32,26 @@ export const IsBlacklistedHost = (host: string): boolean => {
   const WhiteListedHost = ["ack.vercel.app", "localhost:3000"];
   return !WhiteListedHost.includes(host);
 };
+
+// export const HolyFunction = (animeIDs: string[]) => {
+//   let i = 0;
+
+//   const FetchUrl = async () => {
+//     if (i > animeIDs.length - 1) return;
+//     const animeToRevalidate = animeIDs[i];
+//     console.log(`Processing anime #${animeIDs[i]}, i=${i}`);
+
+//     const { success, data } = await GetAnimeData(animeToRevalidate);
+//     console.log(`#${animeIDs[i]} succeed:`, JSON.stringify(success));
+//     console.log(JSON.stringify(data?.AnimeData?.ProvidersLink));
+
+//     await (() => new Promise((res) => setTimeout(res, 2500)))(); // wait 2.5s
+
+//     i++;
+//     FetchUrl();
+//   };
+//   FetchUrl();
+// };
 
 /**
  * Fetch Anime Data
@@ -79,13 +101,19 @@ export const GetAnimeData = async (
     } else AnimeEpsDatas = animeEpsRes;
 
     // 9anime url link
-    const NineAnimeLink = await Fetch9AnimeLink(animeRes);
+    const AnimeTitlesIterable = [
+      animeRes?.title,
+      animeRes?.title_japanese,
+      animeRes?.title_english,
+      ...(animeRes?.title_synonyms || []),
+    ].filter((d) => d);
+    const ProvidersLink = await FetchProvidersLink(AnimeTitlesIterable);
 
     const AnimeDatas: AnimeDatasShape = [
       animeRes,
       AnimeEpsDatas,
       animeRecommendationsRes,
-      NineAnimeLink,
+      ProvidersLink,
     ];
 
     let IsGood = true;
@@ -95,7 +123,7 @@ export const GetAnimeData = async (
     if (IsGood) {
       const MissingElems =
         EpisodesLength <= 0 ||
-        !NineAnimeLink ||
+        !ProvidersLink ||
         animeRecommendationsRes.length <= 0;
 
       const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(
@@ -130,60 +158,80 @@ export const GetAnimeData = async (
   }
 };
 
-const Fetch9AnimeLink = async (
-  data: JikanApiResAnime
-): Promise<string | null> => {
+/* SITE PROVIDER:
+  1. https://gogoanime.lu/category/*    --> Can Check URL + good search ✅✅
+  2. https://chia-anime.su/anime/*      --> Can Check URL, only latin letter search ❌
+  2. https://kickassanime.su/anime/*    --> Can Check URL, only latin letter search ❌
+  3. https://lite.animevibe.se/anime/*  --> Cannot Check If URL good or not ❌ + good search ✅
+  ------------------------------------------------------------------------------------------------------------
+  https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
+*/
+
+/**
+ * Generate and return the working Streaming Providers Link
+ * @param {string[]} AnimeTitles Array of the anime mutliples titles (e.g: Shingeki No Kyojin,Attack On Titan...)
+ * @return {string[]} Array of working providers anime link
+ */
+const FetchProvidersLink = async (
+  AnimeTitles: string[]
+): Promise<string[] | null> => {
   try {
-    // Filter Data
-    const {
-      title,
-      type,
-      year,
-      season,
-      title_japanese,
-      title_english,
-      title_synonyms,
-    } = data;
-
-    const TitlesItarable = [
-      title,
-      title_japanese,
-      title_english,
-      ...title_synonyms,
+    const PROVIDERS: AnimeProviders[] = [
+      "https://gogoanime.lu/category",
+      "https://chia-anime.su/anime",
+      "https://kickassanime.su/anime",
+      "https://lite.animevibe.se/anime",
     ];
-    const APIUrl = encodeURI(
-      `https://ack-9anime-scrapping.up.railway.app/getLink?TitlesItarable=${TitlesItarable.join(
-        ","
-      )}&season=${season}&year=${year}&type=${type}`
+
+    const providersLinks: string[][] = [];
+    for (const provider of PROVIDERS) {
+      const providerLinks: string[] = [];
+      for (const title of AnimeTitles) {
+        const TrimmedTitle = title
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-zA-Z0-9- ]/g, "")
+          .replaceAll(" ", "-")
+          .replaceAll("---", "--")
+          .replaceAll("--", "-");
+
+        if (TrimmedTitle.trim().length <= 0) continue;
+        const providerLink = encodeURI(`${provider}/${TrimmedTitle}`);
+        providerLinks.push(providerLink);
+      }
+      providersLinks.push(providerLinks);
+    }
+
+    const ProvidersResp = await Promise.allSettled(
+      providersLinks.map(async (providerLink) => {
+        const AttemptFetchUrl = (): Promise<string> =>
+          new Promise((res, rej) => {
+            let i = 0;
+            const FetchUrl = async () => {
+              if (i > providerLink.length - 1)
+                return rej("cannot find anime link in all titles");
+
+              const providerResp = await fetch(providerLink[i]);
+              if (providerResp.ok) return res(providerLink[i]); // if page exist, skip
+
+              /* TODO: if page result in 404 (or other): manual search page, template search + cheerio to grab dom elem 
+              -> I didn't implement it yet because the first method works terribly well, but some very few cases, the first method don't work at all and this method (more time expensive but 100% accurate) would be great to have...*/
+              // const cheerio = await import("cheerio");
+
+              i++;
+              FetchUrl();
+            };
+            FetchUrl();
+          });
+        return await AttemptFetchUrl();
+      })
     );
+    const ValidAnimeUrlLink = ProvidersResp.map((res) => {
+      if (res.status === "fulfilled") return res.value;
+      return null;
+    }).filter((e) => e);
 
-    // 2 attempts to get the url, if the 2 failed return null
-    const AtteptFetchLink = (): Promise<string> => {
-      return new Promise((res) => {
-        let i = 0;
-        const FetchLink = async () => {
-          if (i > 1) return res(null);
-          i++;
-
-          const ApiRes = await fetch(APIUrl);
-          if (!ApiRes.ok) return FetchLink();
-
-          const { success, data: UrlLink }: NineAnimeAPIResShape =
-            await ApiRes.json();
-          if (
-            !success ||
-            IsEmptyString(UrlLink) ||
-            !UrlLink.startsWith("/watch/")
-          )
-            return FetchLink();
-
-          return res(UrlLink);
-        };
-        FetchLink();
-      });
-    };
-
-    return await AtteptFetchLink();
+    return ValidAnimeUrlLink.length === 0 ? null : ValidAnimeUrlLink;
   } catch (err) {
     console.error(err);
     return null;
@@ -294,7 +342,7 @@ export function JikanApiToAnimeShape(
   JikanObj: AnimeDatasShape,
   MissingElems = false
 ): SpecialAnimeShape {
-  const [AnimeData, EpsData, Recommendations, NineAnimeUrl] = JikanObj;
+  const [AnimeData, EpsData, Recommendations, ProvidersLink] = JikanObj;
   let NextRefresh: number = null,
     NextEpsReleaseDate: number[] = null;
   let IsAddableToDB = true;
@@ -364,7 +412,7 @@ export function JikanApiToAnimeShape(
           ? AnimeData.broadcast.string
           : null,
       NextRefresh,
-      NineAnimeUrl,
+      ProvidersLink,
       NextEpisodesReleaseDate: NextEpsReleaseDate,
     },
     IsAddableToDB,

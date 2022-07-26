@@ -180,7 +180,7 @@ export interface AnimeShape {
   duration: string;
   malId: number;
   NextRefresh: number;
-  NineAnimeUrl?: string;
+  ProvidersLink?: string[];
   NextEpisodesReleaseDate?: number[];
 }
 export interface AlternativeTitleShape {
@@ -189,9 +189,6 @@ export interface AlternativeTitleShape {
   title_synonyms: string[];
 }
 /* 9anime-api res */
-export interface NineAnimeAPIResShape extends FunctionJob<string> {
-  statusCode: number;
-}
 /* adkami-api Error */
 export interface ADKamiScrapperApiERROR {
   statusCode: number;

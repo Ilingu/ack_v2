@@ -45,7 +45,7 @@ const WatchPage: NextPage = () => {
     EpisodesData,
     duration,
     type,
-    NineAnimeUrl,
+    ProvidersLink,
     NewEpisodeAvailable,
     NextEpisodesReleaseDate,
     broadcast,
@@ -80,7 +80,7 @@ const WatchPage: NextPage = () => {
   if (!UserAnimeData || !CurrentAnimeData)
     return (
       <div className="flex h-screen items-center justify-center">
-        <h1 className="text-headline text-semibold text-4xl">
+        <h1 className="text-semibold text-4xl text-headline">
           <FaSpinner className="icon" /> Loading...
         </h1>
       </div>
@@ -98,7 +98,7 @@ const WatchPage: NextPage = () => {
           <MetaTags title={`Watch ${title}`} description="User Watch Page" />{" "}
           {/* Banner */}
           <div
-            className="from-bgi-darker absolute -z-10 h-80 w-full bg-gradient-to-t bg-cover bg-fixed bg-center bg-no-repeat object-cover opacity-80 blur-sm"
+            className="absolute -z-10 h-80 w-full bg-gradient-to-t from-bgi-darker bg-cover bg-fixed bg-center bg-no-repeat object-cover opacity-80 blur-sm"
             data-testid="WatchBanner"
             style={{
               backgroundImage: `url("${photoPath.split(".jpg")[0] + "l.jpg"}")`,
@@ -121,7 +121,7 @@ const WatchPage: NextPage = () => {
                       blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcwfC/HgAFJwIozPyfrQAAAABJRU5ErkJggg=="
                     />
                     {NewEpisodeAvailable && (
-                      <div className="text-headline bg-primary-darker  absolute top-0 rounded-md px-3 py-1 text-lg font-bold tracking-wide">
+                      <div className="absolute top-0  rounded-md bg-primary-darker px-3 py-1 text-lg font-bold tracking-wide text-headline">
                         NEW
                       </div>
                     )}
@@ -146,7 +146,7 @@ const WatchPage: NextPage = () => {
                 <button
                   onClick={() => setFocusMode(true)}
                   data-testid="WatchActivateFocusModeBtn"
-                  className="shadow-primary-darker bg-primary-main text-headline h-14 w-14 rounded-md text-xl shadow-md 
+                  className="h-14 w-14 rounded-md bg-primary-main text-xl text-headline shadow-md shadow-primary-darker 
                   outline-none"
                 >
                   <FaPlay className="icon" />
@@ -155,8 +155,8 @@ const WatchPage: NextPage = () => {
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
                   }
-                  className="xs:mb-0 shadow-primary-darker bg-primary-main text-headline mb-2 h-14 w-14 rounded-md text-xl 
-                  shadow-md outline-none"
+                  className="mb-2 h-14 w-14 rounded-md bg-primary-main text-xl text-headline shadow-md shadow-primary-darker 
+                  outline-none xs:mb-0"
                 >
                   {Fav ? (
                     <AiFillStar className="icon" />
@@ -180,7 +180,7 @@ const WatchPage: NextPage = () => {
                     EpisodesData={EpisodesData}
                     UserAnimeData={UserAnimeData}
                     ExtraInfo={{
-                      NineAnimeUrl,
+                      ProvidersLink,
                       NextEpisodesReleaseDate,
                       Duration: parseInt(duration.split(" ")[0]),
                       broadcast: Airing && (broadcast || null),

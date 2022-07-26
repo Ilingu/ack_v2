@@ -14,7 +14,12 @@ import Image from "next/image";
 import { doc, increment, updateDoc, deleteField } from "firebase/firestore";
 import { auth, db } from "../../../lib/firebase/firebase";
 // Types
-import { removeDuplicates } from "../../../lib/utils/UtilsFuncs";
+import {
+  GenerateEpProviderUrl,
+  GetProviderUIInfo,
+  pickTextColorBasedOnBgColor,
+  removeDuplicates,
+} from "../../../lib/utils/UtilsFuncs";
 import {
   ConvertBroadcastTimeZone,
   FormatDate,
@@ -41,7 +46,7 @@ interface EpsPosterProps {
   EpisodesData: JikanApiResEpisodes[];
   UserAnimeData: UserAnimeShape;
   ExtraInfo: {
-    NineAnimeUrl: string;
+    ProvidersLink: string[];
     NextEpisodesReleaseDate: number[];
     Duration: number;
     broadcast: string;
@@ -52,7 +57,6 @@ interface EpsPosterItemProps {
   EpisodeData: UserExtraEpisodesShape;
   watched: boolean;
   ExtraData: {
-    NineAnimeEpUrl: string;
     ReleaseDate: number;
   };
   UpdateUserAnimeProgress: (epId: number, remove: boolean) => void;
@@ -101,6 +105,7 @@ const DecrementExtraEpisode = async (_: any, del = false) => {
   }
 };
 
+let GlobalProvidersLink: string[];
 /* COMPONENTS */
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
@@ -113,7 +118,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
     TimestampDate,
     NewEpisodeAvailable,
   },
-  ExtraInfo: { Duration, NineAnimeUrl, NextEpisodesReleaseDate, broadcast },
+  ExtraInfo: { Duration, ProvidersLink, NextEpisodesReleaseDate, broadcast },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
   const [NextEP, setNextEp] = useState<number>(null);
@@ -127,6 +132,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
   const { current: EpisodesLength } = useRef(
     EpisodesData.length + (ExtraEpisodes || 0)
   );
+  GlobalProvidersLink = ProvidersLink;
 
   const NextEpisodeReleaseDate = useMemo((): number => {
     if (!broadcast) return null;
@@ -184,8 +190,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
         <EpsPosterItem
           key={i}
           ExtraData={{
-            NineAnimeEpUrl:
-              NineAnimeUrl && `https://9anime.id${NineAnimeUrl}/ep-${i + 1}`,
             ReleaseDate: NextEpisodesReleaseDate && NextEpisodesReleaseDate[i],
           }}
           EpisodeData={epData}
@@ -290,7 +294,6 @@ const EpsPoster: FC<EpsPosterProps> = ({
     LoadAll,
     GenerateExtraEp,
     EpisodesLength,
-    NineAnimeUrl,
     NextEpisodesReleaseDate,
     UpdateUserAnimeProgress,
     ExtraEpisodes,
@@ -299,9 +302,9 @@ const EpsPoster: FC<EpsPosterProps> = ({
   /* JSX */
   return (
     <div className="relative w-full">
-      <h1 className="text-headline mb-3 flex flex-col text-center text-4xl font-bold">
+      <h1 className="mb-3 flex flex-col text-center text-4xl font-bold text-headline">
         Episodes{" "}
-        <span className="text-description text-lg font-semibold italic">
+        <span className="text-lg font-semibold italic text-description">
           Total: <span data-testid="EpisodesLength">{EpisodesLength}</span>{" "}
           {"//"} Remaining:{" "}
           <span data-testid="EpisodesRemaining">
@@ -313,18 +316,18 @@ const EpsPoster: FC<EpsPosterProps> = ({
       <div className="mb-1 flex flex-wrap gap-2">
         {!isNaN(Duration) && (
           <div
-            className="text-primary-whiter text-xl font-bold tracking-wide"
+            className="text-xl font-bold tracking-wide text-primary-whiter"
             data-testid="WatchTimeRemaining"
           >
             {Math.floor((Duration * (EpisodesLength - NoWatchedEp)) / 60)} Hr{" "}
             {(Duration * (EpisodesLength - NoWatchedEp)) % 60} min{" "}
-            <span className="text-description text-lg font-semibold italic">
+            <span className="text-lg font-semibold italic text-description">
               Remaining
             </span>
           </div>
         )}
         <div
-          className="text-headline mr-auto cursor-pointer text-xl font-bold"
+          className="mr-auto cursor-pointer text-xl font-bold text-headline"
           onClick={() => setFocusMode(true)}
         >
           {NextEP && (
@@ -339,7 +342,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
         </div>
         {NextEpisodeReleaseDate && (
           <div
-            className="text-headline cursor-default font-semibold capitalize"
+            className="cursor-default font-semibold capitalize text-headline"
             title={new Date(NextEpisodeReleaseDate).toLocaleString("fr-FR", {
               weekday: "long",
               year: "numeric",
@@ -349,7 +352,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
               minute: "numeric",
             })}
           >
-            <span className="text-description italic">[NEXT EPISODE]</span>{" "}
+            <span className="italic text-description">[NEXT EPISODE]</span>{" "}
             {Math.round(
               (NextEpisodeReleaseDate - Date.now()) / 1000 / 60 / 60 / 24
             )}{" "}
@@ -357,17 +360,17 @@ const EpsPoster: FC<EpsPosterProps> = ({
           </div>
         )}
         {TimestampDate && (
-          <div className="text-headline cursor-default font-semibold">
+          <div className="cursor-default font-semibold text-headline">
             {TimestampDate.BeganDate && (
-              <span className="hover:text-primary-whiter transition-all">
-                <span className="text-description italic">[Began]</span>{" "}
+              <span className="transition-all hover:text-primary-whiter">
+                <span className="italic text-description">[Began]</span>{" "}
                 {TimestampDate.BeganDate}
               </span>
             )}
             {TimestampDate.EndedDate && (
-              <span className="hover:text-primary-whiter transition-all">
+              <span className="transition-all hover:text-primary-whiter">
                 {" "}
-                <span className="text-description italic">/ [Ended]</span>{" "}
+                <span className="italic text-description">/ [Ended]</span>{" "}
                 {TimestampDate.EndedDate}
               </span>
             )}
@@ -382,14 +385,14 @@ const EpsPoster: FC<EpsPosterProps> = ({
             )
           }
           data-testid="WatchFilterOrderBtn"
-          className="text-headline bg-bgi-whitest rounded-md p-1 font-semibold"
+          className="rounded-md bg-bgi-whitest p-1 font-semibold text-headline"
         >
           {SortOrder === "descending" ? "Descending" : "Ascending"}
         </button>
         <button
           onClick={ToggleEpState}
           data-testid="WatchMarkBtn"
-          className="text-headline bg-bgi-whitest mr-auto cursor-pointer rounded-md p-1 font-semibold"
+          className="mr-auto cursor-pointer rounded-md bg-bgi-whitest p-1 font-semibold text-headline"
         >
           Mark as &quot;{Progress && Progress[0] === -2811 && "Un"}watched&quot;
         </button>
@@ -404,8 +407,8 @@ const EpsPoster: FC<EpsPosterProps> = ({
             setNoOfEpsToAdd(0);
           }}
           data-testid="WatchAddExtraEpsBtn"
-          className="text-headline bg-primary-darker focus:ring-primary-whiter w-40 rounded-md py-1 text-center font-bold outline-none
-             transition focus:ring-2"
+          className="w-40 rounded-md bg-primary-darker py-1 text-center font-bold text-headline outline-none transition
+             focus:ring-2 focus:ring-primary-whiter"
         >
           <FaPlus className="icon" /> Add{" "}
           <input
@@ -416,7 +419,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
             onChange={({ target: { value, valueAsNumber } }) =>
               value.length <= 2 && setNoOfEpsToAdd(valueAsNumber)
             }
-            className="bg-primary-main h-5 w-6 rounded-lg text-center font-bold outline-none"
+            className="h-5 w-6 rounded-lg bg-primary-main text-center font-bold outline-none"
           />{" "}
           Ep{NoOfEpsToAdd > 1 && "s"}
         </button>
@@ -428,8 +431,8 @@ const EpsPoster: FC<EpsPosterProps> = ({
         {!LoadAll && RenderedEps?.length !== EpisodesLength && (
           <button
             onClick={() => setLoadAll(true)}
-            className="text-headline bg-primary-darker focus:ring-primary-whiter w-56 rounded-lg py-2 px-2 text-center font-bold outline-none
-             transition focus:ring-2"
+            className="w-56 rounded-lg bg-primary-darker py-2 px-2 text-center font-bold text-headline outline-none transition
+             focus:ring-2 focus:ring-primary-whiter"
           >
             <FaEye className="icon" /> Load All
           </button>
@@ -442,10 +445,13 @@ const EpsPoster: FC<EpsPosterProps> = ({
 function EpsPosterItem({
   EpisodeData,
   watched,
-  ExtraData: { NineAnimeEpUrl, ReleaseDate },
+  ExtraData: { ReleaseDate },
   UpdateUserAnimeProgress,
 }: EpsPosterItemProps) {
   const { title, mal_id, filler, recap, aired, isExtra } = EpisodeData || {};
+  const [ProviderName, ProviderColor, ProviderLogo] = GetProviderUIInfo(
+    GlobalProvidersLink || []
+  )[0] || [null, null, null];
 
   return (
     <div
@@ -455,21 +461,21 @@ function EpsPosterItem({
           .target;
         if (
           target.classList[0] === "DeleteExtraEp" ||
-          target.classList[0] === "9AnimeLink" ||
+          target.classList[0] === "providerLink" ||
           target.parentElement.classList[0] === "DeleteExtraEp"
         )
           return;
         UpdateUserAnimeProgress(mal_id, watched);
       }}
-      className={`grid-cols-24 bg-bgi-whitest grid w-full cursor-pointer items-center rounded-md py-0.5 px-4 relative${
-        watched || filler || recap ? "" : " border-primary-main border-l-4"
+      className={`grid w-full cursor-pointer grid-cols-24 items-center rounded-md bg-bgi-whitest py-0.5 px-4 relative${
+        watched || filler || recap ? "" : " border-l-4 border-primary-main"
       }${
         filler
           ? " border-l-4 border-red-500"
           : recap
           ? " border-l-4 border-gray-400"
           : watched
-          ? " border-bgi-whitest border-l-4"
+          ? " border-l-4 border-bgi-whitest"
           : ""
       }${watched ? " scale-95" : ""}`}
     >
@@ -485,47 +491,58 @@ function EpsPosterItem({
       )}
       <div>
         {watched ? (
-          <AiOutlineEyeInvisible className="text-description mr-4 -translate-x-3 text-xl" />
+          <AiOutlineEyeInvisible className="mr-4 -translate-x-3 text-xl text-description" />
         ) : (
-          <AiOutlineEye className="text-headline mr-4 -translate-x-3 text-xl" />
+          <AiOutlineEye className="mr-4 -translate-x-3 text-xl text-headline" />
         )}
       </div>
 
-      <p className="text-headline xs:col-span-3 col-span-4 font-semibold lg:col-span-2">
+      <p className="col-span-4 font-semibold text-headline xs:col-span-3 lg:col-span-2">
         Ep. <span className="text-primary-whiter">{mal_id}</span>
       </p>
-      <p className="text-headline lg:col-span-15 xs:col-span-16 col-span-13 font-semibold">
+      <p className="col-span-13 font-semibold text-headline xs:col-span-16 lg:col-span-15">
         {title}
       </p>
-      <a
-        href={NineAnimeEpUrl}
-        target="_blank"
-        rel="noreferrer"
-        className="9AnimeLink xs:col-span-4 text-headline col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider lg:col-span-3"
-      >
-        <div
-          className={`9AnimeLink flex w-24 items-center justify-center gap-1 rounded-lg bg-[#5a2e98]${
-            ReleaseDate && ReleaseDate > Date.now()
-              ? " text-description opacity-50"
-              : ""
-          }`}
-          title={
-            ReleaseDate && ReleaseDate > Date.now()
-              ? "Not published yet"
-              : `Published!`
+
+      {ProviderName && (
+        <a
+          href={
+            GenerateEpProviderUrl(GlobalProvidersLink || [], mal_id)[0] ||
+            "https://ack.vercel.app"
           }
+          target="_blank"
+          rel="noreferrer"
+          className="providerLink col-span-6 flex justify-end text-center font-semibold uppercase tracking-wider text-headline xs:col-span-4 lg:col-span-3"
         >
-          <Image
-            src="/Assets/9animeLogo.png"
-            width={16}
-            height={16}
-            alt="9anime Logo"
-            className="9AnimeLink rounded-md bg-white"
-          />{" "}
-          9anime
-        </div>
-      </a>
-      <p className="text-headline col-span-3 hidden justify-items-end font-semibold lg:grid">
+          <div
+            className={`providerLink flex min-w-[80px] items-center justify-center gap-1 rounded-lg capitalize ${
+              ReleaseDate && ReleaseDate > Date.now()
+                ? " text-description opacity-50"
+                : ""
+            }`}
+            style={{
+              backgroundColor: ProviderColor,
+              color: pickTextColorBasedOnBgColor(ProviderColor),
+            }}
+            title={
+              ReleaseDate && ReleaseDate > Date.now()
+                ? "Not published yet"
+                : `Published!`
+            }
+          >
+            <Image
+              src={ProviderLogo}
+              width={16}
+              height={16}
+              alt={`${ProviderName}'s Logo`}
+              className="providerLink rounded-md bg-white"
+            />{" "}
+            {ProviderName}
+          </div>
+        </a>
+      )}
+
+      <p className="col-span-3 hidden justify-items-end font-semibold text-headline lg:grid">
         {ReleaseDate ? FormatDate(ReleaseDate) : aired && FormatDate(aired)}
       </p>
     </div>

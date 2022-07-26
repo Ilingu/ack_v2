@@ -1,4 +1,4 @@
-import React, { FC, Fragment, useContext, useEffect, useState } from "react";
+import { FC, Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { EpisodesSearchContext } from "../../../lib/context";
 // Types
@@ -10,25 +10,23 @@ import type {
 import { JikanApiToEpisodesShape } from "../../../lib/client/ClientFuncs";
 // UI
 import { FaEye } from "react-icons/fa";
+import { GenerateEpProviderUrl } from "../../../lib/utils/UtilsFuncs";
 
 /* Interface */
 interface EpisodesListProps {
   Eps: JikanApiResEpisodes[];
-  NineAnimeBaseUrl?: string;
+  ProvidersLink?: string[];
 }
 interface EpisodeItemProps {
   EpisodeData: EpisodesShape;
 }
 
-let NineAnimeUrl: string;
+let GlobalProvidersLink: string[];
 
 // JSX
-const EpisodesList: FC<EpisodesListProps> = ({ Eps, NineAnimeBaseUrl }) => {
+const EpisodesList: FC<EpisodesListProps> = ({ Eps, ProvidersLink }) => {
   const [RenderElements, setNewRender] = useState<JSX.Element[]>();
-
-  NineAnimeUrl = NineAnimeBaseUrl
-    ? `https://9anime.id${NineAnimeBaseUrl}`
-    : null;
+  GlobalProvidersLink = ProvidersLink;
 
   useEffect(
     () => LoadEps(),
@@ -47,9 +45,9 @@ const EpisodesList: FC<EpisodesListProps> = ({ Eps, NineAnimeBaseUrl }) => {
 
   return (
     <Fragment>
-      <h1 className="text-headline mb-8 text-center text-4xl font-bold tracking-wider">
+      <h1 className="mb-8 text-center text-4xl font-bold tracking-wider text-headline">
         Episodes{" "}
-        <span className="text-description text-2xl">({Eps?.length})</span>
+        <span className="text-2xl text-description">({Eps?.length})</span>
       </h1>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6">
         {RenderElements}
@@ -59,8 +57,8 @@ const EpisodesList: FC<EpisodesListProps> = ({ Eps, NineAnimeBaseUrl }) => {
         <div className="flex w-full justify-center">
           <button
             onClick={() => LoadEps(false)}
-            className="text-headline bg-primary-darker focus:ring-primary-whiter w-56 rounded-lg py-2 px-2 text-center font-bold outline-none
-             transition focus:ring-2"
+            className="w-56 rounded-lg bg-primary-darker py-2 px-2 text-center font-bold text-headline outline-none transition
+             focus:ring-2 focus:ring-primary-whiter"
           >
             <FaEye className="icon" /> Load All
           </button>
@@ -77,21 +75,25 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
   return (
     <div
       className={`rounded-md px-2 py-2 relative${
-        Filler ? " bg-bgi-whiter scale-90 transform" : ""
-      }${Recap ? " bg-bgi-whiter scale-90 transform" : ""}`}
+        Filler ? " scale-90 transform bg-bgi-whiter" : ""
+      }${Recap ? " scale-90 transform bg-bgi-whiter" : ""}`}
     >
       {Filler && (
-        <div className="text-headline absolute -top-1 -left-1 z-10 rounded-md bg-red-500 px-2 py-1 font-semibold tracking-wide">
+        <div className="absolute -top-1 -left-1 z-10 rounded-md bg-red-500 px-2 py-1 font-semibold tracking-wide text-headline">
           FILLER
         </div>
       )}
       {Recap && (
-        <div className="text-headline absolute -top-1 -right-1 z-10 rounded-md bg-gray-400 px-2 py-1 font-semibold tracking-wide">
+        <div className="absolute -top-1 -right-1 z-10 rounded-md bg-gray-400 px-2 py-1 font-semibold tracking-wide text-headline">
           RECAP
         </div>
       )}
       <a
-        href={NineAnimeUrl ? NineAnimeUrl + `/ep-${epsId}` : ForumURL}
+        href={
+          GlobalProvidersLink
+            ? GenerateEpProviderUrl(GlobalProvidersLink, epsId)[0] || ForumURL
+            : ForumURL
+        }
         target="_blank"
         rel="noreferrer"
       >
@@ -107,11 +109,11 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
         />
       </a>
 
-      <h2 className="text-description mt-2 font-semibold uppercase tracking-wider">
+      <h2 className="mt-2 font-semibold uppercase tracking-wider text-description">
         Episode {epsId}
       </h2>
       <a href={EpsURL} target="_blank" rel="noreferrer">
-        <h1 className="text-headline text-xl font-semibold transition hover:text-gray-200">
+        <h1 className="text-xl font-semibold text-headline transition hover:text-gray-200">
           {title}
         </h1>
       </a>
