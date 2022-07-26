@@ -21,8 +21,10 @@ func newBrowser() (*rod.Browser, error) {
 		return nil, errors.New("cannot find the chromium executable")
 	}
 
-	l := launcher.NewUserMode().Bin(path).Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
-	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
+	// .Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
+	// .MustIncognito().NoDefaultDevice()
+	l := launcher.NewUserMode().Bin(path).Headless(true).Set("no-sandbox")
+	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect(), nil
 }
 
 type AdkamiNewEpisodeShape struct {
