@@ -74,12 +74,17 @@ export interface UserStatsShape {
   Modifiable?: boolean;
 }
 /* LastEpReleased */
+export interface ADKamiScrapperApiRes {
+  success: boolean;
+  data: AdkamiLastReleasedEpisodeShape[];
+  statusCode: number;
+}
 export interface AdkamiLastReleasedEpisodeShape {
-  title: string; // Black Clover
-  episodeId: string; // Episode 28 vostfr
-  TimeReleased: string; // 28min ago
+  Title: string;
+  EpisodeId: string;
+  TimeReleased: string;
   Img: string;
-  Team: string; // Wakanim
+  Team: string;
 }
 /* User */
 export interface UserShape {
@@ -187,12 +192,6 @@ export interface AlternativeTitleShape {
   title_english: string;
   title_japanese: string;
   title_synonyms: string[];
-}
-/* 9anime-api res */
-/* adkami-api Error */
-export interface ADKamiScrapperApiERROR {
-  statusCode: number;
-  message: string;
 }
 /* JikanRes Error */
 export interface JikanApiERROR {

@@ -41,5 +41,5 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 	HandleResponse(&w, http.StatusOK, AdkamiLatestEps) // ✅
 
 	// Cache result
-	caching.CacheNewEpsDatas(AdkamiLatestEps)
+	go caching.CacheNewEpsDatas(AdkamiLatestEps)
 }

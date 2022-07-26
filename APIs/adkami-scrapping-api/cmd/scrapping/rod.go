@@ -64,7 +64,7 @@ func FetchAdkamiLatestEps() ([]AdkamiNewEpisodeShape, error) {
 	SearchPage.MustWaitLoad()
 
 	if IsScrapApiError(SearchPage) {
-		return nil, errors.New("error when requesting scrappong api")
+		return nil, errors.New("error when requesting scrapping api")
 	}
 
 	LastDOMEpList := SearchPage.MustElements(`.video-item-list`) // search input

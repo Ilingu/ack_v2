@@ -1,14 +1,18 @@
 import { NextPage } from "next";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 // Types/Func
-import type { AdkamiLastReleasedEpisodeShape } from "../../../lib/utils/types/interface";
-import { GetLastReleasedAnimeEp } from "../../../lib/client/ClientFuncs";
+import type {
+  AdkamiLastReleasedEpisodeShape,
+  ADKamiScrapperApiRes,
+} from "../../../lib/utils/types/interface";
+import { callApi } from "../../../lib/client/ClientFuncs";
 // UI
 import MetaTags from "../../../components/Services/Metatags";
 import Divider from "../../../components/Design/Divider";
 import Loader from "../../../components/Design/Loader";
 import VerticalDivider from "../../../components/Design/VerticalDivider";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 /* INTERFACES */
 interface LastEpItemProps {
@@ -25,8 +29,12 @@ const LastEpPage: NextPage = () => {
     useState<AdkamiLastReleasedEpisodeShape[]>();
 
   const [RenderedEpisodes, setNewRender] = useState<JSX.Element[]>();
+  const Mounted = useRef(false);
 
   useEffect(() => {
+    if (Mounted.current) return;
+
+    Mounted.current = true;
     GetLastReleasedEpBrutForce();
   }, []);
 
@@ -43,8 +51,16 @@ const LastEpPage: NextPage = () => {
 
   const GetLastReleasedEpBrutForce = async () => {
     try {
-      const newData = await GetLastReleasedAnimeEp();
-      setLastAnimeEp(newData);
+      const {
+        success,
+        data: { success: fetchSucceed, data: LastEps },
+      } = await callApi<ADKamiScrapperApiRes>(
+        `https://adkami-scapping-api.up.railway.app/getLatestEps`
+      );
+
+      if (!success || !fetchSucceed || LastEps?.length <= 0)
+        return toast.error("Cannot Load Ep List") as unknown as void;
+      setLastAnimeEp(LastEps);
     } catch (err) {
       console.error(err);
     }
@@ -57,7 +73,7 @@ const LastEpPage: NextPage = () => {
         description="All the Last Released Anime Episodes in the world!"
       />
       <header>
-        <p className="text-headline text-center font-semibold md:absolute md:top-2 md:left-2">
+        <p className="text-center font-semibold text-headline md:absolute md:top-2 md:left-2">
           Data Get From{" "}
           <a
             href="https://www.adkami.com/"
@@ -68,17 +84,17 @@ const LastEpPage: NextPage = () => {
             <FaExternalLinkAlt className="icon" /> ADKami
           </a>{" "}
         </p>
-        <h1 className="text-primary-whiter xs:text-5xl mb-4 text-center text-4xl font-bold tracking-wide">
+        <h1 className="mb-4 text-center text-4xl font-bold tracking-wide text-primary-whiter xs:text-5xl">
           Last Released <br />{" "}
-          <span className="text-description-whiter font-semibold sm:ml-40">
+          <span className="font-semibold text-description-whiter sm:ml-40">
             Anime Episodes
           </span>
         </h1>
         <Divider />
       </header>
-      <div className="text-headline grid grid-cols-1 justify-items-center gap-2 py-5">
+      <div className="grid grid-cols-1 justify-items-center gap-2 py-5 text-headline">
         {RenderedEpisodes || (
-          <div className="text-headline text-bold text-center text-xl">
+          <div className="text-bold text-center text-xl text-headline">
             <Loader show /> Loading...
           </div>
         )}
@@ -88,14 +104,14 @@ const LastEpPage: NextPage = () => {
 };
 
 function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
-  const { title, episodeId, TimeReleased, Team } = EpisodeData || {};
+  const { Title, EpisodeId, TimeReleased, Team } = EpisodeData || {};
   const TransformEpId = () => {
-    const EpisodesType = episodeId.includes("Episode");
-    const OAVType = episodeId.includes("OAV");
-    const SpecialType = episodeId.includes("Spécial");
-    const MoovieType = episodeId.includes("Film");
+    const EpisodesType = EpisodeId.includes("Episode");
+    const OAVType = EpisodeId.includes("OAV");
+    const SpecialType = EpisodeId.includes("Spécial");
+    const MoovieType = EpisodeId.includes("Film");
 
-    let result = episodeId;
+    let result = EpisodeId;
     let WordToInject = "";
     let NumberToInject = "";
 
@@ -123,8 +139,8 @@ function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
 
     return (
       <Fragment>
-        <span className="text-headline font-semibold">{WordToInject}</span>{" "}
-        <span className="text-primary-whiter font-bold underline">
+        <span className="font-semibold text-headline">{WordToInject}</span>{" "}
+        <span className="font-bold text-primary-whiter underline">
           {NumberToInject}
         </span>{" "}
         {result}
@@ -134,23 +150,23 @@ function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
 
   return (
     <div
-      className="bg-bgi-darker shadow-bgi-black flex w-full flex-col items-center justify-center gap-2 rounded-lg py-2 shadow-md
+      className="flex w-full flex-col items-center justify-center gap-2 rounded-lg bg-bgi-darker py-2 shadow-md shadow-bgi-black
      transition-all hover:shadow-inner md:w-4/5"
     >
       <div className="flex flex-col items-center justify-center gap-x-3 sm:flex-row">
         <h1
-          className="text-primary-whiter cursor-pointer truncate text-xl font-semibold transition hover:text-gray-200"
-          title={title}
+          className="cursor-pointer truncate text-xl font-semibold text-primary-whiter transition hover:text-gray-200"
+          title={Title}
         >
-          {title.slice(0, 30)}
+          {Title.slice(0, 30)}
         </h1>
         <VerticalDivider Styling="sm:block hidden" />
-        <h2 className="text-description hidden text-lg sm:block">
+        <h2 className="hidden text-lg text-description sm:block">
           {TransformEpId()}
         </h2>
       </div>
       <div className="flex items-center justify-center gap-x-3">
-        <h2 className=" text-description block sm:hidden">{TransformEpId()}</h2>
+        <h2 className=" block text-description sm:hidden">{TransformEpId()}</h2>
         <p>{Team}</p>
         <p className="text-description-whiter">
           {TimeReleased.replaceAll("-", "/").split(" ")[0]}

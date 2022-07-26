@@ -1,7 +1,5 @@
 // Types
 import type {
-  AdkamiLastReleasedEpisodeShape,
-  ADKamiScrapperApiERROR,
   AlgoliaDatasShape,
   AnimeShape,
   EpisodesShape,
@@ -357,59 +355,6 @@ export const CheckNewEpisodeData = (
 
   if (!LastEpReleasedID || LastEpReleasedID <= 0) return;
   if (!UserProgress.includes(LastEpReleasedID)) NewEpReleased(AnimeId);
-};
-
-/**
- * Toggle User Anime Fav Field
- * @returns {AdkamiLastReleasedEpisodeShape[]} Array of last released anime episodes in the world
- */
-export const GetLastReleasedAnimeEp = (): Promise<
-  AdkamiLastReleasedEpisodeShape[]
-> => {
-  console.warn("Brute Force 'GetLastReleasedAnimeEp' Called");
-  const fetchData = async (): Promise<
-    AdkamiLastReleasedEpisodeShape[] | false
-  > => {
-    try {
-      const { success, data: LastAnimeEp } = await callApi<
-        AdkamiLastReleasedEpisodeShape[] | ADKamiScrapperApiERROR
-      >(`https://adkami-scapping-api.herokuapp.com/last`);
-
-      if (
-        !success ||
-        !LastAnimeEp ||
-        (LastAnimeEp as ADKamiScrapperApiERROR)?.statusCode
-      )
-        return false;
-
-      return LastAnimeEp as AdkamiLastReleasedEpisodeShape[];
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    let i = 0;
-
-    try {
-      const repeatFetching = async () => {
-        const LastEpData = await fetchData();
-        if (i > 15) return reject("Error: Cannot fetch Last Released Ep");
-
-        if (!LastEpData) {
-          i++;
-          setTimeout(repeatFetching, 3000);
-          return;
-        }
-
-        resolve(LastEpData as AdkamiLastReleasedEpisodeShape[]);
-      };
-      repeatFetching();
-    } catch (err) {
-      reject("Error: Cannot fetch Last Released Ep");
-    }
-  });
 };
 
 /**

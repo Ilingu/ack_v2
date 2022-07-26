@@ -3,6 +3,8 @@ package caching
 import (
 	"adkami-scrapping-api/cmd/scrapping"
 	"encoding/json"
+	"io/ioutil"
+	"log"
 	"os"
 	"time"
 )
@@ -15,12 +17,17 @@ type CachedJSON struct {
 const FilePath = "../../cache.json"
 
 func ReadCachingFile() ([]scrapping.AdkamiNewEpisodeShape, bool) {
-	file, _ := os.Open(FilePath)
+	file, err := os.Open(FilePath)
+	if err != nil {
+		log.Println("Cannot open file (read)")
+		return nil, false
+	}
 	defer file.Close()
 
 	var CachedDatas CachedJSON
 	decoderErr := json.NewDecoder(file).Decode(&CachedDatas)
 	if decoderErr != nil {
+		log.Println("Cannot read file")
 		return nil, false
 	}
 
@@ -37,9 +44,14 @@ func CacheNewEpsDatas(datas []scrapping.AdkamiNewEpisodeShape) {
 		Datas:      datas,
 	}
 
-	file, _ := os.OpenFile(FilePath, os.O_CREATE, os.ModePerm)
-	defer file.Close()
+	jsonObj, err := json.Marshal(CachedDatasObj)
+	if err != nil {
+		log.Println("Cannot open file (write)")
+		return
+	}
 
-	encoder := json.NewEncoder(file)
-	encoder.Encode(CachedDatasObj) // write data
+	err = ioutil.WriteFile(FilePath, jsonObj, os.ModePerm)
+	if err != nil {
+		log.Println("Cannot write file")
+	}
 }

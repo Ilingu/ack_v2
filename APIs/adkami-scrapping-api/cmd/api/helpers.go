@@ -22,13 +22,9 @@ func HandleResponse[T any](resp *http.ResponseWriter, code int, data ...T) {
 		response.Data = data[0]
 	}
 
+	(*resp).Header().Set("Access-Control-Allow-Origin", "*") // Cors
 	(*resp).Header().Set("Content-Type", "application/json")
 	(*resp).WriteHeader(code)
-	enableCors(resp)
 
 	json.NewEncoder(*resp).Encode(response)
-}
-
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
