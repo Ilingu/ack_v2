@@ -29,8 +29,12 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// No Cache... Fetch
-	AdkamiLatestEps := scrapping.FetchAdkamiLatestEps()
-	if AdkamiLatestEps == nil || len(AdkamiLatestEps) <= 0 {
+	AdkamiLatestEps, err := scrapping.FetchAdkamiLatestEps()
+	if err != nil {
+		HandleResponse(&w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err != nil || AdkamiLatestEps == nil || len(AdkamiLatestEps) <= 0 {
 		HandleResponse(&w, http.StatusBadRequest, "no animes returned")
 		return
 	}

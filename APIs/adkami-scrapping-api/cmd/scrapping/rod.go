@@ -46,12 +46,12 @@ func IsScrapApiError(page *rod.Page) bool {
 	return false
 }
 
-func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
+func FetchAdkamiLatestEps() ([]AdkamiNewEpisodeShape, error) {
 	log.Println("Fecthing New Eps...")
 	browser, err := newBrowser()
 	if err != nil {
 		log.Println(err)
-		return nil
+		return nil, errors.New("cannot open browser")
 	}
 	defer browser.MustClose()
 
@@ -65,15 +65,12 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 	SearchPage.MustWaitLoad()
 
 	if IsScrapApiError(SearchPage) {
-		return nil
+		return nil, errors.New("error when requesting scrappong api")
 	}
 
-	LastDOMEpList, err := SearchPage.Elements(`#indexpage .video-item-list.up`) // search input
-	if err != nil {
-		log.Println(len(LastDOMEpList))
-		return nil
-	}
+	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
+	log.Println(len(LastDOMEpList))
 
 	for _, DOMEp := range LastDOMEpList {
 		// Parents
@@ -97,5 +94,5 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 		AdkamiNewEpisodes = append(AdkamiNewEpisodes, NewEp)
 	}
 
-	return AdkamiNewEpisodes
+	return AdkamiNewEpisodes, nil
 }
