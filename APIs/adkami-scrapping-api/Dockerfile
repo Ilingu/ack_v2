@@ -1,7 +1,7 @@
 FROM golang:1.18-alpine
 
 # Installing Chromium
-RUN apk add --no-cache chromium
+RUN apk add chromium
 
 # Create a directory for the app
 RUN mkdir /app

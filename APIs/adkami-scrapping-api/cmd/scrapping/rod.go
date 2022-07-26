@@ -2,6 +2,7 @@ package scrapping
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -16,7 +17,8 @@ func newBrowser() (*rod.Browser, error) {
 	}
 
 	// In prod
-	path, ok := launcher.LookPath() // looking for the chromium execuatble path
+	path, ok := launcher.LookPath() // looking for the chromium executable path
+	log.Println(ok, path)
 	if !ok {
 		return nil, errors.New("cannot find the chromium executable")
 	}
@@ -35,8 +37,10 @@ type AdkamiNewEpisodeShape struct {
 }
 
 func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
+	log.Println("Finding New Eps...")
 	browser, err := newBrowser()
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 	defer browser.MustClose()
