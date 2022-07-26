@@ -23,7 +23,7 @@ func newBrowser() (*rod.Browser, error) {
 
 	// .Headless(true).Set("incognito").Set("no-sandbox").Set("no-zygote")
 	// .MustIncognito().NoDefaultDevice()
-	l := launcher.NewUserMode().Bin(path).Headless(true).Set("no-sandbox")
+	l := launcher.New().Bin(path).Headless(true).Set("no-sandbox")
 	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect(), nil
 }
 
