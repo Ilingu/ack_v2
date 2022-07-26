@@ -54,7 +54,7 @@ func FetchAdkamiLatestEps() []AdkamiNewEpisodeShape {
 	log.Printf("Go at: %s", ScrappingURL)
 	SearchPage.MustNavigate(ScrappingURL)
 	SearchPage.MustWaitLoad()
-	time.Sleep(time.Second * 10)
+	log.Println(SearchPage.MustInfo().URL)
 
 	LastDOMEpList := SearchPage.MustElements(`#indexpage .video-item-list.up`) // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
