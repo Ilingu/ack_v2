@@ -1,4 +1,4 @@
-# 9Anime Web Scrapping API 🌐
+# ADKami Web Scrapping API 🌐
 
 #### ➡️ Scrapping Api to retrieve the lastest released anime episodes from [<u>ADKami</u>](https://www.adkami.com/) ✨
 
