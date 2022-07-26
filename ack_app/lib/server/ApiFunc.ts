@@ -157,22 +157,33 @@ const Fetch9AnimeLink = async (
       )}&season=${season}&year=${year}&type=${type}`
     );
 
-    // 3 attempts to get the url, if the 3 failed return null
-    for (let i = 0; i < 3; i++) {
-      const ApiRes = await fetch(APIUrl);
-      if (!ApiRes.ok) {
-        continue;
-      }
+    // 2 attempts to get the url, if the 2 failed return null
+    const AtteptFetchLink = (): Promise<string> => {
+      return new Promise((res) => {
+        let i = 0;
+        const FetchLink = async () => {
+          if (i > 1) return res(null);
+          i++;
 
-      const { success, data: UrlLink }: NineAnimeAPIResShape =
-        await ApiRes.json();
-      if (!success || IsEmptyString(UrlLink) || !UrlLink.startsWith("/watch/"))
-        continue;
+          const ApiRes = await fetch(APIUrl);
+          if (!ApiRes.ok) return FetchLink();
 
-      return UrlLink;
-    }
+          const { success, data: UrlLink }: NineAnimeAPIResShape =
+            await ApiRes.json();
+          if (
+            !success ||
+            IsEmptyString(UrlLink) ||
+            !UrlLink.startsWith("/watch/")
+          )
+            return FetchLink();
 
-    return null; // the 3 attemps failed...
+          return res(UrlLink);
+        };
+        FetchLink();
+      });
+    };
+
+    return await AtteptFetchLink();
   } catch (err) {
     console.error(err);
     return null;

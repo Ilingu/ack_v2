@@ -25,14 +25,10 @@ func get9AnimeLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	RespCh, ErrCh := make(chan string), make(chan error)
-	go scrapping.ScrappingConfig(args).Fetch9AnimeLink(RespCh, ErrCh) // using goroutine to handle multiple browser at same time
-
-	select {
-	case err := <-ErrCh:
+	NineAnimeUrl, err := scrapping.ScrappingConfig(args).Fetch9AnimeLink()
+	if err != nil {
 		HandleResponse(&w, http.StatusBadRequest, err.Error()) // ❌
 		return
-	case NineAnimeUrl := <-RespCh:
-		HandleResponse(&w, http.StatusOK, NineAnimeUrl) // ✅
 	}
+	HandleResponse(&w, http.StatusOK, NineAnimeUrl) // ✅
 }

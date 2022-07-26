@@ -16,8 +16,6 @@ import (
 	"github.com/go-rod/stealth"
 )
 
-const PAGE_TIMEOUT = 10 * time.Second
-
 type ScrappingConfig struct {
 	TitlesItarable []string
 	Season         string
@@ -58,26 +56,29 @@ func checkAndCloseCookies(page *rod.Page, inputSearch *rod.Element) {
 	time.Sleep(time.Second / 4)
 }
 
-func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan error) {
+func (sc ScrappingConfig) Fetch9AnimeLink() (string, error) {
 	browser, err := newBrowser()
 	if err != nil {
-		errCh <- err
-		return
+		return "", nil
 	}
 	defer browser.MustClose()
 
 	SearchPage := stealth.MustPage(browser)
-
 	for _, title := range sc.TitlesItarable {
+		SearchPage.MustClose()
+
+		SearchPage = stealth.MustPage(browser)
+		SearchPage.MustWaitOpen()
+
 		log.Printf("[LOG]: Processing %s\n", title)
 		SearchPage.MustNavigate("https://9anime.id/filter") // go to filter page
-		pageLoaderr := SearchPage.Timeout(PAGE_TIMEOUT).WaitLoad()
+		pageLoaderr := SearchPage.WaitLoad()
 		if pageLoaderr != nil {
-			log.Println("[WARN] cannot load page")
+			log.Println("[WARN] cannot load page:", pageLoaderr.Error())
 			continue
 		}
 
-		inputSearch := SearchPage.Timeout(PAGE_TIMEOUT).MustElement(`form.filters [name="keyword"]`) // search input
+		inputSearch := SearchPage.MustElement(`form.filters [name="keyword"]`) // search input
 
 		/* Typing Title */
 		for _, char := range title {
@@ -86,8 +87,8 @@ func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan erro
 		}
 
 		checkAndCloseCookies(SearchPage, inputSearch)
-		inputSearch.MustKeyActions().Type(input.Enter).MustDo()   // Submit by pressing enter on form (because clicking on submitBtn triggered the anti-bot detection)
-		pageLoaderr = SearchPage.Timeout(PAGE_TIMEOUT).WaitLoad() // wait for response
+		inputSearch.MustKeyActions().Type(input.Enter).MustDo() // Submit by pressing enter on form (because clicking on submitBtn triggered the anti-bot detection)
+		pageLoaderr = SearchPage.WaitLoad()                     // wait for response
 		if pageLoaderr != nil {
 			log.Println("[WARN] cannot load page")
 			continue
@@ -111,7 +112,7 @@ func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan erro
 		SearchPage.MustNavigate(SearchURL)              // go to search url
 
 		/* Get result and check it */
-		result, err := SearchPage.Timeout(PAGE_TIMEOUT / 5).Element("#list-items") // posters list
+		result, err := SearchPage.Timeout(2 * time.Second).Element("#list-items") // posters list
 		if err != nil {
 			log.Println("[WARN]: No Anime Children")
 			continue // No animes found --> next title
@@ -123,7 +124,7 @@ func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan erro
 			}
 		}
 
-		AnimePoster, errNotFound := SearchPage.Timeout(PAGE_TIMEOUT / 5).Element(`#list-items :first-child .ani.poster > a`) // search anime elem
+		AnimePoster, errNotFound := SearchPage.Timeout(2 * time.Second).Element(`#list-items :first-child .ani.poster > a`) // search anime elem
 		if errNotFound != nil {
 			log.Println("[WARN]: cannot find anime url element (href attr)")
 			continue // No animes found --> next title
@@ -135,9 +136,10 @@ func (sc ScrappingConfig) Fetch9AnimeLink(UrlPageCh chan string, errCh chan erro
 			continue // invalid url --> next title
 		}
 
-		UrlPageCh <- NineAnimeURL
-		return
+		SearchPage.MustClose()
+		return NineAnimeURL, nil
 	}
 
-	errCh <- errors.New("cannot find anime url in these requests")
+	SearchPage.MustClose()
+	return "", errors.New("cannot find anime url in these requests")
 }
