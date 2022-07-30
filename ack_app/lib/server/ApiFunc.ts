@@ -191,9 +191,9 @@ const GenerateProvidersLinks = (AnimeTitles: string[]) => {
           .trim()
           .toLowerCase()
           .replace(/[^a-zA-Z0-9- ]/g, "")
-          .replaceAll(" ", "-")
-          .replaceAll("---", "--")
-          .replaceAll("--", "-")
+          .replace(new RegExp(" ", "g"), "-")
+          .replace(new RegExp("---", "g"), "--")
+          .replace(new RegExp("--", "g"), "-")
       ); // title to simulate right anime page url
       const SafeTitle = encodeURIComponent(title.trim()); // Title to search (in url)
       if (TrimmedTitle.trim().length <= 0) continue;
