@@ -12,9 +12,9 @@ interface TestCase<I, E> {
 interface LittleAnimeShape {
   title: string;
   AgeRating: string;
-  Airing: boolean;
+  Airing?: boolean;
   AiringDate: string;
-  Status: AnimeStatusType;
+  Status?: AnimeStatusType;
   type: AnimeType;
   ReleaseDate: string;
   Synopsis: string;
@@ -64,8 +64,6 @@ describe.concurrent("Testing ApiFuncs", () => {
             broadcast: "Mondays at 00:30 (JST)",
             ProvidersLink: [
               "https://gogoanime.lu/category/sasaki-to-miyano",
-              "https://chia-anime.su/anime/sasaki-to-miyano",
-              "https://kickassanime.su/anime/sasaki-to-miyano",
               "https://lite.animevibe.se/anime/sasaki-to-miyano",
             ],
           },
@@ -88,32 +86,30 @@ describe.concurrent("Testing ApiFuncs", () => {
             broadcast: "Tuesdays at 18:25 (JST)",
             ProvidersLink: [
               "https://gogoanime.lu/category/black-clover",
-              "https://chia-anime.su/anime/black-clover",
-              "https://kickassanime.su/anime/black-clover",
               "https://lite.animevibe.se/anime/black-clover",
             ],
           },
         },
         {
-          input: "26243", // Owari no Seraph
+          input: "47164", // Danmachi IV
           excepted: {
-            title: "Owari no Seraph",
-            AgeRating: "R - 17+ (violence & profanity)",
-            Airing: false,
-            AiringDate: "4/4/2015",
-            Status: "Finished Airing",
+            title:
+              "Dungeon ni Deai wo Motomeru no wa Machigatteiru Darou ka IV: Shin Shou - Meikyuu-hen",
+            AgeRating: "PG-13 - Teens 13 or older",
+            AiringDate: "7/21/2022",
             type: "TV",
-            ReleaseDate: "spring 2015",
+            ReleaseDate: "summer 2022",
             Synopsis:
-              "With the appearance of a mysterious virus that kills everyone above the age of 13, mankind becomes enslaved by previously hidden, power-hungry vampires who emerge in order to subjugate society with the promise of protecting the survivors, in exchange for donations of their blood. Among these survivors are Yuuichirou and Mikaela Hyakuya, two young boys who are taken captive from an orphanage, along with other children whom they consider family. Discontent with being treated like livestock under the vampires' cruel reign, Mikaela hatches a rebellious escape plan that is ultimately doomed to fail. The only survivor to come out on the other side is Yuuichirou, who is found by the Moon Demon Company, a military unit dedicated to exterminating the vampires in Japan. Many years later, now a member of the Japanese Imperial Demon Army, Yuuichirou is determined to take revenge on the creatures that slaughtered his family, but at what cost? Owari no Seraph is a post-apocalyptic supernatural shounen anime that follows a young man's search for retribution, all the while battling for friendship and loyalty against seemingly impossible odds. [Written by MAL Rewrite]",
-            malId: 26243,
+              "Intrepid adventurer Bell Cranel has leveled up, but he can’t rest on his dungeoneering laurels just yet. The Hestia Familia still has a long way to go before it can stand toe-to-toe with the other Familias of Orario — but before Bell can set out on his next mission, reports of a brutal murder rock the adventuring community! One of Bell’s trusted allies stands accused of the horrible crime, and it’s up to Bell and his friends to clear their name and uncover a nefarious plot brewing in the dungeon’s dark depths. (Source: Sentai Filmworks)",
+            malId: 47164,
             nbEp: 12,
-            MalPage: "https://myanimelist.net/anime/26243/Owari_no_Seraph",
-            duration: "23 min per ep",
-            broadcast: "Saturdays at 22:00 (JST)",
+            MalPage:
+              "https://myanimelist.net/anime/47164/Dungeon_ni_Deai_wo_Motomeru_no_wa_Machigatteiru_Darou_ka_IV__Shin_Shou_-_Meikyuu-hen",
+            duration: "23 min",
+            broadcast: "Saturdays at 01:05 (JST)",
             ProvidersLink: [
-              "https://gogoanime.lu/category/owari-no-seraph",
-              "https://lite.animevibe.se/anime/owari-no-seraph",
+              "https://gogoanime.lu/category/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
+              "https://lite.animevibe.se/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
             ],
           },
         },

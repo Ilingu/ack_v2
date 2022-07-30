@@ -86,6 +86,24 @@ export interface AdkamiLastReleasedEpisodeShape {
   Img: string;
   Team: string;
 }
+/* Animevibe api */
+export type AnimeVibeApiSearchResp = AnimeVibeApiSearchShape[];
+export interface AnimeVibeApiSearchShape {
+  animetitle: string;
+  url: string;
+  thumbnail: string;
+}
+export type AnimeVibeApiAnimeResp = AnimeVibeApiAnimeShape[];
+export interface AnimeVibeApiAnimeShape {
+  animetitle: string;
+  thumbnail: string;
+  alternate_titles: string;
+  anime_status: string;
+  anime_genre: string;
+  anime_year: string;
+  total_episodes: string;
+  anime_summary: string;
+}
 /* User */
 export interface UserShape {
   displayName: string;

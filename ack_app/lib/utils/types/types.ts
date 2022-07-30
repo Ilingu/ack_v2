@@ -47,9 +47,7 @@ export type AnimeDatasShape = [
 
 export type AnimeProviders =
   | "https://gogoanime.lu/category"
-  | "https://chia-anime.su/anime"
-  | "https://kickassanime.su/anime"
-  | "https://lite.animevibe.se/anime";
+  | "https://lite.animevibe.se/Anime";
 export type AnimeProvidersName =
   | "gogoanime"
   | "chia-anime"

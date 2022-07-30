@@ -221,18 +221,17 @@ describe.concurrent("Testing UtilFuncs", () => {
   });
 
   test.concurrent("ProviderUrlIdentifier", () => {
-    const { GOGOANIME, CHIA_ANIME, KICKASSANIME, ANIMEVIBE } =
-      SupportedAnimeProvider;
+    const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
 
     const ProvidersSample: TestCase<string, SupportedAnimeProvider>[] = [
       { input: "https://gogoanime.lu", excepted: GOGOANIME },
-      { input: "https://chia-anime.su", excepted: CHIA_ANIME },
-      { input: "https://kickassanime.su", excepted: KICKASSANIME },
+      { input: "https://chia-anime.su", excepted: null },
+      { input: "https://kickassanime.su", excepted: null },
       { input: "https://lite.animevibe.se", excepted: ANIMEVIBE },
       { input: "https://gogoanime.lu/sasaki-to-miyano", excepted: GOGOANIME },
-      { input: "https://chia-anime.su/TOyo5Yo", excepted: CHIA_ANIME },
-      { input: "https://kickassanime.su//$^*_657", excepted: KICKASSANIME },
-      { input: "https://lite.animevibe.se/", excepted: ANIMEVIBE },
+      { input: "https://chia-anime.su/TOyo5Yo", excepted: null },
+      { input: "https://kickassanime.su/", excepted: null },
+      { input: "https://lite.animevibe.se//$^*_657", excepted: ANIMEVIBE },
       { input: "http://gogoanime.lu", excepted: null },
       { input: "https://chia-anime.si", excepted: null },
       { input: "https://kickasanime.su", excepted: null },
@@ -258,8 +257,6 @@ describe.concurrent("Testing UtilFuncs", () => {
       ],
       excepted: [
         ["gogoanime", "#ffc119", "/Assets/gogoanime.png"],
-        ["chia-anime", "#168ddd", "/Assets/chiaanime.webp"],
-        ["kickassanime", "#463610", "/Assets/kickassanime.webp"],
         ["animevibe", "#ffffff", "/Assets/animevibe.ico"],
       ],
     };
@@ -286,8 +283,6 @@ describe.concurrent("Testing UtilFuncs", () => {
       },
       excepted: [
         "https://gogoanime.lu/sasaki-to-miyano-episode-5",
-        "https://chia-anime.su/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen-episode-5",
-        "https://kickassanime.su/ubime-no-etranger-episode-5",
         "https://lite.animevibe.se/anime/black-clover-tv/5",
       ],
     };

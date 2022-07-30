@@ -1,10 +1,11 @@
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { Fragment, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 // Types/Func
 import type {
   AdkamiLastReleasedEpisodeShape,
   ADKamiScrapperApiRes,
+  FunctionJob,
 } from "../../../lib/utils/types/interface";
 import { callApi } from "../../../lib/client/ClientFuncs";
 // UI
@@ -19,21 +20,50 @@ import toast from "react-hot-toast";
 interface LastEpItemProps {
   EpisodeData: PosterLastReleasedEpisodeShape;
 }
+type FunctionJobEps = FunctionJob<AdkamiLastReleasedEpisodeShape[]>;
 type PosterLastReleasedEpisodeShape = Omit<
   AdkamiLastReleasedEpisodeShape,
   "Img"
 >;
 
+const fetchLatestEps = async (): Promise<AdkamiLastReleasedEpisodeShape[]> => {
+  const {
+    success,
+    data: { success: fetchSucceed, data: LastEps },
+  } = await callApi<ADKamiScrapperApiRes>(
+    `https://adkami-scapping-api.up.railway.app/getLatestEps`
+  );
+
+  if (!success || !fetchSucceed || LastEps?.length <= 0) return null;
+  return LastEps;
+};
+
+export const getServerSideProps: GetServerSideProps<
+  FunctionJobEps
+> = async () => {
+  const FetchEpsWithTimeout = (): Promise<FunctionJobEps> =>
+    new Promise(async (res) => {
+      setTimeout(() => res({ success: false }), 1500); // if after 1.5s there is no answer, break out of SSR
+
+      const LastEps = await fetchLatestEps();
+      if (!LastEps) return res({ success: false });
+
+      res({ success: true, data: LastEps });
+    });
+
+  const SSRRespPayload = await FetchEpsWithTimeout();
+  return { props: SSRRespPayload };
+};
 /* COMPONENTS */
-const LastEpPage: NextPage = () => {
-  const { data: LastAnimeEpData } = useQuery("latestEps", async () => {
-    const {
-      success,
-      data: { success: fetchSucceed, data: LastEps },
-    } = await callApi<ADKamiScrapperApiRes>(
-      `https://adkami-scapping-api.up.railway.app/getLatestEps`
-    );
-    if (!success || !fetchSucceed || LastEps?.length <= 0) {
+const LastEpPage: NextPage<FunctionJobEps> = ({
+  success: SSRSuccess,
+  data: SSRLastEps,
+}) => {
+  // Potential Rehydratation with React Query
+  const { data: RQLastEps } = useQuery("latestEps", async () => {
+    if (SSRSuccess && SSRLastEps.length > 0) return [];
+    const LastEps = await fetchLatestEps();
+    if (!LastEps) {
       toast.error("Cannot Load Ep List");
       return [];
     }
@@ -43,16 +73,20 @@ const LastEpPage: NextPage = () => {
 
   const [RenderedEpisodes, setNewRender] = useState<JSX.Element[]>();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => LoadEpisodes(), [LastAnimeEpData]);
-
-  const LoadEpisodes = () => {
-    if (!LastAnimeEpData || LastAnimeEpData?.length <= 0) return;
-    const JSXRenderedElement = LastAnimeEpData.map((epData, i) => (
+  const LoadEpisodes = (EpsDatasToRender: AdkamiLastReleasedEpisodeShape[]) => {
+    if (!EpsDatasToRender || EpsDatasToRender?.length <= 0) return;
+    const JSXRenderedElement = EpsDatasToRender.map((epData, i) => (
       <LastReleasedEpItem key={i} EpisodeData={epData} />
     ));
     setNewRender(JSXRenderedElement);
   };
+
+  useEffect(() => {
+    if (SSRSuccess && SSRLastEps.length > 0) LoadEpisodes(SSRLastEps);
+    else LoadEpisodes(RQLastEps);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [RQLastEps, SSRLastEps]);
 
   return (
     <div className="relative py-2 px-2">

@@ -4,6 +4,7 @@ import { IndexAnimeInAlgolia } from "../algolia/algolia-admin";
 import type {
   AnimeConfigPathsIdShape,
   AnimeShape,
+  AnimeVibeApiSearchResp,
   FunctionJob,
   InternalApiResSuccess,
   JikanApiERROR,
@@ -12,16 +13,15 @@ import type {
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
 } from "../utils/types/interface";
-import type {
-  AnimeDatasShape,
-  AnimeProviders,
-  AnimeStatusType,
-} from "../utils/types/types";
+import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
+import { SupportedAnimeProvider } from "../utils/types/enums";
 // Func
 import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
+
+const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
 
 /**
  * Return Is The Host Is BlackListed
@@ -33,6 +33,7 @@ export const IsBlacklistedHost = (host: string): boolean => {
   return !WhiteListedHost.includes(host);
 };
 
+// To Revalidate all anime
 // export const HolyFunction = (animeIDs: string[]) => {
 //   let i = 0;
 
@@ -159,13 +160,70 @@ export const GetAnimeData = async (
 };
 
 /* SITE PROVIDER:
-  1. https://gogoanime.lu/category/*    --> Can Check URL + good search ✅✅
-  2. https://chia-anime.su/anime/*      --> Can Check URL, only latin letter search ❌
-  2. https://kickassanime.su/anime/*    --> Can Check URL, only latin letter search ❌
-  3. https://lite.animevibe.se/anime/*  --> Cannot Check If URL good or not ❌ + good search ✅
+  1. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
+  2. https://lite.animevibe.se/anime/*  --> Open API (without any protections) ✅✅ Cannot Check If URL good or not (only by search method) ❌ + good search + good vid player ✅
   ------------------------------------------------------------------------------------------------------------
-  https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
+  - https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
+
+  - https://chia-anime.su/anime      --> Don't support anymore (bad service)
+  - https://kickassanime.su/anime    --> Don't support anymore (copy of chia-anime, possibly WP templates...)
 */
+
+interface ProviderLinkInfo {
+  title: string;
+  fetchUrl: string;
+  animeUrl: string;
+  provider: {
+    type: SupportedAnimeProvider;
+    searchUrl: string;
+  };
+}
+
+const GenerateProvidersLinks = (AnimeTitles: string[]) => {
+  const PROVIDERS: SupportedAnimeProvider[] = [GOGOANIME, ANIMEVIBE];
+
+  const providersLinks: ProviderLinkInfo[][] = [];
+  for (const provider of PROVIDERS) {
+    const providerLinks: ProviderLinkInfo[] = [];
+    for (const title of AnimeTitles) {
+      const TrimmedTitle = encodeURI(
+        title
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-zA-Z0-9- ]/g, "")
+          .replaceAll(" ", "-")
+          .replaceAll("---", "--")
+          .replaceAll("--", "-")
+      ); // title to simulate right anime page url
+      const SafeTitle = encodeURIComponent(title.trim()); // Title to search (in url)
+      if (TrimmedTitle.trim().length <= 0) continue;
+
+      let fetchUrl: string, searchUrl: string, animeUrl: string;
+      if (provider === GOGOANIME) {
+        fetchUrl = `${GOGOANIME}/category/${TrimmedTitle}`;
+        searchUrl = `${GOGOANIME}/search.html?keyword=${SafeTitle}`;
+        animeUrl = fetchUrl;
+      } else {
+        fetchUrl = `https://lite-api.animemate.xyz/Anime/${TrimmedTitle}`;
+        searchUrl = `https://lite-api.animemate.xyz/Search/${SafeTitle}`;
+        animeUrl = `${ANIMEVIBE}/anime/${TrimmedTitle}`;
+      }
+
+      providerLinks.push({
+        title: TrimmedTitle,
+        fetchUrl: fetchUrl,
+        animeUrl,
+        provider: {
+          type: provider,
+          searchUrl: searchUrl,
+        },
+      });
+    }
+    providersLinks.push(providerLinks);
+  }
+
+  return providersLinks;
+};
 
 /**
  * Generate and return the working Streaming Providers Link
@@ -176,53 +234,77 @@ const FetchProvidersLink = async (
   AnimeTitles: string[]
 ): Promise<string[] | null> => {
   try {
-    const PROVIDERS: AnimeProviders[] = [
-      "https://gogoanime.lu/category",
-      "https://chia-anime.su/anime",
-      "https://kickassanime.su/anime",
-      "https://lite.animevibe.se/anime",
-    ];
-
-    const providersLinks: string[][] = [];
-    for (const provider of PROVIDERS) {
-      const providerLinks: string[] = [];
-      for (const title of AnimeTitles) {
-        const TrimmedTitle = title
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-zA-Z0-9- ]/g, "")
-          .replaceAll(" ", "-")
-          .replaceAll("---", "--")
-          .replaceAll("--", "-");
-
-        if (TrimmedTitle.trim().length <= 0) continue;
-        const providerLink = encodeURI(`${provider}/${TrimmedTitle}`);
-        providerLinks.push(providerLink);
-      }
-      providersLinks.push(providerLinks);
-    }
-
     const ProvidersResp = await Promise.allSettled(
-      providersLinks.map(async (providerLink) => {
+      GenerateProvidersLinks(AnimeTitles).map(async (providerLinks) => {
+        const ProviderType = providerLinks[0].provider.type;
         const AttemptFetchUrl = (): Promise<string> =>
           new Promise((res, rej) => {
-            let i = 0;
-            const FetchUrl = async () => {
-              if (i > providerLink.length - 1)
-                return rej("cannot find anime link in all titles");
+            try {
+              let i = 0;
+              const Next = () => {
+                i++;
+                FetchUrl();
+              };
 
-              const providerResp = await fetch(providerLink[i]);
-              if (providerResp.ok) return res(providerLink[i]); // if page exist, skip
+              const FetchUrl = async () => {
+                if (i > providerLinks.length - 1)
+                  return rej("cannot find anime link in all titles");
+                const { fetchUrl, animeUrl, provider } = providerLinks[i];
 
-              /* TODO: if page result in 404 (or other): manual search page, template search + cheerio to grab dom elem 
-              -> I didn't implement it yet because the first method works terribly well, but some very few cases, the first method don't work at all and this method (more time expensive but 100% accurate) would be great to have...*/
-              // const cheerio = await import("cheerio");
+                // Method 1: See if prediction were true (if url return 200, anime page exist and we already have his link)
+                const providerResp = await fetch(fetchUrl);
+                if (providerResp.ok)
+                  switch (ProviderType) {
+                    case GOGOANIME:
+                      return res(animeUrl);
+                    case ANIMEVIBE:
+                      const RespToText = await providerResp.text();
+                      if (RespToText !== "Error: Anime not Found")
+                        return res(animeUrl);
+                  }
 
-              i++;
-              FetchUrl();
-            };
-            FetchUrl();
+                // Method 2 (url return error): direcly search in provider using the "search anime" functionnality
+                const searchResp = await fetch(provider.searchUrl);
+                if (!searchResp.ok) return Next(); // No search page -> next iteration
+
+                if (ProviderType === GOGOANIME) {
+                  const cheerio = await import("cheerio");
+                  const $ = cheerio.load(await searchResp.text());
+
+                  const GogoSelector =
+                    "#wrapper_bg div.last_episodes ul.items > li > div.img > a";
+                  const GogoPath = $(GogoSelector).attr("href");
+
+                  if (
+                    !IsEmptyString(GogoPath) &&
+                    GogoPath.startsWith("/category/")
+                  )
+                    return res(`${ProviderType}${GogoPath}`);
+                }
+                if (ProviderType === ANIMEVIBE) {
+                  const AnimeVibeAPIResp: AnimeVibeApiSearchResp =
+                    await searchResp.json();
+                  if (AnimeVibeAPIResp.length === 0) return Next();
+
+                  const AnimeSearchObj = AnimeVibeAPIResp[0];
+                  if (
+                    Object.hasOwn(AnimeSearchObj, "url") &&
+                    !IsEmptyString(AnimeSearchObj.url) &&
+                    AnimeSearchObj.url.startsWith("/anime/")
+                  )
+                    return res(`${ProviderType}${AnimeSearchObj.url}`);
+                }
+
+                Next(); // default --> next iteration
+              };
+
+              FetchUrl(); // 1st call
+            } catch (err) {
+              console.error(err);
+              return rej();
+            }
           });
+
         return await AttemptFetchUrl();
       })
     );

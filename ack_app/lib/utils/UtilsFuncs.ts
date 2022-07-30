@@ -10,6 +10,8 @@ import type {
 import { AnimeWatchType, SupportedAnimeProvider } from "./types/enums";
 import { ProviderUIInfo } from "./types/types";
 
+const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
+
 /* UTILS FUNC */
 /**
  * Encrypt data
@@ -204,28 +206,17 @@ export const ParseCookies = (
 export const ProviderUrlIdentifier = (
   providerUrl: string
 ): SupportedAnimeProvider => {
-  const { GOGOANIME, CHIA_ANIME, KICKASSANIME, ANIMEVIBE } =
-    SupportedAnimeProvider;
   if (providerUrl.includes(GOGOANIME)) return GOGOANIME;
-  if (providerUrl.includes(CHIA_ANIME)) return CHIA_ANIME;
-  if (providerUrl.includes(KICKASSANIME)) return KICKASSANIME;
   if (providerUrl.includes(ANIMEVIBE)) return ANIMEVIBE;
   return null;
 };
 
 export const GetProviderUIInfo = (providersUrl: string[]): ProviderUIInfo[] => {
-  const { GOGOANIME, CHIA_ANIME, KICKASSANIME, ANIMEVIBE } =
-    SupportedAnimeProvider;
-
   return providersUrl
     .map((url): ProviderUIInfo => {
       const ProviderType = ProviderUrlIdentifier(url);
       if (ProviderType === GOGOANIME)
         return ["gogoanime", "#ffc119", "/Assets/gogoanime.png"];
-      if (ProviderType === CHIA_ANIME)
-        return ["chia-anime", "#168ddd", "/Assets/chiaanime.webp"];
-      if (ProviderType === KICKASSANIME)
-        return ["kickassanime", "#463610", "/Assets/kickassanime.webp"];
       if (ProviderType === ANIMEVIBE)
         return ["animevibe", "#ffffff", "/Assets/animevibe.ico"];
       return null;
@@ -233,27 +224,19 @@ export const GetProviderUIInfo = (providersUrl: string[]): ProviderUIInfo[] => {
     .filter((d) => d);
 };
 
-export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) => {
-  const { GOGOANIME, CHIA_ANIME, KICKASSANIME, ANIMEVIBE } =
-    SupportedAnimeProvider;
-
-  return providersUrl
+export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) =>
+  providersUrl
     .map((url) => {
       const ProviderType = ProviderUrlIdentifier(url);
       const title = url.split("/").at(-1);
 
       if (ProviderType === GOGOANIME)
         return `https://gogoanime.lu/${title}-episode-${epId}`;
-      if (ProviderType === CHIA_ANIME)
-        return `https://chia-anime.su/${title}-episode-${epId}`;
-      if (ProviderType === KICKASSANIME)
-        return `https://kickassanime.su/${title}-episode-${epId}`;
       if (ProviderType === ANIMEVIBE)
         return `https://lite.animevibe.se/anime/${title}/${epId}`;
       return null;
     })
     .filter((d) => d);
-};
 
 export function pickTextColorBasedOnBgColor(bgColor: string) {
   const color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;
