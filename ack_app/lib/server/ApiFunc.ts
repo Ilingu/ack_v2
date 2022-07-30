@@ -288,9 +288,9 @@ const FetchProvidersLink = async (
 
                   const AnimeSearchObj = AnimeVibeAPIResp[0];
                   if (
-                    Object.hasOwn(AnimeSearchObj, "url") &&
-                    !IsEmptyString(AnimeSearchObj.url) &&
-                    AnimeSearchObj.url.startsWith("/anime/")
+                    // Object.hasOwn(AnimeSearchObj, "url") &&
+                    !IsEmptyString(AnimeSearchObj?.url) &&
+                    AnimeSearchObj?.url.startsWith("/anime/")
                   )
                     return res(`${ProviderType}${AnimeSearchObj.url}`);
                 }
