@@ -1,5 +1,6 @@
 import { NextPage } from "next";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useQuery } from "react-query";
 // Types/Func
 import type {
   AdkamiLastReleasedEpisodeShape,
@@ -25,18 +26,22 @@ type PosterLastReleasedEpisodeShape = Omit<
 
 /* COMPONENTS */
 const LastEpPage: NextPage = () => {
-  const [LastAnimeEpData, setLastAnimeEp] =
-    useState<AdkamiLastReleasedEpisodeShape[]>();
+  const { data: LastAnimeEpData } = useQuery("latestEps", async () => {
+    const {
+      success,
+      data: { success: fetchSucceed, data: LastEps },
+    } = await callApi<ADKamiScrapperApiRes>(
+      `https://adkami-scapping-api.up.railway.app/getLatestEps`
+    );
+    if (!success || !fetchSucceed || LastEps?.length <= 0) {
+      toast.error("Cannot Load Ep List");
+      return [];
+    }
+
+    return LastEps;
+  });
 
   const [RenderedEpisodes, setNewRender] = useState<JSX.Element[]>();
-  const Mounted = useRef(false);
-
-  useEffect(() => {
-    if (Mounted.current) return;
-
-    Mounted.current = true;
-    GetLastReleasedEpBrutForce();
-  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => LoadEpisodes(), [LastAnimeEpData]);
@@ -47,23 +52,6 @@ const LastEpPage: NextPage = () => {
       <LastReleasedEpItem key={i} EpisodeData={epData} />
     ));
     setNewRender(JSXRenderedElement);
-  };
-
-  const GetLastReleasedEpBrutForce = async () => {
-    try {
-      const {
-        success,
-        data: { success: fetchSucceed, data: LastEps },
-      } = await callApi<ADKamiScrapperApiRes>(
-        `https://adkami-scapping-api.up.railway.app/getLatestEps`
-      );
-
-      if (!success || !fetchSucceed || LastEps?.length <= 0)
-        return toast.error("Cannot Load Ep List") as unknown as void;
-      setLastAnimeEp(LastEps);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
@@ -149,10 +137,7 @@ function LastReleasedEpItem({ EpisodeData }: LastEpItemProps) {
   };
 
   return (
-    <div
-      className="flex w-full flex-col items-center justify-center gap-2 rounded-lg bg-bgi-darker py-2 shadow-md shadow-bgi-black
-     transition-all hover:shadow-inner md:w-4/5"
-    >
+    <div className="flex w-full flex-col items-center justify-center gap-2 rounded-lg bg-bgi-darker py-2 transition-all hover:-translate-x-1 hover:-translate-y-1 hover:bg-bgi-whiter hover:shadow-[0.25rem_0.25rem_0] hover:shadow-primary-whitest md:w-4/5">
       <div className="flex flex-col items-center justify-center gap-x-3 sm:flex-row">
         <h1
           className="cursor-pointer truncate text-xl font-semibold text-primary-whiter transition hover:text-gray-200"
