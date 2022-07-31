@@ -1,6 +1,6 @@
 # ADKami Web Scrapping API 🌐
 
-#### ➡️ Scrapping Api to retrieve the lastest released anime episodes from [<u>ADKami</u>](https://www.adkami.com/) ✨
+#### ➡️ Scrapping Api to retrieve the latest released anime episodes from [<u>ADKami</u>](https://www.adkami.com/) ✨
 
 ## 📕 Purpose and origin:
 
@@ -28,9 +28,9 @@ For some oubvious reason (I'm broke), I can't share with you the railway url of 
 
 ➡️ This app works on [`Go 1.18`]
 
-- Via the bundled executable in this repo releases
-- <s>Via [**Docker Hub**] with this Image name: `ilingu/adkami-scrapping-api`</s> **I currently have some issue with my connection speed, so I can't upload the docker image on hub yet**
+- Via [**Docker Hub**] with this Image name: `ilingu/adkami-scrapping-api`
   - The binary file is in `/app/server/bin/api`
+- Via the bundled executable in this [repo releases](https://github.com/Ilingu/ack_v2/releases) (not recommended)
 
 ## License
 
