@@ -63,6 +63,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             duration: "23 min per ep",
             broadcast: "Mondays at 00:30 (JST)",
             ProvidersLink: [
+              "https://animixplay.to/v1/sasaki-to-miyano",
               "https://gogoanime.lu/category/sasaki-to-miyano",
               "https://lite.animevibe.se/anime/sasaki-to-miyano",
             ],
@@ -85,6 +86,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             duration: "23 min per ep",
             broadcast: "Tuesdays at 18:25 (JST)",
             ProvidersLink: [
+              "https://animixplay.to/v1/black-clover",
               "https://gogoanime.lu/category/black-clover",
               "https://lite.animevibe.se/anime/black-clover",
             ],
@@ -108,6 +110,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             duration: "23 min",
             broadcast: "Saturdays at 01:05 (JST)",
             ProvidersLink: [
+              "https://animixplay.to/v1/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
               "https://gogoanime.lu/category/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
               "https://lite.animevibe.se/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
             ],

@@ -177,9 +177,9 @@ const Settings: NextPage = () => {
           <Divider />
           <section className="my-5 px-3">
             <header>
-              <h1 className="text-description-whiter text-2xl font-bold">
+              <h1 className="text-2xl font-bold text-description-whiter">
                 <FiSettings className="icon" /> Settings{" "}
-                <span className="text-description text-lg font-semibold">
+                <span className="text-lg font-semibold text-description">
                   [ACK::RC]
                 </span>
               </h1>
@@ -189,7 +189,7 @@ const Settings: NextPage = () => {
               <section>
                 <button
                   onClick={() => auth.signOut()}
-                  className="xs:px-3 xs:text-lg rounded-md bg-yellow-400 py-1 px-1 font-semibold text-black"
+                  className="slideBtnAnimation rounded-md bg-secondary py-1 px-1 font-semibold text-headline hover:shadow-secondary-shadow xs:px-3 xs:text-lg"
                 >
                   <FaSignOutAlt className="icon" /> Sign Out
                 </button>
@@ -198,7 +198,7 @@ const Settings: NextPage = () => {
                     await ClearIDB();
                     window.location.reload();
                   }}
-                  className="text-headline bg-secondary xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
+                  className="slideBtnAnimation ml-2 rounded-md bg-secondary py-1 px-1 font-semibold text-headline hover:shadow-secondary-shadow xs:ml-4 xs:px-3 xs:text-lg"
                 >
                   <FaSync className="icon" /> Refresh Datas
                 </button>
@@ -215,20 +215,20 @@ const Settings: NextPage = () => {
                         }
                       }
                     }}
-                    className="bg-primary-main text-headline xs:px-3 xs:ml-4 xs:text-lg ml-2 rounded-md py-1 px-1 font-semibold"
+                    className="slideBtnAnimation ml-2 rounded-md bg-primary-main py-1 px-1 font-semibold text-headline hover:shadow-primary-whitest xs:ml-4 xs:px-3 xs:text-lg"
                   >
                     <FaHome className="icon" /> A2HS
                   </button>
                 )}
               </section>
-              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
+              <section className="mt-5 w-full rounded-md p-2 text-center ring-2 ring-description">
                 <h1
-                  className="text-description-whiter mb-1 text-xl font-bold"
+                  className="mb-1 text-xl font-bold text-description-whiter"
                   title="Nothing is stored"
                 >
                   Session Data:
                 </h1>
-                <ul className="text-headline xs:grid-cols-2 grid text-lg">
+                <ul className="grid text-lg text-headline xs:grid-cols-2">
                   <li>
                     App Version:{" "}
                     <span className="text-primary-whitest">
@@ -268,7 +268,7 @@ const Settings: NextPage = () => {
                   </li>
                   <li>
                     Login Service:{" "}
-                    <span className="text-primary-whitest capitalize">
+                    <span className="capitalize text-primary-whitest">
                       {user?.providerId}
                     </span>
                   </li>
@@ -290,14 +290,14 @@ const Settings: NextPage = () => {
                   </li>
                 </ul>
               </section>
-              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
-                <h1 className="text-description-whiter mb-1 text-xl font-bold">
+              <section className="mt-5 w-full rounded-md p-2 text-center ring-2 ring-description">
+                <h1 className="mb-1 text-xl font-bold text-description-whiter">
                   Username:
                 </h1>
                 <RenameUsername DefaultUsername={username} />
               </section>
-              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
-                <h1 className="text-description-whiter mb-1 text-xl font-bold">
+              <section className="mt-5 w-full rounded-md p-2 text-center ring-2 ring-description">
+                <h1 className="mb-1 text-xl font-bold text-description-whiter">
                   Delete Account:
                 </h1>
                 <p className="text-center font-semibold text-red-200">
@@ -311,10 +311,10 @@ const Settings: NextPage = () => {
                   }
                   className={`${
                     DAConfirmation > 1 ? "bg-green-500" : "bg-red-400"
-                  } text-headline mt-3 rounded-lg py-1 px-5 text-lg font-semibold hover:${
+                  } mt-3 rounded-lg py-1 px-5 text-lg font-semibold text-headline hover:${
                     DAConfirmation <= 1 && "bg-red-500"
                   } 
-                  focus:ring-headline outline-none transition-all focus:ring`}
+                  outline-none transition-all focus:ring focus:ring-headline`}
                 >
                   {DAConfirmation <= 1 ? (
                     <FaTrashAlt className="icon" />
@@ -328,11 +328,11 @@ const Settings: NextPage = () => {
                     : "Click To Cancel"}
                 </button>
               </section>
-              <section className="ring-description mt-5 w-full rounded-md p-2 text-center ring-2">
-                <h1 className="text-description-whiter mb-1 text-xl font-bold">
+              <section className="mt-5 w-full rounded-md p-2 text-center ring-2 ring-description">
+                <h1 className="mb-1 text-xl font-bold text-description-whiter">
                   Contact Dev:
                 </h1>
-                <ul className="text-headline grid grid-cols-2">
+                <ul className="grid grid-cols-2 text-headline">
                   <li>
                     <span className="text-description-whiter underline">
                       Github:
@@ -438,20 +438,19 @@ function RenameUsername({ DefaultUsername }: { DefaultUsername: string }) {
 
   return (
     <form onSubmit={ChangeUsername}>
-      <span className="text-headline text-lg font-bold">@</span>
+      <span className="text-lg font-bold text-headline">@</span>
       <input
         type="text"
         data-testid="RenameUsernameInput"
         value={Username}
         onChange={HandleChange}
-        className="focus:ring-primary-main rounded-md p-1 outline-none transition-all focus:ring"
+        className="rounded-md p-1 outline-none transition-all focus:ring focus:ring-primary-main"
       />
       <button
         type="submit"
         data-testid="RenameUsernameBtnSubmition"
         disabled={!IsValid}
-        className="text-headline bg-primary-main hover:bg-primary-whiter focus:ring-primary-darker ml-2 rounded-md py-1
-                     px-2 font-semibold tracking-wide outline-none transition-all focus:ring"
+        className="ml-2 cursor-pointer rounded-md bg-primary-main py-1 px-2 font-semibold tracking-wide text-headline outline-none transition-all hover:bg-primary-whiter focus:ring focus:ring-primary-darker"
       >
         Change
       </button>

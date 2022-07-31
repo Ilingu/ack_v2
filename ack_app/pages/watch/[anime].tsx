@@ -146,8 +146,8 @@ const WatchPage: NextPage = () => {
                 <button
                   onClick={() => setFocusMode(true)}
                   data-testid="WatchActivateFocusModeBtn"
-                  className="h-14 w-14 rounded-md bg-primary-main text-xl text-headline shadow-md shadow-primary-darker 
-                  outline-none"
+                  className="slideBtnAnimation h-14 w-14 rounded-md bg-primary-main text-xl text-headline outline-none 
+                  hover:shadow-primary-whitest"
                 >
                   <FaPlay className="icon" />
                 </button>
@@ -155,8 +155,7 @@ const WatchPage: NextPage = () => {
                   onClick={() =>
                     UserAnimeData && ToggleFav(malId.toString(), Fav)
                   }
-                  className="mb-2 h-14 w-14 rounded-md bg-primary-main text-xl text-headline shadow-md shadow-primary-darker 
-                  outline-none xs:mb-0"
+                  className="slideBtnAnimation mb-2 h-14 w-14 rounded-md bg-primary-main text-xl text-headline outline-none hover:shadow-primary-whitest xs:mb-0"
                 >
                   {Fav ? (
                     <AiFillStar className="icon" />

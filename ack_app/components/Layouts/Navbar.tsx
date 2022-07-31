@@ -33,7 +33,7 @@ const Navbar: FC = () => {
       fallback={
         <Link href="/sign-up" passHref>
           <a data-testid="Nav-Login-Btn">
-            <button className="bg-primary-darker ml-2 rounded-lg py-2 px-4 text-lg font-bold">
+            <button className="slideBtnAnimation ml-2 rounded-lg bg-primary-darker py-2 px-4 text-lg font-bold hover:shadow-primary-whitest">
               {screen?.width > 768 ? (
                 "Get Started Now"
               ) : (
@@ -56,9 +56,9 @@ const Navbar: FC = () => {
                 className="rounded"
               />
             ) : (
-              <FiSettings className="text-secondary -translate-y-0.5" />
+              <FiSettings className="-translate-y-0.5 text-secondary" />
             )}
-            <span className="text-description-whiter group-hover:text-headline mt-1 transition">
+            <span className="mt-1 text-description-whiter transition group-hover:text-headline">
               Settings
             </span>
           </button>
@@ -71,7 +71,7 @@ const Navbar: FC = () => {
 
 function NavItem({ afterHydrated }: NavItemProps) {
   return (
-    <nav className="bg-bgi-black relative flex h-20 w-full rounded-bl-lg rounded-br-lg">
+    <nav className="relative flex h-20 w-full rounded-bl-lg rounded-br-lg bg-bgi-black">
       <Link href="/" replace passHref>
         <a
           className="absolute ml-2 flex h-full scale-90 items-center sm:scale-100"
@@ -87,12 +87,12 @@ function NavItem({ afterHydrated }: NavItemProps) {
           />
         </a>
       </Link>
-      <div className="text-headline ml-11 flex h-full w-full scale-75 items-center sm:scale-100 sm:justify-end md:mr-0 md:justify-center">
+      <div className="ml-11 flex h-full w-full scale-75 items-center text-headline sm:scale-100 sm:justify-end md:mr-0 md:justify-center">
         <Link href="/anime" passHref>
           <a data-hotkey="Alt+k">
             <button className="btn-navbar group">
-              <FaSearch className="text-secondary -translate-y-0.5" />{" "}
-              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
+              <FaSearch className="-translate-y-0.5 text-secondary" />{" "}
+              <span className="mt-1 text-description-whiter transition group-hover:text-headline">
                 Search
               </span>
             </button>
@@ -101,8 +101,8 @@ function NavItem({ afterHydrated }: NavItemProps) {
         <Link href="/anime/season" passHref>
           <a data-hotkey="Alt+s">
             <button className="btn-navbar group">
-              <FaLeaf className="text-secondary -translate-y-0.5" />{" "}
-              <span className="text-description-whiter group-hover:text-headline mt-1 transition">
+              <FaLeaf className="-translate-y-0.5 text-secondary" />{" "}
+              <span className="mt-1 text-description-whiter transition group-hover:text-headline">
                 Seasons
               </span>
             </button>

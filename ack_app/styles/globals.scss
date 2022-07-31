@@ -8,7 +8,10 @@
     @apply inline -translate-y-0.5;
   }
   .btn-navbar {
-    @apply hover:bg-bgi-whiter flex flex-col items-center px-4 py-4 text-xl font-bold transition;
+    @apply flex flex-col items-center px-4 py-4 text-xl font-bold transition hover:bg-bgi-whiter;
+  }
+  .slideBtnAnimation {
+    @apply transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[0.15rem_0.15rem_0]; // 0.15rem = 2.4px
   }
 }
 

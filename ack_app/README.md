@@ -32,7 +32,7 @@ This is a [Next.js/React](https://nextjs.org/) project bootstrapped with [`creat
 
 Uses Firebase as a DB and [`tRPC`](https://trpc.io/) for API request
 
-This App use [ADKami](https://www.adkami.com/) data for [This Page](https://ack.vercel.app/anime/season/last-released-episodes). \*These Data are extracted with a [nestJS](https://nestjs.com/) Scrapping API --> [Github Repo](https://github.com/Ilingu/adkami-scrapping-api)
+This App use [ADKami](https://www.adkami.com/) data for [This Page](https://ack.vercel.app/anime/season/last-released-episodes). \*These Data are extracted with a **Go Scrapping API** --> [Github Repo](https://github.com/Ilingu/ack_v2/tree/main/APIs/adkami-scrapping-api)
 
 2022 [Ilingu](https://github.com/Ilingu)  
 [![SITE](https://img.shields.io/badge/Licence-MIT-yellow)](https://github.com/Ilingu/ack_v2/blob/main/LICENSE)

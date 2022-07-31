@@ -10,7 +10,7 @@ import type {
 import { AnimeWatchType, SupportedAnimeProvider } from "./types/enums";
 import { ProviderUIInfo } from "./types/types";
 
-const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
+const { ANIMIXPLAY, GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
 
 /* UTILS FUNC */
 /**
@@ -204,9 +204,12 @@ export const ParseCookies = (
 };
 
 export const ProviderUrlIdentifier = (
-  providerUrl: string
+  providerUrl: string,
+  onlyThruth = false
 ): SupportedAnimeProvider => {
-  if (providerUrl.includes(GOGOANIME)) return GOGOANIME;
+  if (providerUrl.includes(GOGOANIME))
+    return onlyThruth ? GOGOANIME : ANIMIXPLAY; // did on purpose; 'cause ANIMIXPLAY uses GOGOANIME under the hood
+  if (providerUrl.includes(ANIMIXPLAY)) return ANIMIXPLAY;
   if (providerUrl.includes(ANIMEVIBE)) return ANIMEVIBE;
   return null;
 };
@@ -217,6 +220,8 @@ export const GetProviderUIInfo = (providersUrl: string[]): ProviderUIInfo[] => {
       const ProviderType = ProviderUrlIdentifier(url);
       if (ProviderType === GOGOANIME)
         return ["gogoanime", "#ffc119", "/Assets/gogoanime.png"];
+      if (ProviderType === ANIMIXPLAY)
+        return ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"];
       if (ProviderType === ANIMEVIBE)
         return ["animevibe", "#ffffff", "/Assets/animevibe.ico"];
       return null;
@@ -232,6 +237,8 @@ export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) =>
 
       if (ProviderType === GOGOANIME)
         return `https://gogoanime.lu/${title}-episode-${epId}`;
+      if (ProviderType === ANIMIXPLAY)
+        return `https://animixplay.to/v1/${title}/ep${epId}`;
       if (ProviderType === ANIMEVIBE)
         return `https://lite.animevibe.se/anime/${title}/${epId}`;
       return null;

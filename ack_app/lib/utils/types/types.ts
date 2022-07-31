@@ -47,12 +47,9 @@ export type AnimeDatasShape = [
 
 export type AnimeProviders =
   | "https://gogoanime.lu/category"
-  | "https://lite.animevibe.se/Anime";
-export type AnimeProvidersName =
-  | "gogoanime"
-  | "chia-anime"
-  | "kickassanime"
-  | "animevibe";
+  | "https://lite.animevibe.se/Anime"
+  | "https://animixplay.to/anime";
+export type AnimeProvidersName = "gogoanime" | "animixplay" | "animevibe";
 export type ProviderUIInfo = [AnimeProvidersName, string, string];
 
 export type tRPCError =

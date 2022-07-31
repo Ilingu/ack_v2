@@ -4,7 +4,6 @@ import { IndexAnimeInAlgolia } from "../algolia/algolia-admin";
 import type {
   AnimeConfigPathsIdShape,
   AnimeShape,
-  AnimeVibeApiSearchResp,
   FunctionJob,
   InternalApiResSuccess,
   JikanApiERROR,
@@ -12,16 +11,28 @@ import type {
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
+  ProviderLinkInfo,
 } from "../utils/types/interface";
 import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 import { SupportedAnimeProvider } from "../utils/types/enums";
 // Func
-import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
+import {
+  IsError,
+  decryptDatas,
+  IsEmptyString,
+  ProviderUrlIdentifier,
+} from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
+import {
+  FetchAnimeVibeLink,
+  FetchAnimixLink,
+  FetchGogoLink,
+  GenerateProvidersTitles,
+} from "./utils/utils";
 
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
-const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
+const { GOGOANIME, ANIMIXPLAY, ANIMEVIBE } = SupportedAnimeProvider;
 
 /**
  * Return Is The Host Is BlackListed
@@ -61,7 +72,6 @@ export const IsBlacklistedHost = (host: string): boolean => {
 export const GetAnimeData = async (
   animeId: string
 ): Promise<FunctionJob<InternalApiResSuccess>> => {
-  let animeData: AnimeShape;
   try {
     const endpoint = `https://api.jikan.moe/v4/anime/${animeId}`;
     // Req
@@ -82,16 +92,16 @@ export const GetAnimeData = async (
     )
       return { success: false };
 
-    const { data: animeRes } = animeResData;
+    const { data: animeJikan } = animeResData;
     const { data: animeRecommendationsRes } = animeRecommendationsResData;
 
     // Episodes Generation
     const EpisodesLength = animeEpsRes?.length || 0;
     let AnimeEpsDatas: JikanApiResEpisodes[] = [];
 
-    if (EpisodesLength < (animeRes?.episodes || 12)) {
+    if (EpisodesLength < (animeJikan?.episodes || 12)) {
       const NonMissingEp = animeEpsRes.map(({ mal_id }) => mal_id);
-      for (let i = 1; i <= (animeRes?.episodes || 12); i++) {
+      for (let i = 1; i <= (animeJikan?.episodes || 12); i++) {
         const EpToAdd: JikanApiResEpisodes = NonMissingEp.includes(i)
           ? animeEpsRes.find(({ mal_id }) => mal_id === i)
           : {
@@ -101,58 +111,55 @@ export const GetAnimeData = async (
       }
     } else AnimeEpsDatas = animeEpsRes;
 
-    // 9anime url link
+    // providers url links
     const AnimeTitlesIterable = [
-      animeRes?.title,
-      animeRes?.title_japanese,
-      animeRes?.title_english,
-      ...(animeRes?.title_synonyms || []),
+      animeJikan?.title,
+      animeJikan?.title_japanese,
+      animeJikan?.title_english,
+      ...(animeJikan?.title_synonyms || []),
     ].filter((d) => d);
-    const ProvidersLink = await FetchProvidersLink(AnimeTitlesIterable);
+    const ProvidersTitlesToCheck = GenerateProvidersTitles(AnimeTitlesIterable);
+    const ProvidersLink = await FetchProvidersLink(ProvidersTitlesToCheck);
 
-    const AnimeDatas: AnimeDatasShape = [
-      animeRes,
+    // Checks
+    const AnimeRawDatas: AnimeDatasShape = [
+      animeJikan,
       AnimeEpsDatas,
       animeRecommendationsRes,
       ProvidersLink,
     ];
 
-    let IsGood = true;
-    if (!AnimeDatas || AnimeDatas.filter((ad) => !!ad).length < 3)
-      IsGood = false;
+    if (AnimeRawDatas.filter((ad) => !!ad).length !== 4)
+      return { success: false };
 
-    if (IsGood) {
-      const MissingElems =
-        EpisodesLength <= 0 ||
-        !ProvidersLink ||
-        animeRecommendationsRes.length <= 0;
+    const MissingElems =
+      EpisodesLength <= 0 ||
+      !ProvidersLink ||
+      animeRecommendationsRes.length <= 0;
+    // Transform raw data in the shape I want
+    const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(
+      AnimeRawDatas,
+      MissingElems
+    );
 
-      const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(
-        AnimeDatas,
-        MissingElems
-      );
-      animeData = AnimeData;
-
-      let AddedToDB = false;
-      let AnimeUpdated = false;
-      if (IsAddableToDB && process.env.NODE_ENV !== "test") {
-        [AddedToDB, AnimeUpdated] = await AddNewGlobalAnime(animeId, animeData);
-        IndexAnimeInAlgolia({
-          title: animeData.title,
-          AlternativeTitle: animeData.AlternativeTitle,
-          OverallScore: animeData.OverallScore,
-          objectID: animeData.malId,
-          photoPath: animeData.photoPath,
-          type: animeData.type,
-        });
-      }
-
-      return {
-        success: true,
-        data: { AddedToDB, AnimeUpdated, AnimeData: animeData },
-      };
+    let AddedToDB = false;
+    let AnimeUpdated = false;
+    if (IsAddableToDB && process.env.NODE_ENV !== "test") {
+      [AddedToDB, AnimeUpdated] = await AddNewGlobalAnime(animeId, AnimeData); // store datas in FB
+      IndexAnimeInAlgolia({
+        title: AnimeData.title,
+        AlternativeTitle: AnimeData.AlternativeTitle,
+        OverallScore: AnimeData.OverallScore,
+        objectID: AnimeData.malId,
+        photoPath: AnimeData.photoPath,
+        type: AnimeData.type,
+      }); // Index Anime title in Algolia
     }
-    return { success: false };
+
+    return {
+      success: true,
+      data: { AddedToDB, AnimeUpdated, AnimeData },
+    };
   } catch (err) {
     console.error(err);
     return { success: false };
@@ -160,8 +167,9 @@ export const GetAnimeData = async (
 };
 
 /* SITE PROVIDER:
-  1. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
-  2. https://lite.animevibe.se/anime/*  --> Open API (without any protections) ✅✅ Cannot Check If URL good or not (only by search method) ❌ + good search + good vid player ✅
+  1. https://animixplay.to/             --> Best UI ✅ Uses GogoAnime under the hood ✅✅
+  2. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
+  3. https://lite.animevibe.se/anime/*  --> Open API (without any protections) ✅✅ Cannot Check If URL good or not (only by search method) ❌ + good search + good vid player ✅
   ------------------------------------------------------------------------------------------------------------
   - https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
 
@@ -169,150 +177,53 @@ export const GetAnimeData = async (
   - https://kickassanime.su/anime    --> Don't support anymore (copy of chia-anime, possibly WP templates...)
 */
 
-interface ProviderLinkInfo {
-  title: string;
-  fetchUrl: string;
-  animeUrl: string;
-  provider: {
-    type: SupportedAnimeProvider;
-    searchUrl: string;
-  };
-}
-
-const GenerateProvidersLinks = (AnimeTitles: string[]) => {
-  const PROVIDERS: SupportedAnimeProvider[] = [GOGOANIME, ANIMEVIBE];
-
-  const providersLinks: ProviderLinkInfo[][] = [];
-  for (const provider of PROVIDERS) {
-    const providerLinks: ProviderLinkInfo[] = [];
-    for (const title of AnimeTitles) {
-      const TrimmedTitle = encodeURI(
-        title
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-zA-Z0-9- ]/g, "")
-          .replace(new RegExp(" ", "g"), "-")
-          .replace(new RegExp("---", "g"), "--")
-          .replace(new RegExp("--", "g"), "-")
-      ); // title to simulate right anime page url
-      const SafeTitle = encodeURIComponent(title.trim()); // Title to search (in url)
-      if (TrimmedTitle.trim().length <= 0) continue;
-
-      let fetchUrl: string, searchUrl: string, animeUrl: string;
-      if (provider === GOGOANIME) {
-        fetchUrl = `${GOGOANIME}/category/${TrimmedTitle}`;
-        searchUrl = `${GOGOANIME}/search.html?keyword=${SafeTitle}`;
-        animeUrl = fetchUrl;
-      } else {
-        fetchUrl = `https://lite-api.animemate.xyz/Anime/${TrimmedTitle}`;
-        searchUrl = `https://lite-api.animemate.xyz/Search/${SafeTitle}`;
-        animeUrl = `${ANIMEVIBE}/anime/${TrimmedTitle}`;
-      }
-
-      providerLinks.push({
-        title: TrimmedTitle,
-        fetchUrl: fetchUrl,
-        animeUrl,
-        provider: {
-          type: provider,
-          searchUrl: searchUrl,
-        },
-      });
-    }
-    providersLinks.push(providerLinks);
-  }
-
-  return providersLinks;
-};
-
 /**
  * Generate and return the working Streaming Providers Link
- * @param {string[]} AnimeTitles Array of the anime mutliples titles (e.g: Shingeki No Kyojin,Attack On Titan...)
+ * @param {ProviderLinkInfo} providersTitles Array of the anime mutliples titles (e.g: Shingeki No Kyojin,Attack On Titan...)
  * @return {string[]} Array of working providers anime link
  */
 const FetchProvidersLink = async (
-  AnimeTitles: string[]
+  providersTitles: ProviderLinkInfo
 ): Promise<string[] | null> => {
   try {
     const ProvidersResp = await Promise.allSettled(
-      GenerateProvidersLinks(AnimeTitles).map(async (providerLinks) => {
-        const ProviderType = providerLinks[0].provider.type;
-        const AttemptFetchUrl = (): Promise<string> =>
-          new Promise((res, rej) => {
-            try {
-              let i = 0;
-              const Next = () => {
-                i++;
-                FetchUrl();
-              };
-
-              const FetchUrl = async () => {
-                if (i > providerLinks.length - 1)
-                  return rej("cannot find anime link in all titles");
-                const { fetchUrl, animeUrl, provider } = providerLinks[i];
-
-                // Method 1: See if prediction were true (if url return 200, anime page exist and we already have his link)
-                const providerResp = await fetch(fetchUrl);
-                if (providerResp.ok)
-                  switch (ProviderType) {
-                    case GOGOANIME:
-                      return res(animeUrl);
-                    case ANIMEVIBE:
-                      const RespToText = await providerResp.text();
-                      if (RespToText !== "Error: Anime not Found")
-                        return res(animeUrl);
-                  }
-
-                // Method 2 (url return error): direcly search in provider using the "search anime" functionnality
-                const searchResp = await fetch(provider.searchUrl);
-                if (!searchResp.ok) return Next(); // No search page -> next iteration
-
-                if (ProviderType === GOGOANIME) {
-                  const cheerio = await import("cheerio");
-                  const $ = cheerio.load(await searchResp.text());
-
-                  const GogoSelector =
-                    "#wrapper_bg div.last_episodes ul.items > li > div.img > a";
-                  const GogoPath = $(GogoSelector).attr("href");
-
-                  if (
-                    !IsEmptyString(GogoPath) &&
-                    GogoPath.startsWith("/category/")
-                  )
-                    return res(`${ProviderType}${GogoPath}`);
-                }
-                if (ProviderType === ANIMEVIBE) {
-                  const AnimeVibeAPIResp: AnimeVibeApiSearchResp =
-                    await searchResp.json();
-                  if (AnimeVibeAPIResp.length === 0) return Next();
-
-                  const AnimeSearchObj = AnimeVibeAPIResp[0];
-                  if (
-                    // Object.hasOwn(AnimeSearchObj, "url") &&
-                    !IsEmptyString(AnimeSearchObj?.url) &&
-                    AnimeSearchObj?.url.startsWith("/anime/")
-                  )
-                    return res(`${ProviderType}${AnimeSearchObj.url}`);
-                }
-
-                Next(); // default --> next iteration
-              };
-
-              FetchUrl(); // 1st call
-            } catch (err) {
-              console.error(err);
-              return rej();
-            }
-          });
-
-        return await AttemptFetchUrl();
-      })
+      Object.keys(providersTitles).map(
+        async (ProviderType: SupportedAnimeProvider) => {
+          const titles = providersTitles[ProviderType];
+          switch (ProviderType) {
+            case ANIMIXPLAY:
+              return await FetchAnimixLink(titles);
+            case GOGOANIME:
+              return await FetchGogoLink(titles);
+            case ANIMEVIBE:
+              return await FetchAnimeVibeLink(titles);
+            default:
+              return await Promise.reject(
+                new Error("not a supported provider")
+              );
+          }
+        }
+      )
     );
+
     const ValidAnimeUrlLink = ProvidersResp.map((res) => {
       if (res.status === "fulfilled") return res.value;
       return null;
     }).filter((e) => e);
 
+    // Adding Animixplay provider
+    const GogoLink = ValidAnimeUrlLink.find(
+      (url) => ProviderUrlIdentifier(url, true) === GOGOANIME
+    );
+    if (!IsEmptyString(GogoLink)) {
+      const Animix = GogoLink.replace(
+        "https://gogoanime.lu/category/",
+        "https://animixplay.to/v1/"
+      );
+      ValidAnimeUrlLink.unshift(Animix);
+    }
+
+    // returns all the valid provider (or null is none)
     return ValidAnimeUrlLink.length === 0 ? null : ValidAnimeUrlLink;
   } catch (err) {
     console.error(err);

@@ -16,7 +16,12 @@ module.exports = {
           whiter: "rgb(153, 155, 255)",
           whitest: "rgb(179, 180, 255)",
         },
-        secondary: "#3b82f680",
+        secondary: {
+          DEFAULT: "rgba(156, 102, 241, 0.8)", // 800
+          base: "rgb(156, 102, 241)",
+          shadow: "rgb(187, 157, 234)",
+        },
+        // fancy: "rgb(187, 102, 241)",
         // Main Colors
         headline: "#ffffff",
         description: {

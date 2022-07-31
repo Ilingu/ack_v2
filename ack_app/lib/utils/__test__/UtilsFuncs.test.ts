@@ -221,18 +221,21 @@ describe.concurrent("Testing UtilFuncs", () => {
   });
 
   test.concurrent("ProviderUrlIdentifier", () => {
-    const { GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
+    const { ANIMEVIBE, ANIMIXPLAY } = SupportedAnimeProvider;
 
     const ProvidersSample: TestCase<string, SupportedAnimeProvider>[] = [
-      { input: "https://gogoanime.lu", excepted: GOGOANIME },
+      { input: "https://gogoanime.lu", excepted: ANIMIXPLAY },
       { input: "https://chia-anime.su", excepted: null },
       { input: "https://kickassanime.su", excepted: null },
+      { input: "https://animixplay.to", excepted: ANIMIXPLAY },
       { input: "https://lite.animevibe.se", excepted: ANIMEVIBE },
-      { input: "https://gogoanime.lu/sasaki-to-miyano", excepted: GOGOANIME },
+      { input: "https://gogoanime.lu/sasaki-to-miyano", excepted: ANIMIXPLAY },
       { input: "https://chia-anime.su/TOyo5Yo", excepted: null },
+      { input: "https://animixplay.to/v1/black-clover", excepted: ANIMIXPLAY },
       { input: "https://kickassanime.su/", excepted: null },
       { input: "https://lite.animevibe.se//$^*_657", excepted: ANIMEVIBE },
       { input: "http://gogoanime.lu", excepted: null },
+      { input: "https://animixplay.com", excepted: null },
       { input: "https://chia-anime.si", excepted: null },
       { input: "https://kickasanime.su", excepted: null },
       { input: "https:/lite.animevibe.se", excepted: null },
@@ -254,10 +257,12 @@ describe.concurrent("Testing UtilFuncs", () => {
         "https://chia-anime.su",
         "https://kickassanime.su/",
         "https://lite.animevibe.se/ubime-no-etranger",
+        "https://animixplay.to/v1/isekai-yakkyoku/ep4",
       ],
       excepted: [
-        ["gogoanime", "#ffc119", "/Assets/gogoanime.png"],
+        ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"],
         ["animevibe", "#ffffff", "/Assets/animevibe.ico"],
+        ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"],
       ],
     };
 
@@ -278,12 +283,14 @@ describe.concurrent("Testing UtilFuncs", () => {
           "https://chia-anime.su/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen",
           "https://kickassanime.su/anime/ubime-no-etranger",
           "https://lite.animevibe.se/anime/black-clover-tv",
+          "https://animixplay.to/v1/kingdom-4th-season",
         ],
         epId: 5,
       },
       excepted: [
-        "https://gogoanime.lu/sasaki-to-miyano-episode-5",
+        "https://animixplay.to/v1/sasaki-to-miyano/ep5",
         "https://lite.animevibe.se/anime/black-clover-tv/5",
+        "https://animixplay.to/v1/kingdom-4th-season/ep5",
       ],
     };
 

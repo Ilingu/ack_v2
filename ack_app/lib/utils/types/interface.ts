@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { AnimeWatchType } from "./enums";
+import { AnimeWatchType, SupportedAnimeProvider } from "./enums";
 import type {
   AnimeStatusType,
   AnimeType,
@@ -21,6 +21,14 @@ export interface FunctionJob<T = any> {
   success: boolean;
   data?: T;
 }
+export type ProviderLinkInfo = {
+  [K in SupportedAnimeProvider]?: ProviderLinkInfoShape[];
+};
+export interface ProviderLinkInfoShape {
+  title: string;
+  SafeTitle: string;
+}
+
 // WebWorkers
 export interface WebWorkerRequest<T = any> {
   data: T;
@@ -29,7 +37,6 @@ export interface DifferenceWWShapeReq {
   CachedValues: AnimeShape[];
   NewValues: UserAnimeShape[];
 }
-
 // Api routes
 export interface InternalApiResSuccess {
   AddedToDB: boolean;

@@ -335,7 +335,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 (Airing && broadcast) || type === "Movie" ? Studios : null
               }
               OtherInfos={[
-                ProvidersLink ? ProvidersLink[0] : null,
+                `https://animixplay.to/anime/${malId}`,
                 Airing && broadcast,
                 Airing ? "Ongoing" : "Finished",
               ]}
@@ -461,7 +461,9 @@ function SpecialInfo({
         <p className="text-lg font-bold text-headline underline">
           Special info:
         </p>
-        <div className="flex flex-wrap justify-center">{TagsSpecialInfo}</div>
+        <div className="mt-1 flex flex-wrap justify-center">
+          {TagsSpecialInfo}
+        </div>
       </div>
     </div>
   );
@@ -475,10 +477,12 @@ function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
   return (
     <div
       style={{
-        backgroundColor: IsProviderLink ? UIInfo[1] : "rgb(28 28 28)",
-        color: IsProviderLink ? pickTextColorBasedOnBgColor(UIInfo[1]) : "#fff",
+        backgroundColor: IsProviderLink && UIInfo[1],
+        color: IsProviderLink && pickTextColorBasedOnBgColor(UIInfo[1]),
       }}
-      className="mr-2 mb-2 cursor-default rounded-lg py-2 px-2 font-bold transition hover:bg-bgi-darker hover:text-primary-whiter"
+      className={`mr-2 mb-2 cursor-default rounded-lg bg-bgi-black py-2 px-2 font-bold text-headline transition-all hover:bg-bgi-darker hover:text-primary-whiter${
+        IsProviderLink ? " slideBtnAnimation" : ""
+      }`}
     >
       {IsProviderLink ? (
         <ProviderAnimeBadge UIInfo={UIInfo} path={dataToShow} />
@@ -503,8 +507,8 @@ function ProviderAnimeBadge({ UIInfo, path }: ProviderAnimeBadgeProps) {
     >
       <Image
         src={UIInfo[2]}
-        width={16}
-        height={16}
+        width={20}
+        height={20}
         alt="9anime Logo"
         className="rounded-md bg-white"
       />

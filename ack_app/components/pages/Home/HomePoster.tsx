@@ -519,9 +519,9 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP && "text-description"
-        } group hover:text-headline mr-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
+        } group mr-2 cursor-pointer text-xl font-bold uppercase transition-all hover:text-headline sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES &&
-          " decoration-primary-darker text-headline"
+          " text-headline decoration-primary-darker"
         }`}
         data-testid="HomeSwitchToBookmarks"
         onClick={() =>
@@ -546,9 +546,9 @@ function HomeHeader({ HomeDisplayType, setHomeDisplayType }: HomeHeaderProps) {
       <h1
         className={`${
           HomeDisplayType === HomeDisplayTypeEnum.ANIMES && "text-description"
-        } hover:text-headline ml-2 cursor-pointer text-xl font-bold uppercase transition-all sm:text-2xl ${
+        } ml-2 cursor-pointer text-xl font-bold uppercase transition-all hover:text-headline sm:text-2xl ${
           HomeDisplayType === HomeDisplayTypeEnum.GROUP &&
-          " decoration-primary-darker text-headline"
+          " text-headline decoration-primary-darker"
         }`}
         data-testid="HomeSwitchToCollections"
         onClick={() =>
@@ -586,9 +586,9 @@ function SortByWatchType({
         (CurrentActiveWatch, i) => (
           <a
             key={i}
-            className={`hover:text-headline block cursor-pointer px-4 py-2 text-base transition-all${
+            className={`block cursor-pointer px-4 py-2 text-base hover:text-headline transition-all${
               ActiveWatchType === CurrentActiveWatch
-                ? " text-headline font-bold"
+                ? " font-bold text-headline"
                 : ""
             }`}
             role="menuitem"
@@ -643,12 +643,12 @@ function GroupFormInput({
           placeholder="Name of group"
         />
         {GroupsMatch && (
-          <div className="text-primary-whitest z-10 mb-3 w-80 cursor-pointer rounded-md bg-slate-800 p-0.5 text-center font-semibold outline-none">
+          <div className="z-10 mb-3 w-80 cursor-pointer rounded-md bg-slate-800 p-0.5 text-center font-semibold text-primary-whitest outline-none">
             {GroupsMatch.map((text) => (
               <p
                 key={text}
                 onClick={() => setInputGroupName(text)}
-                className="hover:text-headline border-t-primary-darker mb-1 border-t transition-all"
+                className="mb-1 border-t border-t-primary-darker transition-all hover:text-headline"
               >
                 {text}
               </p>
@@ -733,23 +733,23 @@ function GroupComponent({
       <div className="absolute top-0 left-1/2 w-9/12 -translate-x-1/2">
         {selectedGroup?.name && (
           <div
-            className="animate-fadeIn bg-bgi-darker flex cursor-pointer flex-col 
-          rounded-lg bg-opacity-90 p-2"
+            className="flex animate-fadeIn cursor-pointer flex-col rounded-lg 
+          bg-bgi-darker bg-opacity-90 p-2"
           >
-            <h1 className="text-headline text-center text-2xl font-bold capitalize">
+            <h1 className="text-center text-2xl font-bold capitalize text-headline">
               <span className="text-primary-main">
                 {selectedGroup?.data?.GroupName}
               </span>{" "}
               Group
             </h1>
             <button
-              className="text-headline absolute top-0 right-2 text-4xl"
+              className="absolute top-0 right-2 text-4xl text-headline"
               onClick={() => setSelectedGroup(null)}
             >
               <AiFillCloseCircle className="icon" />
             </button>
             <button
-              className="text-headline absolute top-0 left-2 text-3xl transition-all hover:text-red-500"
+              className="absolute top-0 left-2 text-3xl text-headline transition-all hover:text-red-500"
               title="Delete this group"
               data-testid="HomeDeleteSelectedGroup"
               onClick={() => DeleteGroup(selectedGroup?.name)}
@@ -789,17 +789,17 @@ function AnimeItemPoster({
   const { WATCHED, WATCHING, DROPPED } = AnimeWatchType;
   const Color =
     WatchType === WATCHING
-      ? "text-primary-whiter"
+      ? "text-primary-whitest"
       : WatchType === WATCHED
       ? "text-green-500"
       : WatchType === DROPPED
       ? "text-red-500"
-      : "text-primary-whitest";
+      : "text-secondary";
 
   const AddToGroup = RenderType === "animeList" && (
     <div
       onClick={() => ToggleGroup(AnimeId.toString(), "ADD")}
-      className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-green-400"
+      className="absolute top-1 right-1 z-10 rounded-lg bg-bgi-darker bg-opacity-70 px-2 py-1 text-lg font-semibold text-green-400"
       title="Add to collection"
       data-testid="HomeAddToGroup"
     >
@@ -815,7 +815,7 @@ function AnimeItemPoster({
         }
         ToggleGroup(AnimeId.toString(), "DELETE");
       }}
-      className="bg-bgi-darker absolute top-1 right-1 z-10 rounded-lg bg-opacity-70 px-2 py-1 text-lg font-semibold text-red-500"
+      className="absolute top-1 right-1 z-10 rounded-lg bg-bgi-darker bg-opacity-70 px-2 py-1 text-lg font-semibold text-red-500"
       data-testid="HomeRemoveFromGroup"
     >
       <FaMinus className="icon" />
@@ -824,14 +824,14 @@ function AnimeItemPoster({
 
   return (
     <div
-      className="group xl:min-h-80 min-h-72 bg-bgi-whiter shadow-bgi-whitest relative w-52 cursor-pointer rounded-lg 
-    p-1 shadow transition-all delay-150 hover:scale-[1.025] xl:w-56"
+      className="xl:min-h-80 min-h-72 group relative w-52 cursor-pointer rounded-lg bg-bgi-whiter p-1 
+    shadow shadow-bgi-whitest transition-all delay-150 hover:scale-[1.025] xl:w-56"
     >
       <div>
         <div
           className={`absolute top-1 ${
             !!NewEpisodeAvailable ? "right-10" : "left-1"
-          } text-headline bg-bgi-darker z-10 rounded-lg bg-opacity-70 px-2 py-1 text-xl font-semibold`}
+          } z-10 rounded-lg bg-bgi-darker bg-opacity-70 px-2 py-1 text-xl font-semibold text-headline`}
           onClick={() => ToggleFav(AnimeId.toString(), Fav)}
         >
           {Fav ? (
@@ -854,12 +854,12 @@ function AnimeItemPoster({
               setCopyClicked(false);
             }, 2000);
           }}
-          className="text-headline bg-bgi-darker absolute bottom-5 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-lg bg-opacity-70 px-2 py-1 text-xl group-hover:block"
+          className="absolute bottom-5 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-lg bg-bgi-darker bg-opacity-70 px-2 py-1 text-xl text-headline group-hover:block"
         >
           {CopyClicked ? <FcOk /> : <FaCopy className="icon" />}
         </div>
         {!!NewEpisodeAvailable && (
-          <div className="text-headline bg-primary-darker absolute top-1 z-10 rounded-md px-3 py-1 font-bold tracking-wide">
+          <div className="absolute top-1 z-10 rounded-md bg-primary-darker px-3 py-1 font-bold tracking-wide text-headline">
             NEW
           </div>
         )}
@@ -905,7 +905,7 @@ function GroupItemPoster({
 
   return (
     <div
-      className="bg-bgi-whiter grid h-80 w-52 cursor-pointer grid-rows-6 rounded-lg"
+      className="grid h-80 w-52 cursor-pointer grid-rows-6 rounded-lg bg-bgi-whiter"
       onClick={() => {
         scrollTo(0, 80);
         setSelectedGroup(GroupData.GroupName);
@@ -916,7 +916,7 @@ function GroupItemPoster({
           <PreviewImg key={i} src={photoURL} />
         ))}
       </div>
-      <h1 className="text-headline row-span-1 flex items-center justify-center text-xl font-bold capitalize">
+      <h1 className="row-span-1 flex items-center justify-center text-xl font-bold capitalize text-headline">
         {GroupData.GroupName}
       </h1>
     </div>
