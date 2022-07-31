@@ -151,8 +151,7 @@ export function SpotDifferenciesBetweenArrays<T = number>(
  * @returns {boolean} true | false
  */
 export const IsError = (api_response: JikanApiERROR): boolean => {
-  if (!api_response || !!api_response?.error) return true;
-  return false;
+  return !api_response || !!api_response?.error;
 };
 
 type Return404Shape = { notFound: true; revalidate?: number };

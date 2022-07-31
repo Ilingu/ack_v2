@@ -24,6 +24,7 @@ import {
 } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
 import {
+  AttemptFetchProvider,
   FetchAnimeVibeLink,
   FetchAnimixLink,
   FetchGogoLink,
@@ -129,9 +130,6 @@ export const GetAnimeData = async (
       ProvidersLink,
     ];
 
-    if (AnimeRawDatas.filter((ad) => !!ad).length !== 4)
-      return { success: false };
-
     const MissingElems =
       EpisodesLength <= 0 ||
       !ProvidersLink ||
@@ -192,15 +190,13 @@ const FetchProvidersLink = async (
           const titles = providersTitles[ProviderType];
           switch (ProviderType) {
             case ANIMIXPLAY:
-              return await FetchAnimixLink(titles);
+              return AttemptFetchProvider(titles, FetchAnimixLink);
             case GOGOANIME:
-              return await FetchGogoLink(titles);
+              return AttemptFetchProvider(titles, FetchGogoLink);
             case ANIMEVIBE:
-              return await FetchAnimeVibeLink(titles);
+              return AttemptFetchProvider(titles, FetchAnimeVibeLink);
             default:
-              return await Promise.reject(
-                new Error("not a supported provider")
-              );
+              return null;
           }
         }
       )
