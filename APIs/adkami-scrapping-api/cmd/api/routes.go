@@ -19,11 +19,11 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 		HandleResponse(&w, http.StatusBadRequest, "invalid method")
 		return
 	}
-	redisDB := caching.NewCache() // open redis
+	cacheHandler := caching.NewCacheHandler() // open cache
 
 	// Checking if there is cache...
-	cachedDatas, err := redisDB.ReadCache()
-	if err == nil {
+	cachedDatas, ok := cacheHandler.ReadCache()
+	if ok {
 		HandleResponse(&w, http.StatusOK, cachedDatas) // ✅
 		log.Println("From Cache ⚡")
 		return
@@ -42,5 +42,5 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 	HandleResponse(&w, http.StatusOK, AdkamiLatestEps) // ✅
 
 	// Cache result
-	go redisDB.WriteCache(AdkamiLatestEps)
+	go cacheHandler.WriteCache(AdkamiLatestEps)
 }
