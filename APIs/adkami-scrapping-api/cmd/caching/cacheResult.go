@@ -2,56 +2,75 @@ package caching
 
 import (
 	"adkami-scrapping-api/cmd/scrapping"
+	"bytes"
+	"context"
 	"encoding/json"
-	"io/ioutil"
+	"errors"
 	"log"
 	"os"
 	"time"
+
+	"github.com/go-redis/redis/v8"
 )
+
+const REDIS_CACHE_KEY = "AdkamiLatestEpisodesCache"
 
 type CachedJSON struct {
 	ExpireDate int64
 	Datas      []scrapping.AdkamiNewEpisodeShape
 }
 
-const FilePath = "../../cache.json"
+type RedisCache struct {
+	redis *redis.Client
+}
 
-func ReadCachingFile() ([]scrapping.AdkamiNewEpisodeShape, bool) {
-	file, err := os.Open(FilePath)
+var ctx = context.Background()
+
+func newRedisClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_URL"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       0, // use default DB
+	})
+}
+
+func NewCache() *RedisCache {
+	return &RedisCache{redis: newRedisClient()}
+}
+
+func (cache *RedisCache) ReadCache() ([]scrapping.AdkamiNewEpisodeShape, error) {
+	resp, err := cache.redis.Get(ctx, REDIS_CACHE_KEY).Bytes()
 	if err != nil {
-		log.Println("Cannot open file (read)")
-		return nil, false
+		log.Println("No Cache Found")
+		return nil, err
 	}
-	defer file.Close()
 
 	var CachedDatas CachedJSON
-	decoderErr := json.NewDecoder(file).Decode(&CachedDatas)
-	if decoderErr != nil {
-		log.Println("Cannot read file")
-		return nil, false
+	err = json.NewDecoder(bytes.NewBuffer(resp)).Decode(&CachedDatas)
+	if err != nil {
+		return nil, err
 	}
 
 	if CachedDatas.ExpireDate <= time.Now().UnixMilli() || len(CachedDatas.Datas) <= 0 {
-		return nil, false // cache expired or data lost
+		log.Println("cache has expired")
+		return nil, errors.New("cache has expired") // cache expired or data lost
 	}
 
-	return CachedDatas.Datas, true
+	return CachedDatas.Datas, nil
 }
 
-func CacheNewEpsDatas(datas []scrapping.AdkamiNewEpisodeShape) {
-	CachedDatasObj := CachedJSON{
+func (cache *RedisCache) WriteCache(datas []scrapping.AdkamiNewEpisodeShape) error {
+	CachedJSONPayload := CachedJSON{
 		ExpireDate: time.Now().UnixMilli() + 7200000, // 2H in milli
 		Datas:      datas,
 	}
 
-	jsonObj, err := json.Marshal(CachedDatasObj)
+	dataBuffer := new(bytes.Buffer)
+	err := json.NewEncoder(dataBuffer).Encode(CachedJSONPayload)
 	if err != nil {
-		log.Println("Cannot open file (write)")
-		return
+		log.Println("Cannot Write Redis")
+		return err
 	}
 
-	err = ioutil.WriteFile(FilePath, jsonObj, os.ModePerm)
-	if err != nil {
-		log.Println("Cannot write file")
-	}
+	return cache.redis.Set(ctx, REDIS_CACHE_KEY, dataBuffer.Bytes(), 2*time.Hour).Err()
 }
