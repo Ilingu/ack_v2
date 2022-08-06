@@ -20,7 +20,8 @@ As a result, I reenforced my Go and Docker skills as well as my web scrapping (a
 2. `Go` (Obvioulsy...) ✨
 3. `Stdlib` for the API endpoints 🌐
 4. ➡️ [`rod`](https://go-rod.github.io/) for the automated browser 🤖 (like puppeteer but for Golang)
-5. `Docker` 🐳 for the deployment on [Railway](https://railway.app/)
+5. `Redis` for caching 🎭
+6. `Docker` 🐳 for the deployment on [Railway](https://railway.app/)
 
 ## ⬇️ Installing:
 

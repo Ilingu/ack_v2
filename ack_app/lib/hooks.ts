@@ -123,12 +123,10 @@ export function useGlobalAnimeData(userUid: string) {
   const GetAnimesDatas = async () => {
     const CachedAnimesDatas = await GetIDBAnimes();
     const CacheExpired = async () => {
-      RenderAnimes(
-        await CallFB(
-          filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
-        ),
-        { save: true, Expire: true }
+      const fetchAllAnime = await CallFB(
+        filterUserAnime(UserAnimesData).map(({ AnimeId }) => AnimeId)
       );
+      RenderAnimes(fetchAllAnime, { save: true, Expire: true });
     };
 
     if (
@@ -139,10 +137,10 @@ export function useGlobalAnimeData(userUid: string) {
     )
       return await CacheExpired();
 
-    if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Refetch in BG but display old version
-
     const GlobalUserAnimeDatas = CachedAnimesDatas[0].AnimesStored;
-    return RenderAnimes(GlobalUserAnimeDatas, { save: false });
+    RenderAnimes(GlobalUserAnimeDatas, { save: false });
+
+    if (CachedAnimesDatas[0]?.expire < Date.now()) CacheExpired(); // Expire --> Refetch in BG but display old version
   };
 
   useEffect(() => {

@@ -475,21 +475,25 @@ function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
   const UIInfo = IsProviderLink && GetProviderUIInfo([dataToShow])[0];
 
   return (
-    <div
-      style={{
-        backgroundColor: IsProviderLink && UIInfo[1],
-        color: IsProviderLink && pickTextColorBasedOnBgColor(UIInfo[1]),
-      }}
-      className={`mr-2 mb-2 cursor-default rounded-lg bg-bgi-black py-2 px-2 font-bold text-headline transition-all hover:bg-bgi-darker hover:text-primary-whiter${
-        IsProviderLink ? " slideBtnAnimation" : ""
-      }`}
-    >
-      {IsProviderLink ? (
-        <ProviderAnimeBadge UIInfo={UIInfo} path={dataToShow} />
-      ) : (
-        dataToShow
-      )}
-    </div>
+    <>
+      <div
+        className={`mr-2 mb-2 cursor-default rounded-lg bg-bgi-black py-2 px-2 font-bold text-headline transition-all hover:bg-bgi-darker hover:text-primary-whiter${
+          IsProviderLink ? " slideBtnAnimation" : ""
+        }`}
+      >
+        {IsProviderLink ? (
+          <ProviderAnimeBadge UIInfo={UIInfo} path={dataToShow} />
+        ) : (
+          dataToShow
+        )}
+      </div>
+      <style jsx>{`
+        div {
+          background-color: ${IsProviderLink && UIInfo[1]};
+          color: ${IsProviderLink && pickTextColorBasedOnBgColor(UIInfo[1])};
+        }
+      `}</style>
+    </>
   );
 }
 

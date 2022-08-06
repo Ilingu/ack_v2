@@ -13,7 +13,7 @@ const MetaTags: FC<Props> = ({
   image = "/favicon.ico",
 }) => (
   <Head>
-    <title>ACK: {title}</title>
+    <title>{`ACK: ${title}`}</title>
     <meta
       name="viewport"
       content="minimum-scale=1, initial-scale=1, width=device-width"

@@ -23,8 +23,7 @@ import { FaPlay, FaSpinner } from "react-icons/fa";
 import MovieList from "../../components/pages/Watch/MovieList";
 import FocusModeComponent from "../../components/pages/Watch/FocusMode";
 import MovieFocusMode from "../../components/pages/Watch/MovieFocusMode";
-
-/* Func */
+import toast from "react-hot-toast";
 
 /* COMPONENT */
 const WatchPage: NextPage = () => {
@@ -52,8 +51,13 @@ const WatchPage: NextPage = () => {
     Airing,
   } = { ...CurrentAnimeData, ...UserAnimeData } || {};
 
+  const RedirectToAnime = () => {
+    push(`/anime/${query.anime}`);
+    toast.error("This anime is not in your AnimeList"); // Notify
+  };
+
   useEffect(() => {
-    if (!GlobalAnime || !UserAnimes) return;
+    if (!GlobalAnime || !UserAnimes) return RedirectToAnime();
 
     const UserAnimeData = UserAnimes.find(
       ({ AnimeId }) => AnimeId?.toString() === query.anime
@@ -62,8 +66,7 @@ const WatchPage: NextPage = () => {
       ({ malId }) => malId?.toString() === query.anime
     );
 
-    if (!UserAnimeData || !CurrentAnimeData) push(`/anime/${query.anime}`);
-
+    if (!UserAnimeData || !CurrentAnimeData) return RedirectToAnime();
     setCurrentAnimeData(CurrentAnimeData);
     setUserAnimeData(UserAnimeData);
 
