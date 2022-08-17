@@ -6,10 +6,10 @@ import { FbAuthentificate } from "../../ApiFunc";
 import { BasicCheck, HandlerRequestShape, ThrowError } from "../../trpc";
 
 export default async function getUser(req: HandlerRequestShape<string>) {
-  const { AuthToken, host } = req?.ctx;
+  const { AuthToken } = req?.ctx;
   const Username = req.input;
 
-  BasicCheck(host, AuthToken);
+  BasicCheck(req?.ctx);
 
   try {
     const { success } = await FbAuthentificate(AuthToken);

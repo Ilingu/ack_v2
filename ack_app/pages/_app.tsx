@@ -67,6 +67,9 @@ export default withTRPC<AppRouter>({
 
     return {
       url,
+      headers: {
+        protected: encodeURIComponent(process.env.NEXT_PUBLIC_API_PASSWORD),
+      },
       queryClientConfig: { defaultOptions: { queries: { staleTime: 60_000 } } },
     };
   },

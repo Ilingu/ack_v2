@@ -4,7 +4,7 @@ import { NextApiResponse } from "next";
 // Types
 import { tRPCError } from "../utils/types/types";
 // Funcs
-import { IsEmptyString, ParseCookies } from "../utils/UtilsFuncs";
+import { IsEmptyString } from "../utils/UtilsFuncs";
 import { IsBlacklistedHost } from "./ApiFunc";
 
 export interface HandlerRequestShape<T = any> {
@@ -16,6 +16,7 @@ export interface HandlerRequestShape<T = any> {
 export interface ContextShape {
   host: string;
   AuthToken: string;
+  ApiPassword: string;
   res?: NextApiResponse<any>;
 }
 
@@ -24,18 +25,16 @@ export interface ContextShape {
 export function createContext(
   opts?: trpcNext.CreateNextContextOptions
 ): ContextShape {
-  const {
-    headers: { host, cookie },
-    url,
-  } = opts?.req;
+  const { headers, cookies, url } = opts?.req;
 
   const RevalidateRoute = url.includes("/animes.revalidate");
 
-  const { success, data: cookies } = ParseCookies(cookie);
-  if (!success) return { host, AuthToken: null };
-
-  const AuthToken = cookies["UsT"];
-  return { AuthToken, host, res: RevalidateRoute ? opts?.res : undefined };
+  return {
+    AuthToken: cookies["UsT"],
+    ApiPassword: headers["protected"]?.toString(),
+    host: headers.host,
+    res: RevalidateRoute ? opts?.res : undefined,
+  };
 }
 type Context = trpc.inferAsyncReturnType<typeof createContext>;
 
@@ -47,7 +46,12 @@ export const ThrowError = (code: tRPCError, reason: string) => {
   throw new trpc.TRPCError({ code, message: reason });
 };
 
-export const BasicCheck = (host: string, AuthToken: string) => {
+export const BasicCheck = ({ host, AuthToken, ApiPassword }: ContextShape) => {
+  if (decodeURIComponent(ApiPassword) !== process.env.NEXT_PUBLIC_API_PASSWORD)
+    return ThrowError(
+      "UNAUTHORIZED",
+      "Access Denied, unauthorized access to the API"
+    );
   if (IsBlacklistedHost(host))
     return ThrowError("UNAUTHORIZED", "Access Denied, blacklisted host");
   if (IsEmptyString(AuthToken))

@@ -9,10 +9,10 @@ import { AnimeShape } from "../../../utils/types/interface";
 export default async function revalidateAnime(
   req: HandlerRequestShape<number>
 ) {
-  const { AuthToken, host, res } = req?.ctx;
+  const { AuthToken, res } = req?.ctx;
   const AnimeID = req.input?.toString();
 
-  BasicCheck(host, AuthToken);
+  BasicCheck(req?.ctx);
   if (!res)
     return ThrowError(
       "INTERNAL_SERVER_ERROR",

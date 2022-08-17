@@ -5,11 +5,10 @@ import { BasicCheck, HandlerRequestShape, ThrowError } from "../../trpc";
 import { FbAuthentificate } from "../../ApiFunc";
 
 export default async function deleteUser(req: HandlerRequestShape<string>) {
-  const { AuthToken, host } = req?.ctx;
+  const { AuthToken } = req?.ctx;
   const Username = req.input;
 
-  BasicCheck(host, AuthToken);
-
+  BasicCheck(req?.ctx);
   try {
     const { success, data: uid } = await FbAuthentificate(AuthToken);
     if (!success || !uid)

@@ -9,10 +9,10 @@ interface InputShape {
   NewUsername: string;
 }
 export default async function renameUser(req: HandlerRequestShape<InputShape>) {
-  const { AuthToken, host } = req?.ctx;
+  const { AuthToken } = req?.ctx;
   const { OldUsername, NewUsername } = req.input;
 
-  BasicCheck(host, AuthToken);
+  BasicCheck(req?.ctx);
 
   try {
     const { success, data: uid } = await FbAuthentificate(AuthToken);
