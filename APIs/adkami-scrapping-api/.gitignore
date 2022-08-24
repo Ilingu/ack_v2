@@ -2,3 +2,4 @@
 .env.prod
 *.exe
 welp.md
+cache.json
