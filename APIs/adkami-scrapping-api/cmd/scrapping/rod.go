@@ -26,6 +26,8 @@ func IsScrapApiError(doc *goquery.Document) bool {
 const ADKamiURL = "https://www.adkami.com/"
 
 func FetchAdkamiLatestEps() ([]AdkamiNewEpisodeShape, error) {
+	log.Println("[LOG] No Cache, fetching datas from ADKami...")
+
 	ScrappingURL := fmt.Sprintf("https://api.scraperbox.com/scrape?token=%s&proxy_location=fr&residential_proxy=true&url=%s", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
 	adkamiResp, err := http.Get(ScrappingURL)
 	if err != nil {
