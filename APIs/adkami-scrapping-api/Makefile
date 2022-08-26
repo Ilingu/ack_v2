@@ -1,8 +1,8 @@
-APP_BINARY=App
+APP_BINARY_NAME=adkami-scrapping-api.exe
 
 build_app:
 	@echo Building App binary...
-	set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ./cmd/bin ./cmd/api 
+	set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ./cmd/bin/${APP_BINARY_NAME} ./cmd/api 
 	@echo Done!
 build_docker:
 	@echo Building Docker App...

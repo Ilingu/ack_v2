@@ -1,7 +1,7 @@
 FROM golang:1.18-alpine
 
-# Installing Chromium
-RUN apk add chromium
+# Installing Chromium --> not necessary because we don't use rod from now on
+# RUN apk add chromium
 
 # Create a directory for the app
 RUN mkdir /app
