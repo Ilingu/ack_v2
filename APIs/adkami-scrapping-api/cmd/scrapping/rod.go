@@ -4,29 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
-	"time"
 
-	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/launcher"
-	"github.com/go-rod/stealth"
+	"github.com/PuerkitoBio/goquery"
 )
-
-func newBrowser() (*rod.Browser, error) {
-	if os.Getenv("APP_MODE") != "prod" {
-		return rod.New().Timeout(time.Minute).MustConnect().MustIncognito().NoDefaultDevice(), nil // In dev
-	}
-
-	// In prod
-	path, ok := launcher.LookPath() // looking for the chromium executable path
-	if !ok {
-		return nil, errors.New("cannot find the chromium executable")
-	}
-
-	l := launcher.New().Bin(path)
-	return rod.New().Timeout(time.Minute).ControlURL(l.MustLaunch()).MustConnect().MustIncognito().NoDefaultDevice(), nil
-}
 
 type AdkamiNewEpisodeShape struct {
 	Title        string // Black Clover
@@ -36,64 +19,55 @@ type AdkamiNewEpisodeShape struct {
 	Team         string // Wakanim
 }
 
-func IsScrapApiError(page *rod.Page) bool {
-	pre, err := page.Timeout(time.Second).Element("pre")
-	if err == nil {
-		log.Println(pre.MustText())
-		return true
-	}
-
-	return false
+func IsScrapApiError(doc *goquery.Document) bool {
+	return doc.Find("pre").Length() >= 1
 }
 
+const ADKamiURL = "https://www.adkami.com/"
+
 func FetchAdkamiLatestEps() ([]AdkamiNewEpisodeShape, error) {
-	log.Println("Fecthing New Eps...")
-	browser, err := newBrowser()
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("cannot open browser")
-	}
-	defer browser.MustClose()
-
-	SearchPage := stealth.MustPage(browser)
-
-	ADKamiURL := "https://www.adkami.com/"
 	ScrappingURL := fmt.Sprintf("https://api.scraperbox.com/scrape?token=%s&proxy_location=fr&residential_proxy=true&url=%s", os.Getenv("WEBSCAPPING_APIKEY"), url.QueryEscape(ADKamiURL))
+	adkamiResp, err := http.Get(ScrappingURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer adkamiResp.Body.Close()
+	if adkamiResp.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", adkamiResp.StatusCode, adkamiResp.Status)
+	}
 
-	SearchPage.MustNavigate(ScrappingURL)
-	SearchPage.MustWaitLoad()
+	// Load the HTML document
+	htmlDoc, err := goquery.NewDocumentFromReader(adkamiResp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	if IsScrapApiError(SearchPage) {
+	if IsScrapApiError(htmlDoc) {
 		return nil, errors.New("error when requesting scrapping api")
 	}
 
-	LastDOMEpList := SearchPage.MustElements(`.video-item-list`) // search input
+	LastDOMEpList := htmlDoc.Find(".video-item-list") // search input
 	AdkamiNewEpisodes := make([]AdkamiNewEpisodeShape, 0)
-	if len(LastDOMEpList) <= 0 {
+	if LastDOMEpList.Length() <= 0 {
 		return nil, errors.New("cannot query the items")
 	}
 
-	for _, DOMEp := range LastDOMEpList {
+	LastDOMEpList.Each(func(_ int, DOMEp *goquery.Selection) {
 		// Parents
-		ImgParent := DOMEp.MustElement(".img")
-		TopParent := DOMEp.MustElement(".top")
-		InfoParent := DOMEp.MustElement(".info")
+		ImgParent := DOMEp.Find(".img")
+		TopParent := DOMEp.Find(".top")
+		InfoParent := DOMEp.Find(".info")
 
 		// Data
-		Title := TopParent.MustElement("a").MustElement(".title").MustText()
-		EpisodeId := TopParent.MustElement(".episode").MustText()
-		TimeReleased := InfoParent.MustElement(".date").MustText()
-		ImgP := ImgParent.MustElement("img").MustAttribute("data-original")
-		Team := TopParent.MustElement(".team").MustText()
-
-		var Img string
-		if ImgP != nil {
-			Img = *ImgP
-		}
+		Title := TopParent.Find("a .title").Text()
+		EpisodeId := TopParent.Find(".episode").Text()
+		TimeReleased := InfoParent.Find(".date").Text()
+		Img, _ := ImgParent.Find("img").Attr("data-original")
+		Team := TopParent.Find(".team").Text()
 
 		NewEp := AdkamiNewEpisodeShape{Title: Title, EpisodeId: EpisodeId, TimeReleased: TimeReleased, Img: Img, Team: Team}
 		AdkamiNewEpisodes = append(AdkamiNewEpisodes, NewEp)
-	}
+	})
 
 	return AdkamiNewEpisodes, nil
 }
