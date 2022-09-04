@@ -37,7 +37,7 @@ func (subscriber) Unsubscribe(URL string) bool {
 }
 
 func (subscriber) DispatchUpdate(datas []scrapping.AdkamiNewEpisodeShape) {
-	var wg *sync.WaitGroup
+	var wg sync.WaitGroup
 
 	wg.Add(len(SubscribedEndpoints))
 	for SubURL := range SubscribedEndpoints {
