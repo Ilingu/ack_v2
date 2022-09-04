@@ -5,6 +5,7 @@ import (
 	"adkami-scrapping-api/cmd/utils"
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"sync"
 )
@@ -18,7 +19,10 @@ func (subscriber) Subscribe(URL string) bool {
 	if utils.IsEmptyString(URL) || !utils.IsValidUrl(URL) {
 		return false
 	}
+
 	SubscribedEndpoints[URL] = true
+	log.Printf("[LOG] New Subscriber: \"%s\"\n", URL)
+
 	return true
 }
 
@@ -33,10 +37,18 @@ func (subscriber) Unsubscribe(URL string) bool {
 	}
 
 	delete(SubscribedEndpoints, URL)
+	log.Printf("[LOG] \"%s\" has unsubscribed\n", URL)
+
 	return true
 }
 
 func (subscriber) DispatchUpdate(datas []scrapping.AdkamiNewEpisodeShape) {
+	log.Println("[LOG] New Anime Update!")
+	if len(datas) <= 0 {
+		log.Println("[LOG] New Anime Update Abortted ❌ No Updates")
+		return
+	}
+
 	var wg sync.WaitGroup
 
 	wg.Add(len(SubscribedEndpoints))
@@ -50,6 +62,8 @@ func (subscriber) DispatchUpdate(datas []scrapping.AdkamiNewEpisodeShape) {
 			}
 
 			resp, err := http.Post(URL, "text/plain", bytes.NewBuffer(body))
+			log.Printf("[LOG] Anime Update Successfully Dispatched to \"%s\" ✅\n", URL)
+
 			if err != nil || resp.StatusCode != http.StatusOK || resp.Header.Get("Continue") != "true" {
 				subEndpointsMutex.Lock() // not best solution, but still better than an unexpected race condition
 				delete(SubscribedEndpoints, URL)

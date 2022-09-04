@@ -24,3 +24,11 @@ func IsValidUrl(URL string) bool {
 	_, err := url.ParseRequestURI(URL)
 	return err == nil
 }
+
+func ReverseSlice[E any, T []E](slice T) T {
+	var output T
+	for i := len(slice) - 1; i >= 0; i-- {
+		output = append(output, slice[i])
+	}
+	return output
+}

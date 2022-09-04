@@ -53,6 +53,7 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// No Cache... Fetch
+	log.Println("[LOG] No Cache, fetching datas from ADKami...")
 	AdkamiLatestEps, err := scrapping.FetchAdkamiLatestEps()
 	if err != nil {
 		HandleResponse(&w, http.StatusBadRequest, err.Error())

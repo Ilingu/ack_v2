@@ -3,6 +3,7 @@ package updates
 import (
 	"adkami-scrapping-api/cmd/caching"
 	"adkami-scrapping-api/cmd/scrapping"
+	"adkami-scrapping-api/cmd/utils"
 )
 
 func QueryUpdate() []scrapping.AdkamiNewEpisodeShape {
@@ -36,5 +37,5 @@ func QueryUpdate() []scrapping.AdkamiNewEpisodeShape {
 		}
 	}
 
-	return NewEps
+	return utils.ReverseSlice(NewEps)
 }
