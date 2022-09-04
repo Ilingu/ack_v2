@@ -45,7 +45,7 @@ func getAdkamiLastestEps(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Checking if there is cache...
-	cachedDatas, ok := caching.ReadCachingFile(false)
+	cachedDatas, ok := caching.ReadCachingFile()
 	if ok {
 		HandleResponse(&w, http.StatusOK, cachedDatas) // ✅
 		log.Println("[LOG] Datas returned from Cache ⚡")

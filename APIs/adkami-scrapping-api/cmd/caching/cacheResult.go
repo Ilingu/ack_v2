@@ -5,48 +5,34 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"time"
 )
-
-type CachedJSON struct {
-	ExpireDate int64
-	Datas      []scrapping.AdkamiNewEpisodeShape
-}
 
 const FilePath = "../../cache.json"
 
-func ReadCachingFile(allowExpire bool) ([]scrapping.AdkamiNewEpisodeShape, bool) {
+func ReadCachingFile() ([]scrapping.AdkamiNewEpisodeShape, bool) {
 	file, err := os.OpenFile(FilePath, os.O_CREATE, os.ModePerm)
 	if err != nil {
-		log.Println("Cannot open file (read)")
+		log.Println("[LOG][CACHE] Cannot open file (read)")
 		return nil, false
 	}
 	defer file.Close()
 
-	var CachedDatas CachedJSON
+	var CachedDatas []scrapping.AdkamiNewEpisodeShape
 	decoderErr := json.NewDecoder(file).Decode(&CachedDatas)
 	if decoderErr != nil {
-		log.Println("Cannot read file")
+		log.Println("[LOG][CACHE] Cannot read file")
 		return nil, false
 	}
 
-	if len(CachedDatas.Datas) <= 0 {
+	if len(CachedDatas) <= 0 {
+		log.Println("[LOG][CACHE] No Cached Datas")
 		return nil, false // datas lost
 	}
-	if !allowExpire && CachedDatas.ExpireDate <= time.Now().UnixMilli() {
-		return nil, false // cache expired
-	}
-
-	return CachedDatas.Datas, true
+	return CachedDatas, true
 }
 
 func CacheNewEpsDatas(datas []scrapping.AdkamiNewEpisodeShape) {
-	CachedDatasObj := CachedJSON{
-		ExpireDate: time.Now().UnixMilli() + 7200000, // 2H in milli
-		Datas:      datas,
-	}
-
-	jsonObj, err := json.Marshal(CachedDatasObj)
+	jsonObj, err := json.Marshal(datas)
 	if err != nil {
 		log.Println("Cannot open file (write)")
 		return

@@ -16,7 +16,7 @@ func QueryUpdate() []scrapping.AdkamiNewEpisodeShape {
 		go caching.CacheNewEpsDatas(LatestEps) // Cache LatestEps for Next Updates
 	}()
 
-	prevLatestEps, ok := caching.ReadCachingFile(true)
+	prevLatestEps, ok := caching.ReadCachingFile()
 	if !ok {
 		return nil // if no prev, no updates
 	}
