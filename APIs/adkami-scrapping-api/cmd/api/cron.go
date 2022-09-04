@@ -15,9 +15,9 @@ type PayloadShape struct {
 }
 
 func RegisterCron() {
-	url, callbackUrl := "http://localhost:3001", "http://localhost:3000/animeUpdates"
+	url, callbackUrl := "http://localhost:3001/addJob", "http://localhost:3000/animeUpdates"
 	if os.Getenv("APP_MODE") == "prod" {
-		url = "https://cronapi.up.railway.app"
+		url = "https://cronapi.up.railway.app/addJob"
 		callbackUrl = "https://adkami-scapping-api.up.railway.app/animeUpdates"
 	}
 
@@ -41,14 +41,14 @@ func RegisterCron() {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println("Cron Register Request Failed ❌")
+		log.Println("Cron Register Request Failed ❌", err)
 		return
 	}
 
 	if resp.StatusCode < 400 {
 		log.Println("Cron Register Request Succeed ✅")
 	} else {
-		log.Println("Cron Register Request Failed ❌")
+		log.Println("Cron Register Request Failed ❌", resp.StatusCode)
 	}
 }
 
