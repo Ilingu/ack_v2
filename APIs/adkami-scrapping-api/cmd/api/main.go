@@ -31,6 +31,11 @@ func main() {
 		Handler: app.routes(), // server
 	}
 
-	log.Printf("Server successfully started on port %s", os.Getenv("PORT"))
-	log.Fatal(srv.ListenAndServe()) // start server
+	time.AfterFunc(time.Second, func() {
+		log.Printf("Server successfully started on port %s", os.Getenv("PORT"))
+		RegisterCron()
+	}) // is server started timeout
+
+	log.Print(srv.ListenAndServe()) // start server
+	log.Fatal("Server Crashed/Failed to start ❌")
 }

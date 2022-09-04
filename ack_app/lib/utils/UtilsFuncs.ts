@@ -235,7 +235,7 @@ export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) =>
       const title = url.split("/").at(-1);
 
       if (ProviderType === GOGOANIME)
-        return `https://gogoanime.lu/${title}-episode-${epId}`;
+        return `https://gogoanime.ee/${title}-episode-${epId}`;
       if (ProviderType === ANIMIXPLAY)
         return `https://animixplay.to/v1/${title}/ep${epId}`;
       if (ProviderType === ANIMEVIBE)

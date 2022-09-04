@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import { useGlobalAnimeData, useUserData } from "../lib/hooks";
 // Server tRPC
 import { withTRPC } from "@trpc/next";
 import { AppRouter } from "./api/trpc/[trpc]";
+// Features
+import { useGlobalAnimeData, useUserData } from "../lib/hooks";
+import { GlobalAppContext } from "../lib/context";
+import { NetworkCheck, ThrowInAppError } from "../lib/client/ClientFuncs";
 // TS
-import { AppProps } from "next/app";
+import type { AppProps } from "next/app";
 // UI
 import "../styles/globals.css";
 import Navbar from "../components/Layouts/Navbar";
-import { GlobalAppContext } from "../lib/context";
-import { NetworkCheck, ThrowInAppError } from "../lib/client/ClientFuncs";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const userData = useUserData();

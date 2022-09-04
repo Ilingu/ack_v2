@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 // DB
 import { auth, db } from "../../lib/firebase/firebase";
@@ -72,8 +72,8 @@ const AnimesWatchType: FC<MyAnimeProps> = ({
         data-testid="MyAnimesSelectType"
         value={SelectValue || UNWATCHED}
         onChange={(e) => setSelectValue(e.target.value as AnimeWatchType)}
-        className={`bg-bgi-black text-headline focus:ring-primary-main w-full rounded-lg px-1 text-center text-2xl
-             outline-none focus:ring-2 transition${
+        className={`w-full rounded-lg bg-bgi-black px-1 text-center text-2xl text-headline outline-none
+             focus:ring-2 focus:ring-primary-main transition${
                classNameProps && ` ${classNameProps}`
              }`}
       >

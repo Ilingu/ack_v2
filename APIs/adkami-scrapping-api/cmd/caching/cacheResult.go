@@ -15,7 +15,7 @@ type CachedJSON struct {
 
 const FilePath = "../../cache.json"
 
-func ReadCachingFile() ([]scrapping.AdkamiNewEpisodeShape, bool) {
+func ReadCachingFile(allowExpire bool) ([]scrapping.AdkamiNewEpisodeShape, bool) {
 	file, err := os.OpenFile(FilePath, os.O_CREATE, os.ModePerm)
 	if err != nil {
 		log.Println("Cannot open file (read)")
@@ -30,8 +30,11 @@ func ReadCachingFile() ([]scrapping.AdkamiNewEpisodeShape, bool) {
 		return nil, false
 	}
 
-	if CachedDatas.ExpireDate <= time.Now().UnixMilli() || len(CachedDatas.Datas) <= 0 {
-		return nil, false // cache expired or data lost
+	if len(CachedDatas.Datas) <= 0 {
+		return nil, false // datas lost
+	}
+	if !allowExpire && CachedDatas.ExpireDate <= time.Now().UnixMilli() {
+		return nil, false // cache expired
 	}
 
 	return CachedDatas.Datas, true

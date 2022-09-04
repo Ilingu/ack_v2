@@ -46,7 +46,7 @@ export type AnimeDatasShape = [
 ];
 
 export type AnimeProviders =
-  | "https://gogoanime.lu/category"
+  | "https://gogoanime.ee/category"
   | "https://lite.animevibe.se/Anime"
   | "https://animixplay.to/anime";
 export type AnimeProvidersName = "gogoanime" | "animixplay" | "animevibe";
