@@ -20,6 +20,10 @@ func (subscriber) Subscribe(URL string) bool {
 		return false
 	}
 
+	if _, exist := SubscribedEndpoints[URL]; exist {
+		return true
+	}
+
 	SubscribedEndpoints[URL] = true
 	log.Printf("[LOG] New Subscriber: \"%s\"\n", URL)
 
