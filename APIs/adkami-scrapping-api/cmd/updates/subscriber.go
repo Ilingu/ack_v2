@@ -65,7 +65,7 @@ func (subscriber) DispatchUpdate(datas []scrapping.AdkamiNewEpisodeShape) {
 				body = []byte{}
 			}
 
-			resp, err := http.Post(URL, "text/plain", bytes.NewBuffer(body))
+			resp, err := http.Post(URL, "application/json", bytes.NewBuffer(body))
 			log.Printf("[LOG] Anime Update Successfully Dispatched to \"%s\" ✅\n", URL)
 
 			if err != nil || resp.StatusCode != http.StatusOK || resp.Header.Get("Continue") != "true" {
