@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -65,13 +66,27 @@ func (subscriber) DispatchUpdate(datas []scrapping.AdkamiNewEpisodeShape) {
 				body = []byte{}
 			}
 
-			resp, err := http.Post(URL, "application/json", bytes.NewBuffer(body))
-			log.Printf("[LOG] Anime Update Successfully Dispatched to \"%s\" ✅\n", URL)
-
-			if err != nil || resp.StatusCode != http.StatusOK || resp.Header.Get("Continue") != "true" {
+			unsubEndpoint := func() {
 				subEndpointsMutex.Lock() // not best solution, but still better than an unexpected race condition
 				delete(SubscribedEndpoints, URL)
 				subEndpointsMutex.Unlock()
+			}
+
+			// CLIENT_TRUST_KEY
+			req, err := http.NewRequest("POST", URL, bytes.NewBuffer(body))
+			if err != nil {
+				unsubEndpoint()
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", os.Getenv("CLIENT_TRUST_KEY"))
+
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil || resp.StatusCode != http.StatusOK || resp.Header.Get("Continue") != "true" {
+				unsubEndpoint()
+				log.Printf("[LOG] Failed to dispatch Anime Update to \"%s\" ❌\n", URL)
+			} else {
+				log.Printf("[LOG] Anime Update Successfully Dispatched to \"%s\" ✅\n", URL)
 			}
 		}(SubURL)
 	}

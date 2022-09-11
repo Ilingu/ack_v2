@@ -2,6 +2,7 @@ package main
 
 import (
 	"adkami-scrapping-api/cmd/updates"
+	"adkami-scrapping-api/cmd/utils"
 	"bytes"
 	"encoding/json"
 	"log"
@@ -55,6 +56,13 @@ func RegisterCron() {
 func HandleReceiveCron(resp http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		HandleResponse(&resp, http.StatusBadRequest, "invalid method")
+		return
+	}
+
+	// Auth
+	srvTrustKey := r.Header.Get("Authorization")
+	if utils.IsEmptyString(srvTrustKey) || utils.Hash(srvTrustKey) != os.Getenv("SERVER_TRUST_KEY") {
+		HandleResponse(&resp, http.StatusUnauthorized, "Cannot Trust this Source")
 		return
 	}
 
