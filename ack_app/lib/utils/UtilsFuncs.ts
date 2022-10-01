@@ -204,10 +204,10 @@ export const ParseCookies = (
 
 export const ProviderUrlIdentifier = (
   providerUrl: string,
-  onlyThruth = false
+  onlyTruth = false
 ): SupportedAnimeProvider => {
   if (providerUrl.includes(GOGOANIME))
-    return onlyThruth ? GOGOANIME : ANIMIXPLAY; // did on purpose; 'cause ANIMIXPLAY uses GOGOANIME under the hood
+    return onlyTruth ? GOGOANIME : ANIMIXPLAY; // did on purpose; 'cause ANIMIXPLAY uses GOGOANIME under the hood
   if (providerUrl.includes(ANIMIXPLAY)) return ANIMIXPLAY;
   if (providerUrl.includes(ANIMEVIBE)) return ANIMEVIBE;
   return null;

@@ -224,12 +224,12 @@ describe.concurrent("Testing UtilFuncs", () => {
     const { ANIMEVIBE, ANIMIXPLAY } = SupportedAnimeProvider;
 
     const ProvidersSample: TestCase<string, SupportedAnimeProvider>[] = [
-      { input: "https://gogoanime.ee", excepted: ANIMIXPLAY },
+      { input: "https://gogoanime.lu", excepted: ANIMIXPLAY },
       { input: "https://chia-anime.su", excepted: null },
       { input: "https://kickassanime.su", excepted: null },
       { input: "https://animixplay.to", excepted: ANIMIXPLAY },
       { input: "https://lite.animevibe.se", excepted: ANIMEVIBE },
-      { input: "https://gogoanime.ee/sasaki-to-miyano", excepted: ANIMIXPLAY },
+      { input: "https://gogoanime.lu/sasaki-to-miyano", excepted: ANIMIXPLAY },
       { input: "https://chia-anime.su/TOyo5Yo", excepted: null },
       { input: "https://animixplay.to/v1/black-clover", excepted: ANIMIXPLAY },
       { input: "https://kickassanime.su/", excepted: null },
@@ -253,7 +253,7 @@ describe.concurrent("Testing UtilFuncs", () => {
   test.concurrent("GetProviderUIInfo", () => {
     const ProvidersSample: TestCase<string[], ProviderUIInfo[]> = {
       input: [
-        "https://gogoanime.ee/sasaki-to-miyano",
+        "https://gogoanime.lu/sasaki-to-miyano",
         "https://chia-anime.su",
         "https://kickassanime.su/",
         "https://lite.animevibe.se/ubime-no-etranger",
@@ -279,7 +279,7 @@ describe.concurrent("Testing UtilFuncs", () => {
     const { input, excepted }: TestCase<InputShape, string[]> = {
       input: {
         providersUrl: [
-          "https://gogoanime.ee/category/sasaki-to-miyano",
+          "https://gogoanime.lu/category/sasaki-to-miyano",
           "https://chia-anime.su/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen",
           "https://kickassanime.su/anime/ubime-no-etranger",
           "https://lite.animevibe.se/anime/black-clover-tv",

@@ -28,7 +28,7 @@ export enum HomeDisplayTypeEnum {
 }
 
 export enum SupportedAnimeProvider {
-  GOGOANIME = "https://gogoanime.ee",
+  GOGOANIME = "https://gogoanime.lu",
   ANIMIXPLAY = "https://animixplay.to",
   ANIMEVIBE = "https://lite.animevibe.se",
 }

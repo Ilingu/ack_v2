@@ -57,7 +57,7 @@ const WatchPage: NextPage = () => {
   };
 
   useEffect(() => {
-    if (!GlobalAnime || !UserAnimes) return RedirectToAnime();
+    if (!GlobalAnime || !UserAnimes) return;
 
     const UserAnimeData = UserAnimes.find(
       ({ AnimeId }) => AnimeId?.toString() === query.anime

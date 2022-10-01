@@ -64,7 +64,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             broadcast: "Mondays at 00:30 (JST)",
             ProvidersLink: [
               "https://animixplay.to/v1/sasaki-to-miyano",
-              "https://gogoanime.ee/category/sasaki-to-miyano",
+              "https://gogoanime.lu/category/sasaki-to-miyano",
               "https://lite.animevibe.se/anime/sasaki-to-miyano",
             ],
           },
@@ -87,7 +87,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             broadcast: "Tuesdays at 18:25 (JST)",
             ProvidersLink: [
               "https://animixplay.to/v1/black-clover",
-              "https://gogoanime.ee/category/black-clover",
+              "https://gogoanime.lu/category/black-clover",
               "https://lite.animevibe.se/anime/black-clover",
             ],
           },
@@ -104,14 +104,14 @@ describe.concurrent("Testing ApiFuncs", () => {
             Synopsis:
               "Intrepid adventurer Bell Cranel has leveled up, but he can’t rest on his dungeoneering laurels just yet. The Hestia Familia still has a long way to go before it can stand toe-to-toe with the other Familias of Orario — but before Bell can set out on his next mission, reports of a brutal murder rock the adventuring community! One of Bell’s trusted allies stands accused of the horrible crime, and it’s up to Bell and his friends to clear their name and uncover a nefarious plot brewing in the dungeon’s dark depths. (Source: Sentai Filmworks)",
             malId: 47164,
-            nbEp: 12,
+            nbEp: 11,
             MalPage:
               "https://myanimelist.net/anime/47164/Dungeon_ni_Deai_wo_Motomeru_no_wa_Machigatteiru_Darou_ka_IV__Shin_Shou_-_Meikyuu-hen",
-            duration: "23 min",
+            duration: "23 min per ep",
             broadcast: "Saturdays at 01:05 (JST)",
             ProvidersLink: [
               "https://animixplay.to/v1/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
-              "https://gogoanime.ee/category/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
+              "https://gogoanime.lu/category/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
               "https://lite.animevibe.se/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
             ],
           },
@@ -119,6 +119,7 @@ describe.concurrent("Testing ApiFuncs", () => {
       ];
 
       for (const { input, excepted } of FetchTests) {
+        console.log(`Fetching ${input}...`);
         const {
           success,
           data: { AnimeData },
@@ -130,6 +131,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             expect(AnimeData?.ProvidersLink).toEqual(excepted.ProvidersLink);
             continue;
           }
+
           expect(AnimeData[exceptedKey]).toBe(excepted[exceptedKey]);
         }
 

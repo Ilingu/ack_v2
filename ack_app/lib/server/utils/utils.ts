@@ -114,13 +114,13 @@ export const FetchGogoLink = async ({
 }: ProviderLinkInfoShape): Promise<string> => {
   try {
     // Method 1
-    const directUrl = `https://gogoanime.ee/category/${title}`;
+    const directUrl = `https://gogoanime.lu/category/${title}`;
     const urlResp = await fetch(directUrl);
 
     if (urlResp.ok) return directUrl; // skip 2nd method
 
     // Method 2: Search Page and crawling of the provider
-    const searchUrl = `https://gogoanime.ee/search.html?keyword=${SafeTitle}`;
+    const searchUrl = `https://gogoanime.lu/search.html?keyword=${SafeTitle}`;
     const searchResp = await fetch(searchUrl);
     if (!searchResp.ok) return null;
 
@@ -134,7 +134,7 @@ export const FetchGogoLink = async ({
     if (IsEmptyString(GogoPath) || !GogoPath.startsWith("/category/"))
       return null;
 
-    return `https://gogoanime.ee${GogoPath}`;
+    return `https://gogoanime.lu${GogoPath}`;
   } catch (err) {
     return null;
   }

@@ -166,7 +166,7 @@ export const GetAnimeData = async (
 
 /* SITE PROVIDER:
   1. https://animixplay.to/             --> Best UI ✅ Uses GogoAnime under the hood ✅✅
-  2. https://gogoanime.ee/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
+  2. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
   3. https://lite.animevibe.se/anime/*  --> Open API (without any protections) ✅✅ Cannot Check If URL good or not (only by search method) ❌ + good search + good vid player ✅
   ------------------------------------------------------------------------------------------------------------
   - https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
@@ -213,7 +213,7 @@ const FetchProvidersLink = async (
     );
     if (!IsEmptyString(GogoLink)) {
       const Animix = GogoLink.replace(
-        "https://gogoanime.ee/category/",
+        "https://gogoanime.lu/category/",
         "https://animixplay.to/v1/"
       );
       ValidAnimeUrlLink.unshift(Animix);
