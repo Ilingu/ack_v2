@@ -26,14 +26,3 @@ export enum HomeDisplayTypeEnum {
   GROUP,
   ANIMES,
 }
-
-export enum SupportedAnimeProvider {
-  GOGOANIME = "https://gogoanime.lu",
-  ANIMIXPLAY = "https://animixplay.to",
-  ANIMEVIBE = "https://lite.animevibe.se",
-}
-
-export const ProvidersInfo = {
-  [SupportedAnimeProvider.GOGOANIME]: {},
-};
-// "https://lite-api.animemate.xyz/Anime";

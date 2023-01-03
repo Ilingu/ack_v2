@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { AnimeWatchType, SupportedAnimeProvider } from "./enums";
+import { AnimeWatchType } from "./enums";
 import type {
   AnimeStatusType,
   AnimeType,
@@ -20,13 +20,6 @@ declare global {
 export interface FunctionJob<T = any> {
   success: boolean;
   data?: T;
-}
-export type ProviderLinkInfo = {
-  [K in SupportedAnimeProvider]?: ProviderLinkInfoShape[];
-};
-export interface ProviderLinkInfoShape {
-  title: string;
-  SafeTitle: string;
 }
 
 // WebWorkers
@@ -210,7 +203,7 @@ export interface AnimeShape {
   duration: string;
   malId: number;
   NextRefresh: number;
-  ProvidersLink?: string[];
+  ProvidersLink?: string;
   NextEpisodesReleaseDate?: number[];
 }
 export interface AlternativeTitleShape {

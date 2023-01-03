@@ -11,29 +11,15 @@ import type {
   JikanApiResEpisodes,
   JikanApiResEpisodesRoot,
   JikanApiResRecommandationsRoot,
-  ProviderLinkInfo,
 } from "../utils/types/interface";
 import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
-import { SupportedAnimeProvider } from "../utils/types/enums";
 // Func
-import {
-  IsError,
-  decryptDatas,
-  IsEmptyString,
-  ProviderUrlIdentifier,
-} from "../utils/UtilsFuncs";
+import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
-import {
-  AttemptFetchProvider,
-  FetchAnimeVibeLink,
-  FetchAnimixLink,
-  FetchGogoLink,
-  GenerateProvidersTitles,
-} from "./utils/utils";
-
+import { fetchProviderLink } from "./utils/utils";
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
-const { GOGOANIME, ANIMIXPLAY, ANIMEVIBE } = SupportedAnimeProvider;
+// zoro wrapper: https://www.npmjs.com/package/zoro-to-api
 
 /**
  * Return Is The Host Is BlackListed
@@ -119,8 +105,9 @@ export const GetAnimeData = async (
       animeJikan?.title_english,
       ...(animeJikan?.title_synonyms || []),
     ].filter((d) => d);
-    const ProvidersTitlesToCheck = GenerateProvidersTitles(AnimeTitlesIterable);
-    const ProvidersLink = await FetchProvidersLink(ProvidersTitlesToCheck);
+
+    const ProvidersLink = await fetchProviderLink(AnimeTitlesIterable);
+    console.log({ ProvidersLink });
 
     // Checks
     const AnimeRawDatas: AnimeDatasShape = [
@@ -161,69 +148,6 @@ export const GetAnimeData = async (
   } catch (err) {
     console.error(err);
     return { success: false };
-  }
-};
-
-/* SITE PROVIDER:
-  1. https://animixplay.to/             --> Best UI ✅ Uses GogoAnime under the hood ✅✅
-  2. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
-  3. https://lite.animevibe.se/anime/*  --> Open API (without any protections) ✅✅ Cannot Check If URL good or not (only by search method) ❌ + good search + good vid player ✅
-  ------------------------------------------------------------------------------------------------------------
-  - https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
-
-  - https://chia-anime.su/anime      --> Don't support anymore (bad service)
-  - https://kickassanime.su/anime    --> Don't support anymore (copy of chia-anime, possibly WP templates...)
-*/
-
-/**
- * Generate and return the working Streaming Providers Link
- * @param {ProviderLinkInfo} providersTitles Array of the anime mutliples titles (e.g: Shingeki No Kyojin,Attack On Titan...)
- * @return {string[]} Array of working providers anime link
- */
-const FetchProvidersLink = async (
-  providersTitles: ProviderLinkInfo
-): Promise<string[] | null> => {
-  try {
-    const ProvidersResp = await Promise.allSettled(
-      Object.keys(providersTitles).map(
-        async (ProviderType: SupportedAnimeProvider) => {
-          const titles = providersTitles[ProviderType];
-          switch (ProviderType) {
-            case ANIMIXPLAY:
-              return AttemptFetchProvider(titles, FetchAnimixLink);
-            case GOGOANIME:
-              return AttemptFetchProvider(titles, FetchGogoLink);
-            case ANIMEVIBE:
-              return AttemptFetchProvider(titles, FetchAnimeVibeLink);
-            default:
-              return null;
-          }
-        }
-      )
-    );
-
-    const ValidAnimeUrlLink = ProvidersResp.map((res) => {
-      if (res.status === "fulfilled") return res.value;
-      return null;
-    }).filter((e) => e);
-
-    // Adding Animixplay provider
-    const GogoLink = ValidAnimeUrlLink.find(
-      (url) => ProviderUrlIdentifier(url, true) === GOGOANIME
-    );
-    if (!IsEmptyString(GogoLink)) {
-      const Animix = GogoLink.replace(
-        "https://gogoanime.lu/category/",
-        "https://animixplay.to/v1/"
-      );
-      ValidAnimeUrlLink.unshift(Animix);
-    }
-
-    // returns all the valid provider (or null is none)
-    return ValidAnimeUrlLink.length === 0 ? null : ValidAnimeUrlLink;
-  } catch (err) {
-    console.error(err);
-    return null;
   }
 };
 

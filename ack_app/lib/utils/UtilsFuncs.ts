@@ -202,31 +202,10 @@ export const ParseCookies = (
   }
 };
 
-export const ProviderUrlIdentifier = (
-  providerUrl: string,
-  onlyTruth = false
-): SupportedAnimeProvider => {
-  if (providerUrl.includes(GOGOANIME))
-    return onlyTruth ? GOGOANIME : ANIMIXPLAY; // did on purpose; 'cause ANIMIXPLAY uses GOGOANIME under the hood
-  if (providerUrl.includes(ANIMIXPLAY)) return ANIMIXPLAY;
-  if (providerUrl.includes(ANIMEVIBE)) return ANIMEVIBE;
-  return null;
-};
-
-export const GetProviderUIInfo = (providersUrl: string[]): ProviderUIInfo[] => {
-  return providersUrl
-    .map((url): ProviderUIInfo => {
-      const ProviderType = ProviderUrlIdentifier(url);
-      if (ProviderType === GOGOANIME)
-        return ["gogoanime", "#ffc119", "/Assets/gogoanime.png"];
-      if (ProviderType === ANIMIXPLAY)
-        return ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"];
-      if (ProviderType === ANIMEVIBE)
-        return ["animevibe", "#ffffff", "/Assets/animevibe.ico"];
-      return null;
-    })
-    .filter((d) => d);
-};
+export const GetProviderUIInfo = (): ProviderUIInfo => [
+  "#ffc119",
+  "/Assets/animepahe.png",
+];
 
 export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) =>
   providersUrl

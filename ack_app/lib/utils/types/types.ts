@@ -42,15 +42,10 @@ export type AnimeDatasShape = [
   JikanApiResAnime,
   JikanApiResEpisodes[],
   JikanApiResRecommandations[],
-  string[]
+  string
 ];
 
-export type AnimeProviders =
-  | "https://gogoanime.ee/category"
-  | "https://lite.animevibe.se/Anime"
-  | "https://animixplay.to/anime";
-export type AnimeProvidersName = "gogoanime" | "animixplay" | "animevibe";
-export type ProviderUIInfo = [AnimeProvidersName, string, string];
+export type ProviderUIInfo = [string, string];
 
 export type tRPCError =
   | "PARSE_ERROR"
