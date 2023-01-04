@@ -6,11 +6,10 @@ import type {
   FunctionJob,
   JikanApiERROR,
   UserAnimeShape,
+  ZoroProvider,
 } from "./types/interface";
-import { AnimeWatchType, SupportedAnimeProvider } from "./types/enums";
+import { AnimeWatchType } from "./types/enums";
 import { ProviderUIInfo } from "./types/types";
-
-const { ANIMIXPLAY, GOGOANIME, ANIMEVIBE } = SupportedAnimeProvider;
 
 /* UTILS FUNC */
 /**
@@ -203,25 +202,15 @@ export const ParseCookies = (
 };
 
 export const GetProviderUIInfo = (): ProviderUIInfo => [
-  "#ffc119",
-  "/Assets/animepahe.png",
+  "rgb(7,191,103)",
+  "/Assets/yugen.png",
 ];
 
-export const GenerateEpProviderUrl = (providersUrl: string[], epId: number) =>
-  providersUrl
-    .map((url) => {
-      const ProviderType = ProviderUrlIdentifier(url);
-      const title = url.split("/").at(-1);
+export const GenerateEpProviderUrl = (YugenId: string, epId: number): string =>
+  `https://yugen.to/watch/${YugenId}/x/${epId}/`;
 
-      if (ProviderType === GOGOANIME)
-        return `https://gogoanime.ee/${title}-episode-${epId}`;
-      if (ProviderType === ANIMIXPLAY)
-        return `https://animixplay.to/v1/${title}/ep${epId}`;
-      if (ProviderType === ANIMEVIBE)
-        return `https://lite.animevibe.se/anime/${title}/${epId}`;
-      return null;
-    })
-    .filter((d) => d);
+export const GenerateProviderUrl = (YugenId: string) =>
+  `https://yugen.to/anime/${YugenId}`;
 
 export function pickTextColorBasedOnBgColor(bgColor: string) {
   const color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;

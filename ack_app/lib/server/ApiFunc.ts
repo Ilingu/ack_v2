@@ -16,7 +16,6 @@ import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 // Func
 import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
-import { fetchProviderLink } from "./utils/utils";
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
 // zoro wrapper: https://www.npmjs.com/package/zoro-to-api
@@ -32,25 +31,22 @@ export const IsBlacklistedHost = (host: string): boolean => {
 };
 
 // To Revalidate all anime
-// export const HolyFunction = (animeIDs: string[]) => {
-//   let i = 0;
-
-//   const FetchUrl = async () => {
-//     if (i > animeIDs.length - 1) return;
-//     const animeToRevalidate = animeIDs[i];
-//     console.log(`Processing anime #${animeIDs[i]}, i=${i}`);
-
-//     const { success, data } = await GetAnimeData(animeToRevalidate);
-//     console.log(`#${animeIDs[i]} succeed:`, JSON.stringify(success));
-//     console.log(JSON.stringify(data?.AnimeData?.ProvidersLink));
-
-//     await (() => new Promise((res) => setTimeout(res, 2500)))(); // wait 2.5s
-
-//     i++;
-//     FetchUrl();
-//   };
-//   FetchUrl();
-// };
+/* export const HolyFunction = (animeIDs: string[]) => {
+  let i = 0;
+ 
+  const FetchUrl = async () => {
+    if (i > animeIDs.length - 1) return;
+    const animeToRevalidate = animeIDs[i];
+    console.log(`Processing anime #${animeIDs[i]}, i=${i}`);
+    const { success, data } = await GetAnimeData(animeToRevalidate);
+    console.log(`#${animeIDs[i]} succeed:`, JSON.stringify(success));
+    console.log(JSON.stringify(data?.AnimeData?.ProvidersLink));
+    await (() => new Promise((res) => setTimeout(res, 2500)))(); // wait 2.5s
+    i++;
+    FetchUrl();
+  };
+  FetchUrl();
+}; */
 
 /**
  * Fetch Anime Data
@@ -106,21 +102,19 @@ export const GetAnimeData = async (
       ...(animeJikan?.title_synonyms || []),
     ].filter((d) => d);
 
-    const ProvidersLink = await fetchProviderLink(AnimeTitlesIterable);
-    console.log({ ProvidersLink });
+    const YugenId = await fetchYugenId(AnimeTitlesIterable);
+    console.log({ YugenId });
 
     // Checks
     const AnimeRawDatas: AnimeDatasShape = [
       animeJikan,
       AnimeEpsDatas,
       animeRecommendationsRes,
-      ProvidersLink,
+      YugenId,
     ];
 
     const MissingElems =
-      EpisodesLength <= 0 ||
-      !ProvidersLink ||
-      animeRecommendationsRes.length <= 0;
+      EpisodesLength <= 0 || !YugenId || animeRecommendationsRes.length <= 0;
     // Transform raw data in the shape I want
     const { AnimeData, IsAddableToDB } = JikanApiToAnimeShape(
       AnimeRawDatas,
@@ -145,6 +139,73 @@ export const GetAnimeData = async (
       success: true,
       data: { AddedToDB, AnimeUpdated, AnimeData },
     };
+  } catch (err) {
+    console.error(err);
+    return { success: false };
+  }
+};
+
+/* SITE PROVIDER:
+  1. zoro.to, animixplay alternative
+  ------------------------------------------------------------------------------------------------------------
+  1. https://gogoanime.lu/category/*    --> Can Directly Check URL + good search + good vid player and communauty ✅✅
+  - https://9anime.id/ --> Don't support anymore (tedious bot protection that I successfully bypass but compared to the 4 providers above it takes ~5-10s to extract the link from 9anime whereas for the others, I don't have to "extract" the link because it's just string templating and checking if that works or not...)
+  [DEAD] https://animixplay.to/             --> Best UI ✅ Uses GogoAnime under the hood ✅✅
+*/
+
+/**
+ * Generate and return the working Streaming Providers Link
+ * @param {ProviderLinkInfo} providersTitles Array of the anime mutliples titles (e.g: Shingeki No Kyojin,Attack On Titan...)
+ * @return {string[]} Array of working providers anime link
+ */
+export const fetchYugenId = async (
+  titles: string[]
+): Promise<string | null> => {
+  return new Promise<string | null>(async (res) => {
+    for (const title of titles) {
+      console.log({ title });
+      const { success, data: anime_id } = await SearchYugen(title);
+      if (!success) continue;
+      return res(anime_id);
+    }
+    return res(null);
+  });
+};
+
+const SearchYugen = async (title: string): Promise<FunctionJob<string>> => {
+  try {
+    const result = await fetch(
+      `https://yugen.to/search/?q=${encodeURI(title.replaceAll(" ", "+"))}`
+    );
+    if (!result.ok) return { success: false };
+
+    const cheerio = await import("cheerio");
+    const $ = cheerio.load(await result.text());
+
+    // PS: if only taking the first result doesn't work very well, take all result's title and take whichever has the highest matching score (compare char-to-char)
+    const searchResp = $("body > main > div > div.cards-grid > a")
+      .map(() => ({
+        id: $(this).attr("href"),
+        name: $(this).children("div.anime-data > span").text(),
+      }))
+      .toArray();
+    if (searchResp.length <= 0) return { success: false };
+
+    console.log({ searchResp });
+    const bestResult = searchResp.find(({ name }) =>
+      title.toLowerCase().includes(name.toLowerCase())
+    );
+    if (
+      !bestResult ||
+      IsEmptyString(bestResult?.id) ||
+      bestResult.id.split("/").length !== 5
+    )
+      return { success: false };
+
+    const anime_id = bestResult.id.split("/")[2];
+    if (isNaN(parseInt(anime_id))) return { success: false };
+
+    return { success: true, data: anime_id };
   } catch (err) {
     console.error(err);
     return { success: false };
@@ -255,7 +316,7 @@ export function JikanApiToAnimeShape(
   JikanObj: AnimeDatasShape,
   MissingElems = false
 ): SpecialAnimeShape {
-  const [AnimeData, EpsData, Recommendations, ProvidersLink] = JikanObj;
+  const [AnimeData, EpsData, Recommendations, YugenId] = JikanObj;
   let NextRefresh: number = null,
     NextEpsReleaseDate: number[] = null;
   let IsAddableToDB = true;
@@ -325,7 +386,7 @@ export function JikanApiToAnimeShape(
           ? AnimeData.broadcast.string
           : null,
       NextRefresh,
-      ProvidersLink,
+      YugenId,
       NextEpisodesReleaseDate: NextEpsReleaseDate,
     },
     IsAddableToDB,

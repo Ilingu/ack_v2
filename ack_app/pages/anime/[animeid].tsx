@@ -17,9 +17,9 @@ import type { ProviderUIInfo } from "../../lib/utils/types/types";
 import { AnimeWatchType } from "../../lib/utils/types/enums";
 // Func
 import {
+  GenerateProviderUrl,
   GetProviderUIInfo,
   pickTextColorBasedOnBgColor,
-  ProviderUrlIdentifier,
   Return404,
 } from "../../lib/utils/UtilsFuncs";
 import { ConvertBroadcastTimeZone } from "../../lib/client/ClientFuncs";
@@ -76,7 +76,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // Check on FB
   const animeFB = await AdminDB.collection("animes").doc(animeId).get();
-  if (animeFB.exists) {
+  /* if (animeFB.exists) {
     const animeData = animeFB.data() as AnimeShape;
 
     if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
@@ -86,7 +86,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         FromCache: true,
         AnimeData: animeData,
       });
-  }
+  } */
 
   // No Anime -> Api Req
   if (!animeId || typeof animeId !== "string" || isNaN(parseInt(animeId))) {
@@ -173,7 +173,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
     Status,
     AiringDate,
     NextRefresh,
-    ProvidersLink,
+    YugenId,
   } = animeData?.AnimeData || {};
 
   useEffect(() => {
@@ -335,7 +335,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
                 (Airing && broadcast) || type === "Movie" ? Studios : null
               }
               OtherInfos={[
-                `https://animixplay.to/anime/${malId}`,
+                YugenId ? GenerateProviderUrl(YugenId) : null,
                 Airing && broadcast,
                 Airing ? "Ongoing" : "Finished",
               ]}
@@ -367,10 +367,7 @@ const AnimeInfo: NextPage<AnimeInfoProps> = ({ animeData }) => {
       {EpisodesData && (
         <section className="mt-2 w-5/6 py-4">
           <EpisodesSearchContext.Provider value={{ photoLink: photoPath }}>
-            <EpisodesList
-              Eps={EpisodesData}
-              ProvidersLink={ProvidersLink || []}
-            />
+            <EpisodesList Eps={EpisodesData} YugenId={YugenId} />
           </EpisodesSearchContext.Provider>
         </section>
       )}
@@ -471,8 +468,8 @@ function SpecialInfo({
 
 function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
   const IsProviderLink =
-    typeof dataToShow === "string" && ProviderUrlIdentifier(dataToShow);
-  const UIInfo = IsProviderLink && GetProviderUIInfo([dataToShow])[0];
+    typeof dataToShow === "string" && dataToShow.includes("yugen.to");
+  const UIInfo = IsProviderLink && GetProviderUIInfo();
 
   return (
     <>
@@ -489,8 +486,8 @@ function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
       </div>
       <style jsx>{`
         div {
-          background-color: ${IsProviderLink && UIInfo[1]};
-          color: ${IsProviderLink && pickTextColorBasedOnBgColor(UIInfo[1])};
+          background-color: ${IsProviderLink && UIInfo[0]};
+          color: ${IsProviderLink && pickTextColorBasedOnBgColor(UIInfo[0])};
         }
       `}</style>
     </>
@@ -510,13 +507,13 @@ function ProviderAnimeBadge({ UIInfo, path }: ProviderAnimeBadgeProps) {
       className="flex items-center justify-center gap-1 capitalize"
     >
       <Image
-        src={UIInfo[2]}
+        src={UIInfo[1]}
         width={20}
         height={20}
         alt="9anime Logo"
         className="rounded-md bg-white"
       />
-      {UIInfo[0]}
+      Yugen
     </a>
   );
 }

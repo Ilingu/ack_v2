@@ -44,7 +44,7 @@ const WatchPage: NextPage = () => {
     EpisodesData,
     duration,
     type,
-    ProvidersLink,
+    YugenId,
     NewEpisodeAvailable,
     NextEpisodesReleaseDate,
     broadcast,
@@ -182,7 +182,7 @@ const WatchPage: NextPage = () => {
                     EpisodesData={EpisodesData}
                     UserAnimeData={UserAnimeData}
                     ExtraInfo={{
-                      ProvidersLink,
+                      YugenId,
                       NextEpisodesReleaseDate,
                       Duration: parseInt(duration.split(" ")[0]),
                       broadcast: Airing && (broadcast || null),

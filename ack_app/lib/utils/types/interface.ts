@@ -203,7 +203,7 @@ export interface AnimeShape {
   duration: string;
   malId: number;
   NextRefresh: number;
-  ProvidersLink?: string;
+  YugenId?: string;
   NextEpisodesReleaseDate?: number[];
 }
 export interface AlternativeTitleShape {

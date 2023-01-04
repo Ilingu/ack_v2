@@ -15,18 +15,18 @@ import { GenerateEpProviderUrl } from "../../../lib/utils/UtilsFuncs";
 /* Interface */
 interface EpisodesListProps {
   Eps: JikanApiResEpisodes[];
-  ProvidersLink?: string[];
+  YugenId?: string;
 }
 interface EpisodeItemProps {
   EpisodeData: EpisodesShape;
 }
 
-let GlobalProvidersLink: string[];
+let GlobalYugenId: string;
 
 // JSX
-const EpisodesList: FC<EpisodesListProps> = ({ Eps, ProvidersLink }) => {
+const EpisodesList: FC<EpisodesListProps> = ({ Eps, YugenId }) => {
   const [RenderElements, setNewRender] = useState<JSX.Element[]>();
-  GlobalProvidersLink = ProvidersLink;
+  GlobalYugenId = YugenId;
 
   useEffect(
     () => LoadEps(),
@@ -90,8 +90,8 @@ function EpisodeItem({ EpisodeData }: EpisodeItemProps) {
       )}
       <a
         href={
-          GlobalProvidersLink
-            ? GenerateEpProviderUrl(GlobalProvidersLink, epsId)[0] || ForumURL
+          GlobalYugenId
+            ? GenerateEpProviderUrl(GlobalYugenId, epsId) || ForumURL
             : ForumURL
         }
         target="_blank"

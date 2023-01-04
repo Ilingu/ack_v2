@@ -46,7 +46,7 @@ interface EpsPosterProps {
   EpisodesData: JikanApiResEpisodes[];
   UserAnimeData: UserAnimeShape;
   ExtraInfo: {
-    ProvidersLink: string[];
+    YugenId: string;
     NextEpisodesReleaseDate: number[];
     Duration: number;
     broadcast: string;
@@ -105,7 +105,7 @@ const DecrementExtraEpisode = async (_: any, del = false) => {
   }
 };
 
-let GlobalProvidersLink: string[];
+let GlobalYugenId: string;
 /* COMPONENTS */
 const EpsPoster: FC<EpsPosterProps> = ({
   EpisodesData,
@@ -118,7 +118,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
     TimestampDate,
     NewEpisodeAvailable,
   },
-  ExtraInfo: { Duration, ProvidersLink, NextEpisodesReleaseDate, broadcast },
+  ExtraInfo: { Duration, YugenId, NextEpisodesReleaseDate, broadcast },
 }) => {
   const [RenderedEps, setNewRender] = useState<JSX.Element[]>();
   const [NextEP, setNextEp] = useState<number>(null);
@@ -132,7 +132,7 @@ const EpsPoster: FC<EpsPosterProps> = ({
   const { current: EpisodesLength } = useRef(
     EpisodesData.length + (ExtraEpisodes || 0)
   );
-  GlobalProvidersLink = ProvidersLink;
+  GlobalYugenId = YugenId;
 
   const NextEpisodeReleaseDate = useMemo((): number => {
     if (!broadcast) return null;
@@ -449,9 +449,7 @@ function EpsPosterItem({
   UpdateUserAnimeProgress,
 }: EpsPosterItemProps) {
   const { title, mal_id, filler, recap, aired, isExtra } = EpisodeData || {};
-  const [ProviderName, ProviderColor, ProviderLogo] = GetProviderUIInfo(
-    GlobalProvidersLink || []
-  )[0] || [null, null, null];
+  const [ProviderColor, ProviderLogo] = GetProviderUIInfo();
 
   return (
     <div
@@ -504,10 +502,10 @@ function EpsPosterItem({
         {title}
       </p>
 
-      {ProviderName && (
+      {GlobalYugenId && (
         <a
           href={
-            GenerateEpProviderUrl(GlobalProvidersLink || [], mal_id)[0] ||
+            GenerateEpProviderUrl(GlobalYugenId, mal_id) ||
             "https://ack.vercel.app"
           }
           target="_blank"
@@ -534,10 +532,10 @@ function EpsPosterItem({
               src={ProviderLogo}
               width={16}
               height={16}
-              alt={`${ProviderName}'s Logo`}
+              alt={`Yugen's Logo`}
               className="providerLink rounded-md bg-white"
             />{" "}
-            {ProviderName}
+            Yugen{" "}
           </div>
         </a>
       )}
