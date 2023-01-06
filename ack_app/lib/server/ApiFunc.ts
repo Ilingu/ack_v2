@@ -182,11 +182,27 @@ export const fetchYugenId = async (
 
 const SearchYugen = async (title: string): Promise<FunctionJob<string>> => {
   try {
-    const result = await fetch(
-      `https://yugen.to/search/?q=${encodeURI(
-        title.replace(new RegExp(" ", "g"), "+")
-      )}`
-    );
+    const url = `https://yugen.to/search/?q=${encodeURI(
+      title.replace(new RegExp(" ", "g"), "+")
+    )}`;
+
+    const auth =
+      `Basic ` +
+      Buffer.from(
+        `${process.env.SCRAPPING_USERNAME ?? "husked4559"}:${
+          process.env.SCRAPPING_PASSWORD ?? "6PFeQX8JEowWpQsUa9EPkGbcb"
+        }`
+      ).toString("base64");
+
+    const result = await fetch("http://api.scraping-bot.io/scrape/raw-html", {
+      method: "POST",
+      body: JSON.stringify({ url }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: auth,
+      },
+    });
     if (!result.ok) return { success: false };
 
     const cheerio = await import("cheerio");

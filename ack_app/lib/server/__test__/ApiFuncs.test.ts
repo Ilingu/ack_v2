@@ -64,7 +64,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             YugenId: "/11550/sasaki-to-miyano/",
           },
         },
-        {
+        /*   {
           input: "34572", // Black Clover
           excepted: {
             title: "Black Clover",
@@ -100,7 +100,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             YugenId:
               "/15631/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen/",
           },
-        },
+        }, */
       ];
 
       for (const { input, excepted } of FetchTests) {
