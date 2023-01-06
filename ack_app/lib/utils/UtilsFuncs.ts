@@ -6,7 +6,6 @@ import type {
   FunctionJob,
   JikanApiERROR,
   UserAnimeShape,
-  ZoroProvider,
 } from "./types/interface";
 import { AnimeWatchType } from "./types/enums";
 import { ProviderUIInfo } from "./types/types";

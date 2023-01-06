@@ -1,8 +1,6 @@
 import { expect, test, describe } from "vitest";
 import type { UserAnimeShape } from "../types/interface";
-import { AnimeWatchType, SupportedAnimeProvider } from "../types/enums";
-import type { ProviderUIInfo } from "../types/types";
-
+import { AnimeWatchType } from "../types/enums";
 import {
   isValidUrl,
   filterUserAnime,
@@ -11,9 +9,6 @@ import {
   IsEmptyString,
   shuffleArray,
   ParseCookies,
-  ProviderUrlIdentifier,
-  GetProviderUIInfo,
-  GenerateEpProviderUrl,
 } from "../UtilsFuncs";
 
 interface TestCase<I, E> {
@@ -218,83 +213,5 @@ describe.concurrent("Testing UtilFuncs", () => {
 
     expect(anwser.success).toBe(true);
     expect(anwser.data).toEqual(CookiesSample.excepted);
-  });
-
-  test.concurrent("ProviderUrlIdentifier", () => {
-    const { ANIMEVIBE, ANIMIXPLAY } = SupportedAnimeProvider;
-
-    const ProvidersSample: TestCase<string, SupportedAnimeProvider>[] = [
-      { input: "https://gogoanime.lu", excepted: ANIMIXPLAY },
-      { input: "https://chia-anime.su", excepted: null },
-      { input: "https://kickassanime.su", excepted: null },
-      { input: "https://animixplay.to", excepted: ANIMIXPLAY },
-      { input: "https://lite.animevibe.se", excepted: ANIMEVIBE },
-      { input: "https://gogoanime.lu/sasaki-to-miyano", excepted: ANIMIXPLAY },
-      { input: "https://chia-anime.su/TOyo5Yo", excepted: null },
-      { input: "https://animixplay.to/v1/black-clover", excepted: ANIMIXPLAY },
-      { input: "https://kickassanime.su/", excepted: null },
-      { input: "https://lite.animevibe.se//$^*_657", excepted: ANIMEVIBE },
-      { input: "http://gogoanime.ee", excepted: null },
-      { input: "https://animixplay.com", excepted: null },
-      { input: "https://chia-anime.si", excepted: null },
-      { input: "https://kickasanime.su", excepted: null },
-      { input: "https:/lite.animevibe.se", excepted: null },
-      { input: "abcde", excepted: null },
-      { input: "https://ack.vercel.app", excepted: null },
-      { input: "http://localhost:3000/getLink", excepted: null },
-      { input: "78645)è_àç$^mù$sdq qze^$r  JHLSGL", excepted: null },
-    ];
-
-    for (const { input, excepted } of ProvidersSample) {
-      expect(ProviderUrlIdentifier(input)).toBe(excepted);
-    }
-  });
-
-  test.concurrent("GetProviderUIInfo", () => {
-    const ProvidersSample: TestCase<string[], ProviderUIInfo[]> = {
-      input: [
-        "https://gogoanime.lu/sasaki-to-miyano",
-        "https://chia-anime.su",
-        "https://kickassanime.su/",
-        "https://lite.animevibe.se/ubime-no-etranger",
-        "https://animixplay.to/v1/isekai-yakkyoku/ep4",
-      ],
-      excepted: [
-        ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"],
-        ["animevibe", "#ffffff", "/Assets/animevibe.ico"],
-        ["animixplay", "#188ee7", "/Assets/animixplaylogo.webp"],
-      ],
-    };
-
-    const UIInfo = GetProviderUIInfo(ProvidersSample.input);
-    expect(UIInfo).toEqual(ProvidersSample.excepted);
-  });
-
-  test.concurrent("GenerateEpProviderUrl", () => {
-    interface InputShape {
-      providersUrl: string[];
-      epId: number;
-    }
-
-    const { input, excepted }: TestCase<InputShape, string[]> = {
-      input: {
-        providersUrl: [
-          "https://gogoanime.lu/category/sasaki-to-miyano",
-          "https://chia-anime.su/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen",
-          "https://kickassanime.su/anime/ubime-no-etranger",
-          "https://lite.animevibe.se/anime/black-clover-tv",
-          "https://animixplay.to/v1/kingdom-4th-season",
-        ],
-        epId: 5,
-      },
-      excepted: [
-        "https://animixplay.to/v1/sasaki-to-miyano/ep5",
-        "https://lite.animevibe.se/anime/black-clover-tv/5",
-        "https://animixplay.to/v1/kingdom-4th-season/ep5",
-      ],
-    };
-
-    const EpLink = GenerateEpProviderUrl(input.providersUrl, input.epId);
-    expect(EpLink).toEqual(excepted);
   });
 });

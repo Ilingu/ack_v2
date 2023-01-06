@@ -23,7 +23,7 @@ interface LittleAnimeShape {
   MalPage: string;
   duration: string;
   broadcast: string;
-  ProvidersLink?: string[];
+  YugenId?: string;
 }
 
 global.fetch = fetch;
@@ -62,11 +62,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             MalPage: "https://myanimelist.net/anime/44055/Sasaki_to_Miyano",
             duration: "23 min per ep",
             broadcast: "Mondays at 00:30 (JST)",
-            ProvidersLink: [
-              "https://animixplay.to/v1/sasaki-to-miyano",
-              "https://gogoanime.lu/category/sasaki-to-miyano",
-              "https://lite.animevibe.se/anime/sasaki-to-miyano",
-            ],
+            YugenId: "/11550/sasaki-to-miyano/",
           },
         },
         {
@@ -85,11 +81,7 @@ describe.concurrent("Testing ApiFuncs", () => {
             MalPage: "https://myanimelist.net/anime/34572/Black_Clover",
             duration: "23 min per ep",
             broadcast: "Tuesdays at 18:25 (JST)",
-            ProvidersLink: [
-              "https://animixplay.to/v1/black-clover",
-              "https://gogoanime.lu/category/black-clover",
-              "https://lite.animevibe.se/anime/black-clover",
-            ],
+            YugenId: "/875/black-clover/",
           },
         },
         {
@@ -109,11 +101,8 @@ describe.concurrent("Testing ApiFuncs", () => {
               "https://myanimelist.net/anime/47164/Dungeon_ni_Deai_wo_Motomeru_no_wa_Machigatteiru_Darou_ka_IV__Shin_Shou_-_Meikyuu-hen",
             duration: "23 min per ep",
             broadcast: "Saturdays at 01:05 (JST)",
-            ProvidersLink: [
-              "https://animixplay.to/v1/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
-              "https://gogoanime.lu/category/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
-              "https://lite.animevibe.se/anime/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv",
-            ],
+            YugenId:
+              "/15631/dungeon-ni-deai-wo-motomeru-no-wa-machigatteiru-darou-ka-iv-shin-shou-meikyuu-hen/",
           },
         },
       ];
@@ -126,14 +115,8 @@ describe.concurrent("Testing ApiFuncs", () => {
         } = await GetAnimeData(input);
 
         expect(success).toBe(true);
-        for (const exceptedKey of Object.keys(excepted)) {
-          if (exceptedKey === "ProvidersLink") {
-            expect(AnimeData?.ProvidersLink).toEqual(excepted.ProvidersLink);
-            continue;
-          }
-
+        for (const exceptedKey of Object.keys(excepted))
           expect(AnimeData[exceptedKey]).toBe(excepted[exceptedKey]);
-        }
 
         await (() => new Promise((res) => setTimeout(res, 2000)))();
       }
