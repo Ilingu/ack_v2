@@ -188,11 +188,9 @@ const SearchYugen = async (title: string): Promise<FunctionJob<string>> => {
 
     const auth =
       `Basic ` +
-      Buffer.from(
-        `${process.env.SCRAPPING_USERNAME ?? "husked4559"}:${
-          process.env.SCRAPPING_PASSWORD ?? "6PFeQX8JEowWpQsUa9EPkGbcb"
-        }`
-      ).toString("base64");
+      Buffer.from(`husked4559:${process.env.SCRAPPING_PASSWORD}`).toString(
+        "base64"
+      );
 
     const result = await fetch("http://api.scraping-bot.io/scrape/raw-html", {
       method: "POST",
