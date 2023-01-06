@@ -35,7 +35,7 @@
     "algoliasearch": "^4.12.1",
     "cheerio": "^1.0.0-rc.12",
     "firebase": "^9.6.4",
-    "firebase-admin": "^10.0.2",
+    "firebase-admin": "^11.4.1",
     "idb": "^7.0.0",
     "lodash.debounce": "^4.0.8",
     "lodash.kebabcase": "^4.1.1",
