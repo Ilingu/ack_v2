@@ -207,10 +207,10 @@ export const GetProviderUIInfo = (): ProviderUIInfo => [
 ];
 
 export const GenerateEpProviderUrl = (YugenId: string, epId: number): string =>
-  `https://yugen.to/watch/${YugenId}/x/${epId}/`;
+  `https://yugen.to/watch${YugenId}${epId}/`;
 
 export const GenerateProviderUrl = (YugenId: string) =>
-  `https://yugen.to/anime/${YugenId}`;
+  `https://yugen.to/anime${YugenId}`;
 
 export function pickTextColorBasedOnBgColor(bgColor: string) {
   const color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;
@@ -219,3 +219,11 @@ export function pickTextColorBasedOnBgColor(bgColor: string) {
   const b = parseInt(color.substring(4, 6), 16); // hexToB
   return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? "#222" : "#fff";
 }
+
+export const trim_match = (str: string, match: string): string =>
+  str.replace(new RegExp(`^\\${match}+|\\${match}+$`, "g"), "");
+
+export const trim_match_start = (str: string, match: string): string =>
+  str.replace(new RegExp(`^\\${match}+`, "g"), "");
+export const trim_match_end = (str: string, match: string): string =>
+  str.replace(new RegExp(`\\${match}+$`, "g"), "");

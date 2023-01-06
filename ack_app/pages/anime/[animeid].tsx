@@ -76,7 +76,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // Check on FB
   const animeFB = await AdminDB.collection("animes").doc(animeId).get();
-  /* if (animeFB.exists) {
+  if (animeFB.exists) {
     const animeData = animeFB.data() as AnimeShape;
 
     if (!animeData?.NextRefresh || animeData?.NextRefresh > Date.now())
@@ -86,7 +86,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         FromCache: true,
         AnimeData: animeData,
       });
-  } */
+  }
 
   // No Anime -> Api Req
   if (!animeId || typeof animeId !== "string" || isNaN(parseInt(animeId))) {

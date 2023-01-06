@@ -14,7 +14,12 @@ import type {
 } from "../utils/types/interface";
 import type { AnimeDatasShape, AnimeStatusType } from "../utils/types/types";
 // Func
-import { IsError, decryptDatas, IsEmptyString } from "../utils/UtilsFuncs";
+import {
+  IsError,
+  decryptDatas,
+  IsEmptyString,
+  trim_match_start,
+} from "../utils/UtilsFuncs";
 import { callApi, removeParamsFromPhotoUrl } from "../client/ClientFuncs";
 /* BEWARE!!! Function only executable on the backend, if you try to import from the frontend: error */
 
@@ -33,15 +38,18 @@ export const IsBlacklistedHost = (host: string): boolean => {
 // To Revalidate all anime
 /* export const HolyFunction = (animeIDs: string[]) => {
   let i = 0;
- 
+
   const FetchUrl = async () => {
     if (i > animeIDs.length - 1) return;
     const animeToRevalidate = animeIDs[i];
     console.log(`Processing anime #${animeIDs[i]}, i=${i}`);
+
     const { success, data } = await GetAnimeData(animeToRevalidate);
+
     console.log(`#${animeIDs[i]} succeed:`, JSON.stringify(success));
-    console.log(JSON.stringify(data?.AnimeData?.ProvidersLink));
-    await (() => new Promise((res) => setTimeout(res, 2500)))(); // wait 2.5s
+    console.log(JSON.stringify(data?.AnimeData?.YugenId));
+
+    await (() => new Promise((res) => setTimeout(res, 2500)))(); // wait 2.5s, holy time
     i++;
     FetchUrl();
   };
@@ -184,28 +192,27 @@ const SearchYugen = async (title: string): Promise<FunctionJob<string>> => {
 
     // PS: if only taking the first result doesn't work very well, take all result's title and take whichever has the highest matching score (compare char-to-char)
     const searchResp = $("body > main > div > div.cards-grid > a")
-      .map(() => ({
-        id: $(this).attr("href"),
-        name: $(this).children("div.anime-data > span").text(),
+      .map((_, el) => ({
+        link: $(el).attr("href"),
+        name: $(el).find("div.anime-data > span").text().trim(),
       }))
       .toArray();
     if (searchResp.length <= 0) return { success: false };
 
-    console.log({ searchResp });
     const bestResult = searchResp.find(({ name }) =>
-      title.toLowerCase().includes(name.toLowerCase())
+      name.toLowerCase().includes(title.toLowerCase())
     );
     if (
       !bestResult ||
-      IsEmptyString(bestResult?.id) ||
-      bestResult.id.split("/").length !== 5
+      IsEmptyString(bestResult?.link) ||
+      bestResult.link.split("/").length !== 5
     )
       return { success: false };
 
-    const anime_id = bestResult.id.split("/")[2];
+    const anime_id = bestResult.link.split("/")[2];
     if (isNaN(parseInt(anime_id))) return { success: false };
 
-    return { success: true, data: anime_id };
+    return { success: true, data: trim_match_start(bestResult.link, "/anime") };
   } catch (err) {
     console.error(err);
     return { success: false };
