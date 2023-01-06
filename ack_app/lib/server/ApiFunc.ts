@@ -183,7 +183,9 @@ export const fetchYugenId = async (
 const SearchYugen = async (title: string): Promise<FunctionJob<string>> => {
   try {
     const result = await fetch(
-      `https://yugen.to/search/?q=${encodeURI(title.replaceAll(" ", "+"))}`
+      `https://yugen.to/search/?q=${encodeURI(
+        title.replace(new RegExp(" ", "g"), "+")
+      )}`
     );
     if (!result.ok) return { success: false };
 
