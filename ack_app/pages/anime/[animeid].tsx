@@ -468,7 +468,7 @@ function SpecialInfo({
 
 function SpecialInfoItem({ dataToShow }: { dataToShow: unknown }) {
   const IsProviderLink =
-    typeof dataToShow === "string" && dataToShow.includes("yugen.to");
+    typeof dataToShow === "string" && dataToShow.includes("yugenanime.ro");
   const UIInfo = IsProviderLink && GetProviderUIInfo();
 
   return (

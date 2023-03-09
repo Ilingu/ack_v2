@@ -206,10 +206,10 @@ export const GetProviderUIInfo = (): ProviderUIInfo => [
 ];
 
 export const GenerateEpProviderUrl = (YugenId: string, epId: number): string =>
-  `https://yugen.to/watch${YugenId}${epId}/`;
+  `https://yugenanime.ro/watch${YugenId}${epId}/`;
 
 export const GenerateProviderUrl = (YugenId: string) =>
-  `https://yugen.to/anime${YugenId}`;
+  `https://yugenanime.ro/anime${YugenId}`;
 
 export function pickTextColorBasedOnBgColor(bgColor: string) {
   const color = bgColor.charAt(0) === "#" ? bgColor.substring(1, 7) : bgColor;
