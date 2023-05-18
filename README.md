@@ -1,3 +1,7 @@
+# [MAINTENANCE], as of May 18 2023, ack backend (firebase) was shutdown; thus I have to recreate an entire backend service (problably in pocketbase) from scratch; this'll take quite a while and I currently don't even think I'll have the strenght to do it.
+
+---
+
 # [ACK] MyAnimList :: List your anime
 
 #### ➡️ **ACK is a [MAL](https://myanimelist.net/) data based web app (PWA) to track your animes progression with a fancy Design ✨**
